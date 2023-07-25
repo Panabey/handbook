@@ -1,0 +1,18 @@
+.vscode
+
+# backend
+.venv/
+env/
+*.db
+
+# mypy cache
+.mypy_cache/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# pytest cache
+.pytest_cache/
+
+# coverage test
+.coverage
