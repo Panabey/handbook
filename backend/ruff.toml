@@ -1,0 +1,5 @@
+# Official web site https://beta.ruff.rs/docs/
+# github actions https://github.com/astral-sh/ruff/blob/main/docs/configuration.md
+select = ["E", "F", "B", "N", "W"]
+
+target-version = "py311"

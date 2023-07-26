@@ -8,6 +8,9 @@ env/
 # mypy cache
 .mypy_cache/
 
+# ruff cache
+.ruff_cache/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 

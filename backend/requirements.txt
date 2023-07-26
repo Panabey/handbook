@@ -4,3 +4,7 @@ Django==4.2.3
 # via main API server
 fastapi==0.100.0
 sqlalchemy==2.0.19
+orjson>=3.9.2
+pydantic-settings==2.0.2
+
+pre-commit>=3.3.3,<3.4.0
