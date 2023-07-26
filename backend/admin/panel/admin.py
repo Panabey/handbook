@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Course, CourseContent
+
+from .models import Handbook, HandbookContent
 
 
 class HandbookModelAdmin(admin.ModelAdmin):
@@ -26,5 +27,5 @@ class HandbookModelAdmin(admin.ModelAdmin):
         )
 
 
-admin.site.register(Course, HandbookModelAdmin)
-admin.site.register(CourseContent, HandbookModelAdmin)
+admin.site.register(Handbook, HandbookModelAdmin)
+admin.site.register(HandbookContent, HandbookModelAdmin)
