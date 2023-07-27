@@ -5,7 +5,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from core.settings import settings
-from routers.api.router import router
+from routers.api.v1.router import router
 from modules.database.engine import init_database
 
 
@@ -29,4 +29,4 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=("GET", "POST", "PUT"),
 )
-app.include_router(router)
+app.include_router(router, prefix="/api")

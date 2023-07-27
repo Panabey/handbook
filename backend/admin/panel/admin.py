@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import Handbook, HandbookContent
+from .models import Handbook, HandbookContent, HandbookPage, Posts
 
 
-class HandbookModelAdmin(admin.ModelAdmin):
+class MultiplyModelAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
     using = "handbook"
 
@@ -27,5 +27,7 @@ class HandbookModelAdmin(admin.ModelAdmin):
         )
 
 
-admin.site.register(Handbook, HandbookModelAdmin)
-admin.site.register(HandbookContent, HandbookModelAdmin)
+admin.site.register(Posts, MultiplyModelAdmin)
+admin.site.register(Handbook, MultiplyModelAdmin)
+admin.site.register(HandbookPage, MultiplyModelAdmin)
+admin.site.register(HandbookContent, MultiplyModelAdmin)
