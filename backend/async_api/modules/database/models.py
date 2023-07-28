@@ -46,6 +46,7 @@ class HandbookPage(Base):
     handbook_title_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("handbook_content.id")
     )
+    slug: Mapped[str] = mapped_column(String(100), unique=True)
     title: Mapped[str] = mapped_column(String(80))
     text: Mapped[str] = mapped_column(String)
     reading_time: Mapped[int] = mapped_column(Integer)
