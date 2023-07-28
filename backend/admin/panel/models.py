@@ -9,6 +9,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+from slugify import slugify
 from mdeditor.fields import MDTextField
 from .ext.utils_admin import calculate_reading_time
 
@@ -50,6 +51,7 @@ class HandbookPage(models.Model):
         HandbookContent, models.DO_NOTHING, verbose_name="Раздел"
     )
     title = models.CharField(max_length=80, verbose_name="Название темы")
+    slug = models.CharField(max_length=150, blank=True)
     text = MDTextField(verbose_name="Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField(auto_now=True)
@@ -60,6 +62,9 @@ class HandbookPage(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        # SEO optimization
+        self.slug = slugify(self.title)
+
         self.reading_time = calculate_reading_time(self.text)
         super().save(*args, **kwargs)
 
@@ -71,7 +76,7 @@ class HandbookPage(models.Model):
 
 
 class Posts(models.Model):
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=80, verbose_name="Название поста")
     text = MDTextField(verbose_name="Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField(auto_now=True)
@@ -86,6 +91,6 @@ class Posts(models.Model):
 
     class Meta:
         managed = True
-        verbose_name = "Новость"
-        verbose_name_plural = "Новости"
+        verbose_name = "Пост"
+        verbose_name_plural = "Посты"
         db_table = "posts"
