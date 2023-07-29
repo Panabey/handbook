@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from sqlalchemy.orm import load_only, selectinload
+from sqlalchemy.orm import load_only, selectinload, defer
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,9 +29,16 @@ async def get_content(session: AsyncSession):
         .distinct(HBookContent.id, HBookContent.title)
     )
 
-    content = await session.scalars(smt)
-    return content.all()
+    result = await session.scalars(smt)
+    return result.all()
 
 
-async def get_page(session: AsyncSession):
-    pass
+async def get_page_by_id(session: AsyncSession, page_id: int):
+    smt = (
+        select(HBookPage)
+        .where(HBook.id == page_id)
+        .options(defer(HBookPage.is_visible), defer(HBookPage.handbook_title_id))
+    )
+
+    result = await session.scalars(smt)
+    return result.first()
