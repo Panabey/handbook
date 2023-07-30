@@ -27,7 +27,7 @@ async def get_handbooks(session: Session):
     return result
 
 
-@router.get("/content", response_model=list[ContentDetail])
+@router.get("/content", response_model=ContentDetail)
 async def get_content_handbook(session: Session, handbook_id: Id):
     result = await get_content(session, handbook_id)
     return result
