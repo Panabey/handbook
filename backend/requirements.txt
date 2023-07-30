@@ -1,5 +1,6 @@
 # via admin
 Django>=4.2.3,<4.3.0
+bcrypt>=4.0.1
 django-mdeditor>=0.1.20
 python-slugify>=8.0.1,<8.1.0
 
