@@ -16,17 +16,18 @@ async def get_all(session: AsyncSession):
     return handbooks.all()
 
 
-async def get_content(session: AsyncSession):
+async def get_content(session: AsyncSession, handbook_id: int):
     smt = (
         select(HBookContent)
         .join(HBookContent.hbook_page)
+        .where(HBookContent.handbook_id == handbook_id, HBookContent.is_visible)
         .options(
             load_only(HBookContent.id, HBookContent.title),
             selectinload(HBookContent.hbook_page).load_only(
                 HBookPage.id, HBookPage.title, HBookPage.slug
             ),
         )
-        .distinct(HBookContent.id, HBookContent.title)
+        .distinct(HBookContent.id)
     )
 
     result = await session.scalars(smt)
@@ -36,7 +37,7 @@ async def get_content(session: AsyncSession):
 async def get_page_by_id(session: AsyncSession, page_id: int):
     smt = (
         select(HBookPage)
-        .where(HBook.id == page_id)
+        .where(HBookPage.id == page_id, HBookPage.is_visible)
         .options(defer(HBookPage.is_visible), defer(HBookPage.handbook_title_id))
     )
 
