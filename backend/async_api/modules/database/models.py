@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import Boolean
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
@@ -66,3 +67,49 @@ class Posts(Base):
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     reading_time: Mapped[int] = mapped_column(Integer)
+
+
+class Quiz(Base):
+    __tablename__ = "quiz"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(100))
+    description: Mapped[str] = mapped_column(String, nullable=True)
+
+    questions: Mapped[list["Question"]] = relationship(
+        back_populates="answers",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+
+
+class Question(Base):
+    __tablename__ = "quiz_question"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    quiz_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("quiz.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
+    title: Mapped[str] = mapped_column(String(200))
+    hint: Mapped[str] = mapped_column(String(200), nullable=True)
+
+    answers: Mapped[list["Answer"]] = relationship(
+        back_populates="question",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    quiz: Mapped["Quiz"] = relationship(back_populates="questions")
+
+
+class Answer(Base):
+    __tablename__ = "quiz_answer"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    question_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("quiz_question.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
+    title: Mapped[str] = mapped_column(String(200))
+    is_correct: Mapped[bool] = mapped_column(Boolean)
+    explanation: Mapped[str] = mapped_column(String(200), nullable=True)
+
+    question: Mapped["Question"] = relationship(back_populates="answers")

@@ -94,3 +94,52 @@ class Posts(models.Model):
         verbose_name = "Пост"
         verbose_name_plural = "Посты"
         db_table = "posts"
+
+
+class Quiz(models.Model):
+    title = models.TextField(verbose_name="Название")
+    description = models.TextField(verbose_name="Описание", blank=True, null=True)
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = True
+        db_table = "quiz"
+        verbose_name = "Тест"
+        verbose_name_plural = "Тесты"
+
+
+class QuizQuestion(models.Model):
+    quiz = models.ForeignKey(Quiz, models.CASCADE, verbose_name="Тест")
+    title = models.TextField(verbose_name="Вопрос")
+    hint = models.CharField(
+        verbose_name="Подсказка", max_length=200, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = True
+        db_table = "quiz_question"
+        verbose_name = "Вопрос к тесту"
+        verbose_name_plural = "Вопросы к тесту"
+
+
+class QuizAnswer(models.Model):
+    question = models.ForeignKey(QuizQuestion, models.CASCADE)
+    title = models.CharField(verbose_name="Ответ", max_length=100)
+    is_correct = models.BooleanField(verbose_name="Правильный?", default=False)
+    explanation = models.TextField(
+        verbose_name="Объсянение", max_length=200, blank=True, null=True
+    )
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = True
+        db_table = "quiz_answer"
+        verbose_name = "Ответ к тесту"
+        verbose_name_plural = "Ответы к тесту"
