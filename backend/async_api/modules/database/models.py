@@ -76,8 +76,8 @@ class Quiz(Base):
     title: Mapped[str] = mapped_column(String(100))
     description: Mapped[str] = mapped_column(String, nullable=True)
 
-    questions: Mapped[list["Question"]] = relationship(
-        back_populates="answers",
+    questions_info: Mapped[list["Question"]] = relationship(
+        back_populates="quiz_info",
         cascade="all, delete",
         passive_deletes=True,
     )
@@ -93,12 +93,12 @@ class Question(Base):
     title: Mapped[str] = mapped_column(String(200))
     hint: Mapped[str] = mapped_column(String(200), nullable=True)
 
-    answers: Mapped[list["Answer"]] = relationship(
-        back_populates="question",
+    answers_info: Mapped[list["Answer"]] = relationship(
+        back_populates="question_info",
         cascade="all, delete",
         passive_deletes=True,
     )
-    quiz: Mapped["Quiz"] = relationship(back_populates="questions")
+    quiz_info: Mapped["Quiz"] = relationship(back_populates="questions_info")
 
 
 class Answer(Base):
@@ -112,4 +112,4 @@ class Answer(Base):
     is_correct: Mapped[bool] = mapped_column(Boolean)
     explanation: Mapped[str] = mapped_column(String(200), nullable=True)
 
-    question: Mapped["Question"] = relationship(back_populates="answers")
+    question_info: Mapped["Question"] = relationship(back_populates="answers_info")
