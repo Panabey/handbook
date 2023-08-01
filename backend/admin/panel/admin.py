@@ -1,4 +1,7 @@
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 
 from .models import (
     Quiz,
@@ -12,16 +15,17 @@ from .models import (
 
 
 class MultiplyModelAdmin(admin.ModelAdmin):
-    # A handy constant for the name of the alternate database.
+    """Расширеная модель для подключения сторонней базы данных"""
+
     using = "handbook"
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         obj.save(using=self.using)
 
-    def delete_model(self, request, obj):
+    def delete_model(self, request: HttpRequest, obj: Any) -> None:
         obj.delete(using=self.using)
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
         return super().get_queryset(request).using(self.using)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -36,6 +40,8 @@ class MultiplyModelAdmin(admin.ModelAdmin):
 
 
 class MultiModelTabularInline(admin.TabularInline):
+    """Расширеная модель для соеденения нескольхих таблиц"""
+
     using = "handbook"
 
     def get_queryset(self, request):
@@ -63,11 +69,33 @@ class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
 
 
+class PostAdmin(MultiplyModelAdmin):
+    list_display = ("title", "create_date", "update_date")
+    list_filter = ("create_date", "update_date")
+    ordering = ("create_date", "update_date")
+    search_fields = ("title",)
+    list_per_page = 25
+
+
+class HandbookAdmin(MultiplyModelAdmin):
+    list_display = ("title", "is_visible")
+    search_fields = ("title",)
+    list_per_page = 25
+
+
+class ExtendedHandbookAdmin(MultiplyModelAdmin):
+    list_display = ("title", "is_visible", "create_date", "update_date")
+    list_filter = ("is_visible", "create_date", "update_date")
+    ordering = ("create_date", "update_date")
+    search_fields = ("title",)
+    list_per_page = 25
+
+
 admin.site.register(Quiz, MultiplyModelAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
 admin.site.register(QuizAnswer, MultiplyModelAdmin)
 
-admin.site.register(Posts, MultiplyModelAdmin)
-admin.site.register(Handbook, MultiplyModelAdmin)
-admin.site.register(HandbookPage, MultiplyModelAdmin)
-admin.site.register(HandbookContent, MultiplyModelAdmin)
+admin.site.register(Posts, PostAdmin)
+admin.site.register(Handbook, HandbookAdmin)
+admin.site.register(HandbookPage, ExtendedHandbookAdmin)
+admin.site.register(HandbookContent, HandbookAdmin)

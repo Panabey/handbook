@@ -41,8 +41,8 @@ class HandbookContent(models.Model):
 
     class Meta:
         managed = True
-        verbose_name = "Раздел"
-        verbose_name_plural = "Разделы"
+        verbose_name = "Раздел справочника"
+        verbose_name_plural = "Разделы справочника"
         db_table = "handbook_content"
 
 
@@ -70,8 +70,8 @@ class HandbookPage(models.Model):
 
     class Meta:
         managed = True
-        verbose_name = "Тема"
-        verbose_name_plural = "Темы"
+        verbose_name = "Тема справочника"
+        verbose_name_plural = "Темы справочника"
         db_table = "handbook_page"
 
 
@@ -97,7 +97,7 @@ class Posts(models.Model):
 
 
 class Quiz(models.Model):
-    title = models.TextField(verbose_name="Название")
+    title = models.CharField(verbose_name="Название", max_length=100)
     description = models.TextField(verbose_name="Описание", blank=True, null=True)
 
     def __str__(self) -> str:
@@ -112,7 +112,7 @@ class Quiz(models.Model):
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, models.CASCADE, verbose_name="Тест")
-    title = models.TextField(verbose_name="Вопрос")
+    title = MDTextField(verbose_name="Вопрос")
     hint = models.CharField(
         verbose_name="Подсказка", max_length=200, blank=True, null=True
     )
