@@ -9,3 +9,17 @@ async def get_post(session: AsyncSession, post_id: int):
 
     result = await session.scalars(smt)
     return result.first()
+
+
+async def search_post(
+    session: AsyncSession, query: str, continue_after: int, limit: int
+):
+    smt = (
+        select(Posts)
+        .where(Posts.title.ilike(f"%{query}%"))
+        .order_by(Posts.id)
+        .offset(continue_after)
+        .limit(limit)
+    )
+    result = await session.scalars(smt)
+    return result.all()
