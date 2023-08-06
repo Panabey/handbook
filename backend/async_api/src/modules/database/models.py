@@ -1,9 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
+from sqlalchemy import Text
 from sqlalchemy import String
+from sqlalchemy import Integer
 from sqlalchemy import Boolean
+from sqlalchemy import ForeignKey
+
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
@@ -49,7 +51,7 @@ class HandbookPage(Base):
     )
     slug: Mapped[str] = mapped_column(String(100), unique=True)
     title: Mapped[str] = mapped_column(String(80))
-    text: Mapped[str] = mapped_column(String)
+    text: Mapped[str] = mapped_column(Text)
     reading_time: Mapped[int] = mapped_column(Integer)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
@@ -63,7 +65,7 @@ class Posts(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(80))
-    text: Mapped[str] = mapped_column(String)
+    text: Mapped[str] = mapped_column(Text)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     reading_time: Mapped[int] = mapped_column(Integer)

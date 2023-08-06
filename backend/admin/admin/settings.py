@@ -81,8 +81,11 @@ DATABASES = {
         "NAME": BASE_DIR / "admin.db",
     },
     "handbook": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR.parent / "async_api/handbook.db",
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": "192.168.1.3",
+        "NAME": "handbook",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
     },
 }
 
