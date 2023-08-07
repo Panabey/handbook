@@ -77,6 +77,7 @@ class HandbookPage(models.Model):
 
 class Posts(models.Model):
     title = models.CharField(max_length=80, verbose_name="Название поста")
+    anons = models.TextField(max_length=255, verbose_name="Краткое содержание")
     text = MDTextField(verbose_name="Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField(auto_now=True)
