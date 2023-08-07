@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from routers.api.deps import get_async_session
 from modules.database.orm.posts import get_post
 from modules.database.orm.posts import search_post
+from modules.database.orm.posts import get_all_post
 
 from modules.schemas.base import DetailInfo
 from modules.schemas.posts import PostDetail
@@ -22,8 +23,9 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.get("/all")
-async def get_all_posts(session: Session):
-    pass
+async def get_all_posts(session: Session, continue_after: Int = None):
+    result = await get_all_post(session, continue_after, 20)
+    return result
 
 
 @router.get("/", response_model=PostDetail, responses={
