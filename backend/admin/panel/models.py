@@ -25,7 +25,7 @@ class Handbook(models.Model):
         return self.title
 
     class Meta:
-        managed = True
+        managed = False
         verbose_name = "Справочник"
         verbose_name_plural = "Справочники"
         db_table = "handbook"
@@ -40,7 +40,7 @@ class HandbookContent(models.Model):
         return self.title
 
     class Meta:
-        managed = True
+        managed = False
         verbose_name = "Раздел справочника"
         verbose_name_plural = "Разделы справочника"
         db_table = "handbook_content"
@@ -69,7 +69,7 @@ class HandbookPage(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        managed = True
+        managed = False
         verbose_name = "Тема справочника"
         verbose_name_plural = "Темы справочника"
         db_table = "handbook_page"
@@ -91,7 +91,7 @@ class Posts(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        managed = True
+        managed = False
         verbose_name = "Пост"
         verbose_name_plural = "Посты"
         db_table = "posts"
@@ -105,7 +105,7 @@ class Quiz(models.Model):
         return self.title
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "quiz"
         verbose_name = "Тест"
         verbose_name_plural = "Тесты"
@@ -122,7 +122,7 @@ class QuizQuestion(models.Model):
         return self.title
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "quiz_question"
         verbose_name = "Вопрос к тесту"
         verbose_name_plural = "Вопросы к тесту"
@@ -140,7 +140,7 @@ class QuizAnswer(models.Model):
         return self.title
 
     class Meta:
-        managed = True
+        managed = False
         db_table = "quiz_answer"
         verbose_name = "Ответ к тесту"
         verbose_name_plural = "Ответы к тесту"
