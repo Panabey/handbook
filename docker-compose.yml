@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  async_api:
+    image: async_api
+    restart: always
+    build:
+      context: .
+      dockerfile: backend/async_api/src/Dockerfile
+    expose:
+      - 8000
+    environment:
+      - DEBUG_MODE=true
+      - DATABASE_URL=postgresql+asyncpg://<username>:<password>@postgresql/handbook
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=Host(`<domain>`)"
+      - "traefik.http.routers.django.tls=true"
+      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
+    depends_on:
+      - postgresql
+
+  admin:
+    image: admin
+    restart: always
+    build:
+      context: .
+      dockerfile: backend/admin/Dockerfile
+    expose:
+      - 8001
+    environment:
+      - DEBUG_MODE=false
+      - ALLOWED_HOSTS=dropmecode.ru
+      - DATABASE_HOST=<ip>
+      - DATABASE_NAME=<name_database>
+      - DATABASE_USER=<user>
+      - DATABASE_PASSWORD=<password>
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+    depends_on:
+      - postgresql
+
+  postgresql:
+    container_name: postgresql_handbook
+    image: postgres:15
+    restart: always
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=<username>
+      - POSTGRES_PASSWORD=<password>
+      - POSTGRES_DB=handbook
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  traefik:
+    image: traefik:2.10
+    restart: always
+    container_name: "traefik"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.email=<email>"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./certificates:/certificates"
+
+volumes:
+  traefik-certificates:
+  pg-data:
+  certificates:
