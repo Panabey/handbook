@@ -7,9 +7,11 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 COPY backend/async_api/requirements.txt .
-RUN python -m pip install -r requirements.txt --no-cache-dir -U
 
 WORKDIR /app
+
+RUN python -m pip install -r requirements.txt --no-cache-dir -U
+
 COPY backend/async_api/src /app
 
 CMD ["uvicorn", "main:app", \

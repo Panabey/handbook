@@ -2,7 +2,7 @@
 .gitignore
 .pre-commit-config.yaml
 *.md
-*.db
+.toml
 
 .vscode/
 .venv/

@@ -6,10 +6,12 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 ENV PYTHONUNBUFFERED=1
 
+WORKDIR /app
+
 COPY backend/admin/requirements.txt .
+
 RUN python -m pip install -r requirements.txt --no-cache-dir -U
 
-WORKDIR /app
 COPY backend/admin /app
 
 RUN python manage.py makemigrations

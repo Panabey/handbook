@@ -6,17 +6,17 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: backend/async_api/src/Dockerfile
+      dockerfile: backend/async_api/Dockerfile
     expose:
       - 8000
     environment:
-      - DEBUG_MODE=true
-      - DATABASE_URL=postgresql+asyncpg://<username>:<password>@postgresql/handbook
+      - DEBUG_MODE=false
+      - URL_DATABASE=postgresql+asyncpg://<username>:<password>@postgresql/handbook
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.django.rule=Host(`<domain>`)"
-      - "traefik.http.routers.django.tls=true"
-      - "traefik.http.routers.django.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     depends_on:
       - postgresql
 
@@ -30,16 +30,20 @@ services:
       - 8001
     environment:
       - DEBUG_MODE=false
-      - ALLOWED_HOSTS=dropmecode.ru
-      - DATABASE_HOST=<ip>
+      - ALLOWED_HOSTS=["<host>"]
+      - DATABASE_HOST=postgresql
       - DATABASE_NAME=<name_database>
       - DATABASE_USER=<user>
       - DATABASE_PASSWORD=<password>
+      - CSRF_COOKIE_SECURE=True
+      - CORS_ALLOWED_ORIGINS=["https://<host>"]
+      - CSRF_TRUSTED_ORIGINS=["https://<host>"]
+      - SECRET_APP=<token> # without $
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)"
-      - "traefik.http.routers.fastapi.tls=true"
-      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.admin.rule=Host(`<domain>`)"
+      - "traefik.http.routers.admin.tls=true"
+      - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
     depends_on:
       - postgresql
 
@@ -78,6 +82,5 @@ services:
       - "./certificates:/certificates"
 
 volumes:
-  traefik-certificates:
   pg-data:
   certificates:
