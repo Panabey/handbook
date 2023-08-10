@@ -1,0 +1,6 @@
+Django>=4.2.4,<4.3.0
+psycopg2>=2.9.7
+bcrypt>=4.0.1
+django-mdeditor>=0.1.20
+python-slugify>=8.0.1,<8.1.0
+python-dotenv==1.0.0

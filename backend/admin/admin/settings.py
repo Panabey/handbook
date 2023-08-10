@@ -9,9 +9,12 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-osspm-qx%k0-+pg^bg6oi*2$@+h!l9j8b2l6#y#@8kd7wdl6)c"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG_MODE", False)
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", ["*",]).split(',')  # fmt: skip
 
 
 # Application definition
@@ -82,10 +85,10 @@ DATABASES = {
     },
     "handbook": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": "192.168.1.3",
-        "NAME": "handbook",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
+        "HOST": os.getenv("DATABASE_HOST", None),
+        "NAME": os.getenv("DATABASE_NAME", None),
+        "USER": os.getenv("DATABASE_USER", None),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD", None),
     },
 }
 
