@@ -5,4 +5,3 @@
 -r async_api/requirements.txt
 
 pre-commit>=3.3.3,<3.4.0
-psycopg2>=2.9.7
