@@ -4,12 +4,14 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
+BASE_URL = os.path.dirname(os.path.dirname(__file__))
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         case_sensitive=True,
         env_file_encoding="utf-8",
-        env_file=os.path.join(os.path.dirname(__file__), ".env"),
+        env_file=os.path.join(BASE_URL, ".env"),
     )
     # general
     DEBUG_MODE: bool = Field(default=False)
@@ -23,7 +25,7 @@ class Settings(BaseSettings):
     DATABASE_PASSWORD: str | None = Field(default=None)
 
     # cors
-    CORS_ALLOWED_ORIGINS = list[str] = Field(default=["http://localhost"])
+    CORS_ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost"])
 
     # csrf
     CSRF_COOKIE_SECURE: bool = Field(default=False)

@@ -7,19 +7,39 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create,
 #       modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models
+import re
 
-from slugify import slugify
+from typing import Collection
+from django.db import models
+from django.core.exceptions import ValidationError
+
 from mdeditor.fields import MDTextField
 from .ext.utils_admin import calculate_reading_time
 
 
+class Status(models.Model):
+    title = models.CharField(max_length=25, verbose_name="Название статуса")
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = False
+        verbose_name = "Статус"
+        verbose_name_plural = "Статусы"
+        db_table = "status"
+
+
 class Handbook(models.Model):
-    title = models.CharField(max_length=80, verbose_name="Название справочника")
-    description = models.CharField(
-        max_length=255, blank=True, null=True, verbose_name="Описание"
+    logo_url = models.FileField(
+        "Изображение", upload_to="images/handbook", blank=True, null=True
     )
-    is_visible = models.BooleanField(default=False)
+    title = models.CharField("Название справочника", max_length=80)
+    description = models.TextField("Описание", max_length=255, blank=True, null=True)
+    is_visible = models.BooleanField("Видимый?", default=False)
+    status = models.ForeignKey(
+        "Status", models.SET_NULL, blank=True, null=True, verbose_name="Статус"
+    )
 
     def __str__(self) -> str:
         return self.title
@@ -33,11 +53,22 @@ class Handbook(models.Model):
 
 class HandbookContent(models.Model):
     handbook = models.ForeignKey(Handbook, models.DO_NOTHING, verbose_name="Справочник")
-    title = models.CharField(max_length=80, verbose_name="Раздел справочника")
-    is_visible = models.BooleanField(default=False)
+    title = models.CharField(
+        "Раздел справочника", help_text="Например: 1. Основы", max_length=80
+    )
+    is_visible = models.BooleanField("Видимый?", default=False)
 
     def __str__(self) -> str:
         return self.title
+
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        errors = {}
+        # шаблон <число>. <текст>
+        if not re.match(r"^\d+\.\s.+", self.title):
+            errors["title"] = ValidationError("Несоответствие шаблону")
+        if errors:
+            raise ValidationError(errors)
+        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -47,24 +78,31 @@ class HandbookContent(models.Model):
 
 
 class HandbookPage(models.Model):
-    handbook_title = models.ForeignKey(
+    content = models.ForeignKey(
         HandbookContent, models.DO_NOTHING, verbose_name="Раздел"
     )
-    title = models.CharField(max_length=80, verbose_name="Название темы")
-    slug = models.CharField(max_length=150, blank=True)
-    text = MDTextField(verbose_name="Текст")
+    title = models.CharField(
+        "Название темы", help_text="Например: 1.1 Циклы", max_length=80
+    )
+    text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
-    update_date = models.DateTimeField(auto_now=True)
-    create_date = models.DateTimeField(auto_now_add=True)
-    is_visible = models.BooleanField(default=False)
+    update_date = models.DateTimeField("Дата создания", auto_now=True)
+    create_date = models.DateTimeField("Дата редактирования", auto_now_add=True)
+    is_visible = models.BooleanField("Видимый?", default=False)
 
     def __str__(self) -> str:
         return self.title
 
-    def save(self, *args, **kwargs):
-        # SEO optimization
-        self.slug = slugify(self.title)
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        errors = {}
+        # шаблон <число>.<число>. <текст>
+        if not re.match(r"^\d+\.\d+\s.+", self.title):
+            errors["title"] = ValidationError("Несоответствие шаблону")
+        if errors:
+            raise ValidationError(errors)
+        return super().clean_fields(exclude)
 
+    def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
         super().save(*args, **kwargs)
 
@@ -75,13 +113,13 @@ class HandbookPage(models.Model):
         db_table = "handbook_page"
 
 
-class Posts(models.Model):
-    title = models.CharField(max_length=80, verbose_name="Название поста")
-    anons = models.TextField(max_length=255, verbose_name="Краткое содержание")
-    text = MDTextField(verbose_name="Текст")
+class Post(models.Model):
+    title = models.CharField("Название поста", max_length=80)
+    anons = models.TextField("Краткое содержание", max_length=255)
+    text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
-    update_date = models.DateTimeField(auto_now=True)
-    create_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField("Дата создания", auto_now=True)
+    create_date = models.DateTimeField("Дата редактирования", auto_now_add=True)
 
     def __str__(self) -> str:
         return self.title
@@ -94,12 +132,12 @@ class Posts(models.Model):
         managed = False
         verbose_name = "Пост"
         verbose_name_plural = "Посты"
-        db_table = "posts"
+        db_table = "post"
 
 
 class Quiz(models.Model):
-    title = models.CharField(verbose_name="Название", max_length=100)
-    description = models.TextField(verbose_name="Описание", blank=True, null=True)
+    title = models.CharField("Название", max_length=100)
+    description = models.TextField("Описание", blank=True, null=True)
 
     def __str__(self) -> str:
         return self.title
@@ -113,10 +151,8 @@ class Quiz(models.Model):
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, models.CASCADE, verbose_name="Тест")
-    title = MDTextField(verbose_name="Вопрос")
-    hint = models.CharField(
-        verbose_name="Подсказка", max_length=200, blank=True, null=True
-    )
+    title = MDTextField("Текст вопроса")
+    hint = models.CharField("Подсказка", max_length=200, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.title
@@ -130,11 +166,9 @@ class QuizQuestion(models.Model):
 
 class QuizAnswer(models.Model):
     question = models.ForeignKey(QuizQuestion, models.CASCADE)
-    title = models.CharField(verbose_name="Ответ", max_length=100)
-    is_correct = models.BooleanField(verbose_name="Правильный?", default=False)
-    explanation = models.TextField(
-        verbose_name="Объсянение", max_length=200, blank=True, null=True
-    )
+    title = models.CharField("Ответ", max_length=100)
+    is_correct = models.BooleanField("Правильный?", default=False)
+    explanation = models.TextField("Объсянение", max_length=200, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.title

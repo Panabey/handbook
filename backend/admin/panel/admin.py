@@ -6,7 +6,8 @@ from django.http.request import HttpRequest
 
 from .models import (
     Quiz,
-    Posts,
+    Post,
+    Status,
     Handbook,
     QuizAnswer,
     QuizQuestion,
@@ -75,28 +76,48 @@ class PostAdmin(MultiplyModelAdmin):
     list_filter = ("create_date", "update_date")
     ordering = ("create_date", "update_date")
     search_fields = ("title",)
-    list_per_page = 25
+    list_per_page = 20
 
 
 class HandbookAdmin(MultiplyModelAdmin):
     list_display = ("title", "is_visible")
     search_fields = ("title",)
-    list_per_page = 25
+    list_per_page = 20
 
 
-class ExtendedHandbookAdmin(MultiplyModelAdmin):
-    list_display = ("title", "is_visible", "create_date", "update_date")
+class HandbookContentAdmin(MultiplyModelAdmin):
+    list_display = ("handbook", "title", "is_visible")
+    search_fields = ("title", "handbook__title")
+    list_per_page = 20
+
+
+class HandbookPageAdmin(MultiplyModelAdmin):
+    list_display = (
+        "title",
+        "content",
+        "get_handbook",
+        "is_visible",
+        "create_date",
+        "update_date",
+    )
     list_filter = ("is_visible", "create_date", "update_date")
     ordering = ("create_date", "update_date")
-    search_fields = ("title",)
-    list_per_page = 25
+    search_fields = ("title", "content__handbook__title")
+    list_per_page = 20
+
+    def get_handbook(self, obj: HandbookPage):
+        return obj.content.handbook.title
+
+    get_handbook.short_description = "Справочник"
 
 
 admin.site.register(Quiz, MultiplyModelAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
 admin.site.register(QuizAnswer, MultiplyModelAdmin)
 
-admin.site.register(Posts, PostAdmin)
+admin.site.register(Post, PostAdmin)
+
+admin.site.register(Status, MultiplyModelAdmin)
 admin.site.register(Handbook, HandbookAdmin)
-admin.site.register(HandbookPage, ExtendedHandbookAdmin)
-admin.site.register(HandbookContent, HandbookAdmin)
+admin.site.register(HandbookPage, HandbookPageAdmin)
+admin.site.register(HandbookContent, HandbookContentAdmin)
