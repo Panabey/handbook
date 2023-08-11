@@ -5,6 +5,8 @@
 env/
 *.db
 
+images/
+
 staticfiles/
 
 # mypy cache
