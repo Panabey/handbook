@@ -6,7 +6,6 @@ from sqlalchemy import Integer
 from sqlalchemy import Boolean
 from sqlalchemy import ForeignKey
 
-
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import mapped_column
@@ -23,9 +22,16 @@ class Handbook(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(255), nullable=True)
-    is_visible: Mapped[bool] = mapped_column(default=False)
+    logo_url: Mapped[str] = mapped_column(String, nullable=True)
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
+    status_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("status.id", ondelete="SET NULL", onupdate="CASCADE"),
+        nullable=True,
+    )
 
     content: Mapped[list["HandbookContent"]] = relationship(back_populates="hbook")
+    status_info: Mapped["Status"] = relationship(back_populates="hbook_status")
 
 
 class HandbookContent(Base):
@@ -34,7 +40,7 @@ class HandbookContent(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     handbook_id: Mapped[int] = mapped_column(Integer, ForeignKey("handbook.id"))
     title: Mapped[str] = mapped_column(String(80))
-    is_visible: Mapped[bool] = mapped_column(default=False)
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     hbook: Mapped["Handbook"] = relationship(back_populates="content")
     hbook_page: Mapped[list["HandbookPage"]] = relationship(
@@ -46,22 +52,32 @@ class HandbookPage(Base):
     __tablename__ = "handbook_page"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    handbook_title_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("handbook_content.id")
-    )
-    slug: Mapped[str] = mapped_column(String(100), unique=True)
+    content_id: Mapped[int] = mapped_column(Integer, ForeignKey("handbook_content.id"))
     title: Mapped[str] = mapped_column(String(80))
     text: Mapped[str] = mapped_column(Text)
     reading_time: Mapped[int] = mapped_column(Integer)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
-    is_visible: Mapped[bool] = mapped_column(default=False)
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     hbook_content: Mapped["HandbookContent"] = relationship(back_populates="hbook_page")
 
 
-class Posts(Base):
-    __tablename__ = "posts"
+class Status(Base):
+    __tablename__ = "status"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(25))
+
+    hbook_status: Mapped[list[Handbook]] = relationship(
+        back_populates="status_info",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+
+
+class Post(Base):
+    __tablename__ = "post"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(80))

@@ -1,19 +1,25 @@
 from sqlalchemy import select
 from sqlalchemy.orm import load_only, defer, joinedload
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from modules.database.models import Status
 from modules.database.models import Handbook as HBook
 from modules.database.models import HandbookPage as HBookPage
 from modules.database.models import HandbookContent as HBookContent
 
 
 async def get_all(session: AsyncSession):
-    smt = select(HBook.id, HBook.title, HBook.description)\
-        .where(HBook.is_visible)  # fmt: skip
+    smt = (
+        select(
+            HBook.id, HBook.title, HBook.description, HBook.logo_url,
+            Status.title.label("status")  # fmt: skip
+        )
+        .join(HBook.status_info, isouter=True)
+        .where(HBook.is_visible)
+    )
 
-    handbooks = await session.execute(smt)
-    return handbooks.all()
+    result = await session.execute(smt)
+    return result.all()
 
 
 async def get_content(session: AsyncSession, handbook_id: int):
@@ -27,7 +33,7 @@ async def get_content(session: AsyncSession, handbook_id: int):
             joinedload(HBook.content)
             .load_only(HBookContent.title)
             .joinedload(HBookContent.hbook_page)
-            .load_only(HBookPage.id, HBookPage.title, HBookPage.slug),
+            .load_only(HBookPage.id, HBookPage.title),
         )
     )
 

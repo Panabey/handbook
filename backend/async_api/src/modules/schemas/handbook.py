@@ -8,7 +8,6 @@ from pydantic import AliasChoices
 class HBookPage(BaseModel):
     id: int
     title: str
-    slug: str
 
 
 class HBookContent(BaseModel):
@@ -20,16 +19,23 @@ class HandbookDetail(BaseModel):
     id: int
     title: str
     description: str | None
+    logo_url: str | None
+    status: str | None
 
 
-class ContentDetail(HandbookDetail):
+class HandbookDetailShort(BaseModel):
+    id: int
+    title: str
+    description: str | None
+
+
+class ContentDetail(HandbookDetailShort):
     content: list[HBookContent]
 
 
 class PageDetail(BaseModel):
     id: int
     title: str
-    slug: str
     text: str
     reading_time: int
     create_date: datetime

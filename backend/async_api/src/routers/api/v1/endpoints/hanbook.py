@@ -1,3 +1,5 @@
+import re
+
 from typing import Annotated
 
 from fastapi import Query
@@ -32,6 +34,16 @@ async def get_handbooks(session: Session):
 async def get_content_handbook(session: Session, handbook_id: Id):
     """Получение списка всех тем и подтем справочника"""
     result = await get_content(session, handbook_id)
+
+    result.content = sorted(  # сортировка по названию тем
+        result.content, key=lambda x: int(re.search(r"^(\d+)\.", x.title).group(1))
+    )
+    for content_item in result.content:
+        content_item.hbook_page = sorted(  # сортировка по названию страниц
+            content_item.hbook_page,
+            key=lambda x: int(re.search(r"\.(\d+)", x.title).group(1)),
+        )
+
     return result
 
 
