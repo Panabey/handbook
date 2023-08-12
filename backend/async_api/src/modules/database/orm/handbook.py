@@ -16,6 +16,7 @@ async def get_all(session: AsyncSession):
         )
         .join(HBook.status_info, isouter=True)
         .where(HBook.is_visible)
+        .order_by(HBook.id)
     )
 
     result = await session.execute(smt)
@@ -45,8 +46,36 @@ async def get_page_by_id(session: AsyncSession, page_id: int):
     smt = (
         select(HBookPage)
         .where(HBookPage.id == page_id, HBookPage.is_visible)
-        .options(defer(HBookPage.is_visible), defer(HBookPage.handbook_title_id))
+        .options(defer(HBookPage.is_visible), defer(HBookPage.content_id))
     )
 
     result = await session.scalars(smt)
     return result.first()
+
+
+async def search_page(
+    session: AsyncSession,
+    handbook_id: int | None,
+    search_text: str,
+    limit: int,
+    continue_after: int | None,
+):
+    smt = (
+        select(
+            HBook.id,
+            HBook.title,
+            HBookPage.id.label("page_id"),
+            HBookPage.title.label("page_title"),
+        )
+        .join(HBook.content)
+        .join(HBookContent.hbook_page)
+        .where(HBookPage.title.ilike(f"%{search_text}%"))
+        .order_by(HBookPage.id)
+        .offset(continue_after)
+        .limit(limit)
+    )
+    if handbook_id:
+        smt = smt.where(HBook.id == handbook_id)
+
+    result = await session.execute(smt)
+    return result.all()

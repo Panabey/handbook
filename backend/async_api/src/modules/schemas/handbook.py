@@ -5,14 +5,23 @@ from pydantic import BaseModel
 from pydantic import AliasChoices
 
 
-class HBookPage(BaseModel):
+class HBookPageDetail(BaseModel):
     id: int
     title: str
 
 
-class HBookContent(BaseModel):
+class SearchPageDetail(BaseModel):
+    id: int
     title: str
-    page: list[HBookPage] = Field(validation_alias=AliasChoices("page", "hbook_page"))
+    page_id: int
+    page_title: str
+
+
+class HBookContentDetail(BaseModel):
+    title: str
+    page: list[HBookPageDetail] = Field(
+        validation_alias=AliasChoices("page", "hbook_page")
+    )
 
 
 class HandbookDetail(BaseModel):
@@ -30,7 +39,7 @@ class HandbookDetailShort(BaseModel):
 
 
 class ContentDetail(HandbookDetailShort):
-    content: list[HBookContent]
+    content: list[HBookContentDetail]
 
 
 class PageDetail(BaseModel):
