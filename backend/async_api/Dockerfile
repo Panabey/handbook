@@ -6,18 +6,20 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 ENV PYTHONUNBUFFERED=1
 
-COPY backend/async_api/requirements.txt .
-
 WORKDIR /app
 
-RUN python -m pip install -r requirements.txt --no-cache-dir -U
-
 COPY backend/async_api/src /app
+
+RUN pip install uvloop httptools -r requirements.txt --no-cache-dir -U && alembic upgrade head
+
+WORKDIR /app/src
 
 CMD ["uvicorn", "main:app", \
     "--workers", "2", \
     "--host", "0.0.0.0", \
     "--port", "8000", \
+    "--loop", "uvloop", \
+    "--http", "httptools", \
     "--timeout-keep-alive", "30", \
     "--proxy-headers", \
     "--no-server-header" \
