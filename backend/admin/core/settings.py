@@ -20,9 +20,14 @@ class Settings(BaseSettings):
 
     # databse
     DATABASE_HOST: str | None = Field(default=None)
-    DATABASE_NAME: str | None = Field(default=None)
-    DATABASE_USER: str | None = Field(default=None)
-    DATABASE_PASSWORD: str | None = Field(default=None)
+
+    DB_BACKEND_NAME: str | None = Field(default=None)
+    DB_BACKEND_USER: str | None = Field(default=None)
+    DB_BACKEND_PASSWORD: str | None = Field(default=None)
+
+    DB_ADMIN_NAME: str | None = Field(default=None)
+    DB_ADMIN_USER: str | None = Field(default=None)
+    DB_ADMIN_PASSWORD: str | None = Field(default=None)
 
     # cors
     CORS_ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost"])

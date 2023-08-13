@@ -32,13 +32,19 @@ services:
       - DEBUG_MODE=false
       - ALLOWED_HOSTS=["<host>"]
       - DATABASE_HOST=postgresql
-      - DATABASE_NAME=<name_database>
-      - DATABASE_USER=<user>
-      - DATABASE_PASSWORD=<password>
+      # for db async_api
+      - DB_BACKEND_NAME=<name_database>
+      - DB_BACKEND_USER=<user>
+      - DB_BACKEND_PASSWORD=<password>
+      # for db admin
+      - DB_ADMIN_NAME=<name_database>
+      - DB_ADMIN_USER=<user>
+      - DB_ADMIN_PASSWORD=<password>
+      # other
       - CSRF_COOKIE_SECURE=True
       - CORS_ALLOWED_ORIGINS=["https://<host>"]
       - CSRF_TRUSTED_ORIGINS=["https://<host>"]
-      - SECRET_APP=<token> # without $
+      - SECRET_APP=<token> # without symbols$
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin.rule=Host(`<domain>`)"
@@ -54,10 +60,17 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_USER=<username>
       - POSTGRES_PASSWORD=<password>
-      - POSTGRES_DB=handbook
+      # for async_api
+      - BACKEND_USER=<username>
+      - BACKEND_PASSWORD=<password>
+      - BACKEND_DB=handbook
+      # for admin
+      - ADMIN_USER=<username>
+      - ADMIN_PASSWORD=<password>
+      - ADMIN_DB=admin_handbook
     volumes:
+      - ./scripts/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
       - pg-data:/var/lib/postgresql/data
 
   traefik:

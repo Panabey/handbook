@@ -84,15 +84,18 @@ WSGI_APPLICATION = "admin.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "admin.db",
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": settings.DATABASE_HOST,
+        "NAME": settings.DB_ADMIN_NAME,
+        "USER": settings.DB_ADMIN_USER,
+        "PASSWORD": settings.DB_ADMIN_PASSWORD,
     },
     "handbook": {
         "ENGINE": "django.db.backends.postgresql",
         "HOST": settings.DATABASE_HOST,
-        "NAME": settings.DATABASE_NAME,
-        "USER": settings.DATABASE_USER,
-        "PASSWORD": settings.DATABASE_PASSWORD,
+        "NAME": settings.DB_BACKEND_NAME,
+        "USER": settings.DB_BACKEND_USER,
+        "PASSWORD": settings.DB_BACKEND_PASSWORD,
     },
 }
 
