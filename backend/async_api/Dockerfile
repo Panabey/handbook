@@ -10,7 +10,7 @@ WORKDIR /app
 
 COPY backend/async_api /app
 
-RUN pip install uvloop httptools -r requirements.txt --no-cache-dir -U && alembic upgrade head
+RUN pip install uvloop httptools -r requirements.txt --no-cache-dir -U
 
 WORKDIR /app/src
 

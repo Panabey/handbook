@@ -14,6 +14,4 @@ RUN pip install -r requirements.txt --no-cache-dir -U
 
 COPY backend/admin /app
 
-RUN python manage.py makemigrations && python manage.py migrate
-
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
