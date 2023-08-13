@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   async_api:
@@ -55,7 +55,7 @@ services:
 
   postgresql:
     container_name: postgresql_handbook
-    image: postgres:15
+    image: postgres:15.3
     restart: always
     expose:
       - 5432

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         case_sensitive=True,
         env_file_encoding="utf-8",
-        env_file=os.path.join(BASE_URL, ".env"),
+        env_file=(os.path.join(BASE_URL, ".env"), ".env"),
     )
     # general
     DEBUG_MODE: bool = Field(default=False)
