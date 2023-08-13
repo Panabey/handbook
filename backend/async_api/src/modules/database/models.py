@@ -40,6 +40,7 @@ class HandbookContent(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     handbook_id: Mapped[int] = mapped_column(Integer, ForeignKey("handbook.id"))
     title: Mapped[str] = mapped_column(String(80))
+    description: Mapped[str] = mapped_column(String(255))
     is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     hbook: Mapped["Handbook"] = relationship(back_populates="content")
@@ -54,6 +55,7 @@ class HandbookPage(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     content_id: Mapped[int] = mapped_column(Integer, ForeignKey("handbook_content.id"))
     title: Mapped[str] = mapped_column(String(80))
+    meta: Mapped[str] = mapped_column(String(120))
     text: Mapped[str] = mapped_column(Text)
     reading_time: Mapped[int] = mapped_column(Integer)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())

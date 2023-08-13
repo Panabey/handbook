@@ -19,6 +19,7 @@ class SearchPageDetail(BaseModel):
 
 class HBookContentDetail(BaseModel):
     title: str
+    description: str
     page: list[HBookPageDetail] = Field(
         validation_alias=AliasChoices("page", "hbook_page")
     )
@@ -44,6 +45,7 @@ class ContentDetail(HandbookDetailShort):
 
 class PageDetail(BaseModel):
     id: int
+    meta: str
     title: str
     text: str
     reading_time: int

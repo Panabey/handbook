@@ -32,7 +32,7 @@ async def get_content(session: AsyncSession, handbook_id: int):
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
             joinedload(HBook.content)
-            .load_only(HBookContent.title)
+            .load_only(HBookContent.title, HBookContent.description)
             .joinedload(HBookContent.hbook_page)
             .load_only(HBookPage.id, HBookPage.title),
         )

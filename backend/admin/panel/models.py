@@ -56,6 +56,7 @@ class HandbookContent(models.Model):
     title = models.CharField(
         "Раздел справочника", help_text="Например: 1. Основы", max_length=80
     )
+    description = models.TextField("Описание раздела", max_length=255)
     is_visible = models.BooleanField("Видимый?", default=False)
 
     def __str__(self) -> str:
@@ -84,6 +85,7 @@ class HandbookPage(models.Model):
     title = models.CharField(
         "Название темы", help_text="Например: 1.1 Циклы", max_length=80
     )
+    meta = models.TextField("Описание мета-тегов", max_length=120)
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField("Дата создания", auto_now=True)
