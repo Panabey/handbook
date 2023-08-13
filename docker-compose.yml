@@ -11,10 +11,10 @@ services:
       - 8000
     environment:
       - DEBUG_MODE=false
-      - URL_DATABASE=postgresql+asyncpg://<username>:<password>@postgresql/handbook
+      - URL_DATABASE=postgresql+asyncpg://handbook_user:<password>@postgresql/handbook # change
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)"
+      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)" # change
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     depends_on:
@@ -30,24 +30,24 @@ services:
       - 8001
     environment:
       - DEBUG_MODE=false
-      - ALLOWED_HOSTS=["<host>"]
+      - ALLOWED_HOSTS=["<host>"] # change
       - DATABASE_HOST=postgresql
       # for db async_api
-      - DB_BACKEND_NAME=<name_database>
-      - DB_BACKEND_USER=<user>
-      - DB_BACKEND_PASSWORD=<password>
+      - DB_BACKEND_NAME=handbook
+      - DB_BACKEND_USER=handbook_user
+      - DB_BACKEND_PASSWORD=<password> # change
       # for db admin
-      - DB_ADMIN_NAME=<name_database>
-      - DB_ADMIN_USER=<user>
-      - DB_ADMIN_PASSWORD=<password>
+      - DB_ADMIN_NAME=django_handbook
+      - DB_ADMIN_USER=django_user
+      - DB_ADMIN_PASSWORD=<password> # change
       # other
       - CSRF_COOKIE_SECURE=True
-      - CORS_ALLOWED_ORIGINS=["https://<host>"]
-      - CSRF_TRUSTED_ORIGINS=["https://<host>"]
+      - CORS_ALLOWED_ORIGINS=["https://<host>"] # change
+      - CSRF_TRUSTED_ORIGINS=["https://<host>"] # change
       - SECRET_APP=<token> # without symbols$
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.admin.rule=Host(`<domain>`)"
+      - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
       - "traefik.http.routers.admin.tls=true"
       - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
     depends_on:
@@ -60,15 +60,15 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_PASSWORD=<password>
+      - POSTGRES_PASSWORD=<password> # change
       # for async_api
-      - BACKEND_USER=<username>
-      - BACKEND_PASSWORD=<password>
+      - BACKEND_USER=handbook_user
+      - BACKEND_PASSWORD=<password> # change
       - BACKEND_DB=handbook
       # for admin
-      - ADMIN_USER=<username>
-      - ADMIN_PASSWORD=<password>
-      - ADMIN_DB=admin_handbook
+      - ADMIN_USER=django_user
+      - ADMIN_PASSWORD=<password> # change
+      - ADMIN_DB=django_handbook
     volumes:
       - ./scripts/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
       - pg-data:/var/lib/postgresql/data
@@ -84,7 +84,7 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.email=<email>"
+      - "--certificatesresolvers.letsencrypt.acme.email=<email>" # change
       - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
     ports:
