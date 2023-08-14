@@ -6,11 +6,12 @@ from django.http.request import HttpRequest
 
 from .models import (
     Quiz,
+    QuizTopic,
+    QuizAnswer,
+    QuizQuestion,
     Post,
     Status,
     Handbook,
-    QuizAnswer,
-    QuizQuestion,
     HandbookPage,
     HandbookContent,
 )
@@ -67,6 +68,17 @@ class AnswerInline(MultiModelTabularInline):
     max_num = 4
 
 
+class QuizTopicAdmin(MultiplyModelAdmin):
+    search_fields = ("title",)
+    list_per_page = 20
+
+
+class QuizAdmin(MultiplyModelAdmin):
+    list_display = ("title", "topic")
+    search_fields = ("title", "topic")
+    list_per_page = 20
+
+
 class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
 
@@ -111,7 +123,8 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     get_handbook.short_description = "Справочник"
 
 
-admin.site.register(Quiz, MultiplyModelAdmin)
+admin.site.register(Quiz, QuizAdmin)
+admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
 admin.site.register(QuizAnswer, MultiplyModelAdmin)
 

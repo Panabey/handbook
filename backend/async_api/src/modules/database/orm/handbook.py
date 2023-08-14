@@ -26,8 +26,6 @@ async def get_all(session: AsyncSession):
 async def get_content(session: AsyncSession, handbook_id: int):
     smt = (
         select(HBook)
-        .join(HBook.content)
-        .join(HBookContent.hbook_page)
         .where(HBook.id == handbook_id, HBookContent.is_visible)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),

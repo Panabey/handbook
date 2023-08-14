@@ -27,8 +27,15 @@ class AnswerDetail(BaseModel):
 
 class QuizAllDetail(BaseModel):
     id: int
+    logo_url: str | None
     title: str
-    description: str | None
+    meta: str
+
+
+class QuizTopicsDetail(BaseModel):
+    id: int
+    title: str
+    quizzes_info: list[QuizAllDetail]
 
 
 class QuizDetail(QuizAllDetail):

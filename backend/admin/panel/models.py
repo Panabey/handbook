@@ -137,9 +137,27 @@ class Post(models.Model):
         db_table = "post"
 
 
+class QuizTopic(models.Model):
+    title = models.CharField("Название", max_length=60)
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = False
+        db_table = "quiz_topic"
+        verbose_name = "Тема тестов"
+        verbose_name_plural = "Темы тестов"
+
+
 class Quiz(models.Model):
+    topic = models.ForeignKey(QuizTopic, models.CASCADE, verbose_name="Тема")
+    logo_url = models.FileField(
+        "Изображение", upload_to="images/quiz", blank=True, null=True
+    )
     title = models.CharField("Название", max_length=100)
-    description = models.TextField("Описание", blank=True, null=True)
+    meta = models.TextField("Описание мета-тегов", max_length=80)
+    description = MDTextField("Описание", blank=True, null=True)
 
     def __str__(self) -> str:
         return self.title

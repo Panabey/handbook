@@ -30,7 +30,11 @@ class Handbook(Base):
         nullable=True,
     )
 
-    content: Mapped[list["HandbookContent"]] = relationship(back_populates="hbook")
+    content: Mapped[list["HandbookContent"]] = relationship(
+        back_populates="hbook",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
     status_info: Mapped["Status"] = relationship(back_populates="hbook_status")
 
 
@@ -38,14 +42,16 @@ class HandbookContent(Base):
     __tablename__ = "handbook_content"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    handbook_id: Mapped[int] = mapped_column(Integer, ForeignKey("handbook.id"))
+    handbook_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("handbook.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
     title: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(255))
     is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     hbook: Mapped["Handbook"] = relationship(back_populates="content")
     hbook_page: Mapped[list["HandbookPage"]] = relationship(
-        back_populates="hbook_content"
+        back_populates="hbook_content", cascade="all, delete", passive_deletes=True
     )
 
 
@@ -53,7 +59,10 @@ class HandbookPage(Base):
     __tablename__ = "handbook_page"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    content_id: Mapped[int] = mapped_column(Integer, ForeignKey("handbook_content.id"))
+    content_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("handbook_content.id", ondelete="CASCADE", onupdate="CASCADE"),
+    )
     title: Mapped[str] = mapped_column(String(80))
     meta: Mapped[str] = mapped_column(String(120))
     text: Mapped[str] = mapped_column(Text)
@@ -90,18 +99,59 @@ class Post(Base):
     reading_time: Mapped[int] = mapped_column(Integer)
 
 
+class QuizTag(Base):
+    __tablename__ = "quiz_tag"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    quiz_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("quiz.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
+    tag_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("tag.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
+
+
+class Tag(Base):
+    __tablename__ = "tag"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    title: Mapped[str] = mapped_column(String(60))
+
+    quizzez_tag: Mapped[list["Quiz"]] = relationship(secondary=QuizTag)
+
+
+class QuizTopic(Base):
+    __tablename__ = "quiz_topic"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(60))
+
+    quizzes_info: Mapped[list["Quiz"]] = relationship(
+        back_populates="topic_info",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+
+
 class Quiz(Base):
     __tablename__ = "quiz"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    topic_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("quiz_topic.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
+    logo_url: Mapped[str] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String(100))
-    description: Mapped[str] = mapped_column(String, nullable=True)
+    meta: Mapped[str] = mapped_column(String(80))
+    description: Mapped[str] = mapped_column(String(255))
 
+    topic_info: Mapped[QuizTopic] = relationship(back_populates="quizzes_info")
     questions_info: Mapped[list["Question"]] = relationship(
         back_populates="quiz_info",
         cascade="all, delete",
         passive_deletes=True,
     )
+    tags_info: Mapped[list["Tag"]] = relationship(secondary=QuizTag)
 
 
 class Question(Base):

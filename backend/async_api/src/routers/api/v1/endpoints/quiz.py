@@ -11,14 +11,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from routers.api.deps import get_async_session
 from modules.database.orm.quiz import get_all
 from modules.database.orm.quiz import get_one
-from modules.database.orm.quiz import get_question
+from modules.database.orm.quiz import get_topics
 from modules.database.orm.quiz import get_answer
+from modules.database.orm.quiz import get_question
 
 from modules.schemas.base import DetailInfo
 from modules.schemas.quiz import QuizDetail
 from modules.schemas.quiz import QuizAllDetail
 from modules.schemas.quiz import QuizAnswerDetail
 from modules.schemas.quiz import QuizQuestionDetail
+from modules.schemas.quiz import QuizTopicsDetail
 
 from modules.schemas.quiz import QuizAnswerView
 
@@ -27,6 +29,18 @@ router = APIRouter()
 Session = Annotated[AsyncSession, Depends(get_async_session)]
 QueryId = Annotated[int, Query(ge=1, le=2147483647)]
 PathId = Annotated[int, Path(ge=1, le=2147483647)]
+
+
+@router.get("/topic/all", response_model=list[QuizTopicsDetail])
+async def get_all_topic(
+    session: Session,
+    limit: Annotated[int, Query(ge=1, le=5)] = 5,
+    count_content: Annotated[int, Query(ge=1, le=5)] = 3,
+    continue_after: Annotated[int, Query(ge=1, le=100)] = None,
+):
+    """Получение полного списка доступных топиков для тестов"""
+    result = await get_topics(session, limit, count_content, continue_after)
+    return result
 
 
 @router.get("/all", response_model=list[QuizAllDetail])
