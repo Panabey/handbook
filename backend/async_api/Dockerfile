@@ -15,9 +15,11 @@ RUN pip install uvloop httptools -r requirements.txt --no-cache-dir -U
 WORKDIR /app/src
 
 CMD ["uvicorn", "main:app", \
-    "--workers", "2", \
+    "--workers", "3", \
     "--host", "0.0.0.0", \
     "--port", "8000", \
+    "--ws", "none", \
+    "--interface", "asgi3", \
     "--loop", "uvloop", \
     "--http", "httptools", \
     "--timeout-keep-alive", "30", \
