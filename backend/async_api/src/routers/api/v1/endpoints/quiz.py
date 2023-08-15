@@ -61,7 +61,7 @@ async def get_topic_quiz(
 @router.get(
     "/{quiz_id}",
     response_model=QuizDetail,
-    responses={400: {"model": DetailInfo}}
+    responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_quiz(session: Session, quiz_id: PathId):
     """
@@ -70,14 +70,14 @@ async def get_quiz(session: Session, quiz_id: PathId):
     """
     result = await get_one(session, quiz_id)
     if result is None:
-        raise HTTPException(400, "Not found")
+        raise HTTPException(404, "По Вашему запросу ничего не найдено..")
     return result
 
 
 @router.get(
     "/{quiz_id}/question",
     response_model=QuizQuestionDetail,
-    responses={400: {"model": DetailInfo}},
+    responses={404: {"model": DetailInfo}},
 )
 async def get_quiz_question(session: Session, quiz_id: PathId, question_id: QueryId):
     """
@@ -86,14 +86,14 @@ async def get_quiz_question(session: Session, quiz_id: PathId, question_id: Quer
     """
     result = await get_question(session, quiz_id, question_id)
     if result is None:
-        raise HTTPException(400, "Not found")
+        raise HTTPException(404, "По Вашему запросу ничего не найдено..")
     return result
 
 
 @router.post(
     "/answer/view",
     response_model=QuizAnswerDetail,
-    responses={400: {"model": DetailInfo}},
+    responses={404: {"model": DetailInfo}},
 )
 async def get_quiz_answer(session: Session, schema: QuizAnswerView):
     """
@@ -102,5 +102,5 @@ async def get_quiz_answer(session: Session, schema: QuizAnswerView):
     """
     result = await get_answer(session, schema.quiz_id, schema.question_id)
     if result is None:
-        raise HTTPException(400, "Not found")
+        raise HTTPException(404, "По Вашему запросу ничего не найдено..")
     return result

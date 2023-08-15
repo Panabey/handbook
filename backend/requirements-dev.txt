@@ -1,2 +1,0 @@
-# via FastAPI
-uvicorn>=0.23.2,<0.24.0
