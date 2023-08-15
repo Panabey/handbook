@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     DEBUG_MODE: bool = Field(default=False)
 
     URL_DATABASE: str
-
     ALLOW_ORIGINS: tuple[str] = Field(default=("*",))
+    ALLOW_METHODS: tuple[str] = Field(default=("GET", "POST", "PUT"))
 
 
 settings = Settings()

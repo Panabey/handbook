@@ -9,14 +9,14 @@ from routers.api.v1.router import router
 app = FastAPI(
     debug=settings.DEBUG_MODE,
     title="Handbook API",
-    version="0.1.0",
+    version="0.2.0",
     default_response_class=ORJSONResponse,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=("*"),
+    allow_origins=settings.ALLOW_ORIGINS,
     allow_credentials=True,
-    allow_methods=("GET", "POST", "PUT"),
+    allow_methods=settings.ALLOW_METHODS,
 )
 app.include_router(router, prefix="/api")
