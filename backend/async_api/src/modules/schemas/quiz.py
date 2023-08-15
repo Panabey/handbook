@@ -25,11 +25,17 @@ class AnswerDetail(BaseModel):
     explanation: str | None
 
 
+class TagsDetail(BaseModel):
+    id: int
+    title: str
+
+
 class QuizAllDetail(BaseModel):
     id: int
     logo_url: str | None
     title: str
     meta: str
+    tags: list[TagsDetail] = Field(validation_alias=AliasChoices("tags", "tags_info"))
 
 
 class QuizTopicsDetail(BaseModel):

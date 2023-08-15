@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from routers.api.deps import get_async_session
-from modules.database.orm.quiz import get_all
+from modules.database.orm.quiz import get_by_topic
 from modules.database.orm.quiz import get_one
 from modules.database.orm.quiz import get_topics
 from modules.database.orm.quiz import get_answer
@@ -38,15 +38,23 @@ async def get_all_topic(
     count_content: Annotated[int, Query(ge=1, le=5)] = 3,
     continue_after: Annotated[int, Query(ge=1, le=100)] = None,
 ):
-    """Получение полного списка доступных топиков для тестов"""
+    """Получение полного списка доступных топиков для квизов.
+
+    Также включает небольшой список последних квизов.
+    """
     result = await get_topics(session, limit, count_content, continue_after)
     return result
 
 
-@router.get("/all", response_model=list[QuizAllDetail])
-async def get_all_quiz(session: Session):
-    """Получения полного списка доступных тестов."""
-    result = await get_all(session)
+@router.get("/topic", response_model=list[QuizAllDetail])
+async def get_topic_quiz(
+    session: Session,
+    topic_id: QueryId,
+    limit: Annotated[int, Query(ge=1, le=20)] = 20,
+    continue_after: Annotated[int, Query(ge=1, le=1000)] = None,
+):
+    """Получения полного списка доступных тестов в текущем топике."""
+    result = await get_by_topic(session, topic_id, limit, continue_after)
     return result
 
 

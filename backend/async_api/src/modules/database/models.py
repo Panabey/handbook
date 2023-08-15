@@ -117,7 +117,9 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(60))
 
-    quizzez_tag: Mapped[list["Quiz"]] = relationship(secondary=QuizTag)
+    quizzez_tag: Mapped[list["Quiz"]] = relationship(
+        secondary="quiz_tag", back_populates="tags_info"
+    )
 
 
 class QuizTopic(Base):
@@ -151,7 +153,9 @@ class Quiz(Base):
         cascade="all, delete",
         passive_deletes=True,
     )
-    tags_info: Mapped[list["Tag"]] = relationship(secondary=QuizTag)
+    tags_info: Mapped[list["Tag"]] = relationship(
+        secondary="quiz_tag", back_populates="quizzez_tag"
+    )
 
 
 class Question(Base):

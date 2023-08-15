@@ -52,7 +52,7 @@ class Handbook(models.Model):
 
 
 class HandbookContent(models.Model):
-    handbook = models.ForeignKey(Handbook, models.DO_NOTHING, verbose_name="Справочник")
+    handbook = models.ForeignKey(Handbook, models.CASCADE, verbose_name="Справочник")
     title = models.CharField(
         "Раздел справочника", help_text="Например: 1. Основы", max_length=80
     )
@@ -79,9 +79,7 @@ class HandbookContent(models.Model):
 
 
 class HandbookPage(models.Model):
-    content = models.ForeignKey(
-        HandbookContent, models.DO_NOTHING, verbose_name="Раздел"
-    )
+    content = models.ForeignKey(HandbookContent, models.CASCADE, verbose_name="Раздел")
     title = models.CharField(
         "Название темы", help_text="Например: 1.1 Циклы", max_length=80
     )
@@ -150,6 +148,19 @@ class QuizTopic(models.Model):
         verbose_name_plural = "Темы тестов"
 
 
+class Tag(models.Model):
+    title = models.CharField("Название тега", max_length=60)
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = False
+        db_table = "tag"
+        verbose_name = "Тег квиза"
+        verbose_name_plural = "Теги квизов"
+
+
 class Quiz(models.Model):
     topic = models.ForeignKey(QuizTopic, models.CASCADE, verbose_name="Тема")
     logo_url = models.FileField(
@@ -167,6 +178,18 @@ class Quiz(models.Model):
         db_table = "quiz"
         verbose_name = "Тест"
         verbose_name_plural = "Тесты"
+
+
+class QuizTag(models.Model):
+    quiz = models.ForeignKey(Quiz, models.CASCADE)
+    tag = models.ForeignKey(Tag, models.CASCADE)
+
+    def __str__(self) -> str:
+        return "Тег квизов"
+
+    class Meta:
+        managed = False
+        db_table = "quiz_tag"
 
 
 class QuizQuestion(models.Model):

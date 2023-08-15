@@ -39,10 +39,22 @@ async def get_topics(
     return result.unique().all()
 
 
-async def get_all(session: AsyncSession):
-    smt = select(Quiz).options(defer(Quiz.description))
+async def get_by_topic(
+    session: AsyncSession, topic_id: int, limit: int, continue_after: int
+):
+    smt = (
+        select(Quiz)
+        .where(Quiz.topic_id == topic_id)
+        .order_by(Quiz.id.desc())
+        .offset(continue_after)
+        .limit(limit)
+        .options(
+            defer(Quiz.description), defer(Quiz.topic_id), joinedload(Quiz.tags_info)
+        )
+    )
+
     result = await session.scalars(smt)
-    return result.all()
+    return result.unique().all()
 
 
 async def get_one(session: AsyncSession, quiz_id: int):

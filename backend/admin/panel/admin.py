@@ -5,7 +5,9 @@ from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
 from .models import (
+    Tag,
     Quiz,
+    QuizTag,
     QuizTopic,
     QuizAnswer,
     QuizQuestion,
@@ -68,12 +70,19 @@ class AnswerInline(MultiModelTabularInline):
     max_num = 4
 
 
+class QuizTagInline(MultiModelTabularInline):
+    model = QuizTag
+    extra = 1
+    max_num = 3
+
+
 class QuizTopicAdmin(MultiplyModelAdmin):
     search_fields = ("title",)
     list_per_page = 20
 
 
 class QuizAdmin(MultiplyModelAdmin):
+    inlines = [QuizTagInline]
     list_display = ("title", "topic")
     search_fields = ("title", "topic")
     list_per_page = 20
@@ -123,6 +132,7 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     get_handbook.short_description = "Справочник"
 
 
+admin.site.register(Tag, MultiplyModelAdmin)
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
