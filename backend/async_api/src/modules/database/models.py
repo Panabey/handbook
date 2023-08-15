@@ -23,7 +23,6 @@ class Handbook(Base):
     title: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
-    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
     status_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("status.id", ondelete="SET NULL", onupdate="CASCADE"),
@@ -47,7 +46,6 @@ class HandbookContent(Base):
     )
     title: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(255))
-    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     hbook: Mapped["Handbook"] = relationship(back_populates="content")
     hbook_page: Mapped[list["HandbookPage"]] = relationship(
@@ -69,7 +67,6 @@ class HandbookPage(Base):
     reading_time: Mapped[int] = mapped_column(Integer)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
-    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     hbook_content: Mapped["HandbookContent"] = relationship(back_populates="hbook_page")
 

@@ -101,13 +101,13 @@ class PostAdmin(MultiplyModelAdmin):
 
 
 class HandbookAdmin(MultiplyModelAdmin):
-    list_display = ("title", "is_visible")
+    list_display = ("title",)
     search_fields = ("title",)
     list_per_page = 20
 
 
 class HandbookContentAdmin(MultiplyModelAdmin):
-    list_display = ("handbook", "title", "is_visible")
+    list_display = ("handbook", "title")
     search_fields = ("title", "handbook__title")
     list_per_page = 20
 
@@ -117,11 +117,10 @@ class HandbookPageAdmin(MultiplyModelAdmin):
         "title",
         "content",
         "get_handbook",
-        "is_visible",
         "create_date",
         "update_date",
     )
-    list_filter = ("is_visible", "create_date", "update_date")
+    list_filter = ("create_date", "update_date")
     ordering = ("create_date", "update_date")
     search_fields = ("title", "content__handbook__title")
     list_per_page = 20

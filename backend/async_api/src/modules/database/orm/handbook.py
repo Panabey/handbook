@@ -15,7 +15,6 @@ async def get_all(session: AsyncSession):
             Status.title.label("status")  # fmt: skip
         )
         .join(HBook.status_info, isouter=True)
-        .where(HBook.is_visible)
         .order_by(HBook.id)
     )
 
@@ -26,7 +25,7 @@ async def get_all(session: AsyncSession):
 async def get_content(session: AsyncSession, handbook_id: int):
     smt = (
         select(HBook)
-        .where(HBook.id == handbook_id, HBookContent.is_visible)
+        .where(HBook.id == handbook_id)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
             joinedload(HBook.content)
@@ -43,8 +42,8 @@ async def get_content(session: AsyncSession, handbook_id: int):
 async def get_page_by_id(session: AsyncSession, page_id: int):
     smt = (
         select(HBookPage)
-        .where(HBookPage.id == page_id, HBookPage.is_visible)
-        .options(defer(HBookPage.is_visible), defer(HBookPage.content_id))
+        .where(HBookPage.id == page_id)
+        .options(defer(HBookPage.content_id))
     )
 
     result = await session.scalars(smt)

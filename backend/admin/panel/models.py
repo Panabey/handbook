@@ -36,7 +36,6 @@ class Handbook(models.Model):
     )
     title = models.CharField("Название справочника", max_length=80)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
-    is_visible = models.BooleanField("Видимый?", default=False)
     status = models.ForeignKey(
         "Status", models.SET_NULL, blank=True, null=True, verbose_name="Статус"
     )
@@ -57,7 +56,6 @@ class HandbookContent(models.Model):
         "Раздел справочника", help_text="Например: 1. Основы", max_length=80
     )
     description = models.TextField("Описание раздела", max_length=255)
-    is_visible = models.BooleanField("Видимый?", default=False)
 
     def __str__(self) -> str:
         return self.title
@@ -88,7 +86,6 @@ class HandbookPage(models.Model):
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField("Дата создания", auto_now=True)
     create_date = models.DateTimeField("Дата редактирования", auto_now_add=True)
-    is_visible = models.BooleanField("Видимый?", default=False)
 
     def __str__(self) -> str:
         return self.title
