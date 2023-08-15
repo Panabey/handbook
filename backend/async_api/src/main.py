@@ -17,6 +17,6 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOW_ORIGINS,
     allow_credentials=True,
-    allow_methods=settings.ALLOW_METHODS,
+    allow_methods=("GET", "POST", "HEAD"),
 )
 app.include_router(router, prefix="/api")
