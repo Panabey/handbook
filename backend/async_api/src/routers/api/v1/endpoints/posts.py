@@ -23,7 +23,7 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.get("/all")
-async def get_all_posts(session: Session, continue_after: Int = None):
+async def get_all_posts(session: Session, continue_after: Int | None = None):
     result = await get_all_post(session, continue_after, 20)
     return result
 

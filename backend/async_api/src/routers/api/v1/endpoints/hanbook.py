@@ -77,8 +77,8 @@ async def get_page_handbook(session: Session, page_id: Int):
 async def search_page_handbook(
     session: Session,
     q: Annotated[str, Query(min_length=1, max_length=80)],
-    handbook_id: Int = None,
-    continue_after: Int = None,
+    handbook_id: Int | None = None,
+    continue_after: Int | None = None,
 ):
     """Поиск тем по конкретному справочнику или по всем записям.
 

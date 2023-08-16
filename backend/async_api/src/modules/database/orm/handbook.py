@@ -1,5 +1,7 @@
 from sqlalchemy import select
-from sqlalchemy.orm import load_only, defer, joinedload
+from sqlalchemy.orm import defer
+from sqlalchemy.orm import load_only
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from modules.database.models import Status
