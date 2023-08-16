@@ -38,10 +38,17 @@ class QuizAllDetail(BaseModel):
     tags: list[TagsDetail] = Field(validation_alias=AliasChoices("tags", "tags_info"))
 
 
+class QuizAllShortDetail(BaseModel):
+    id: int
+    logo_url: str | None
+    title: str
+    meta: str
+
+
 class QuizTopicsDetail(BaseModel):
     id: int
     title: str
-    quizzes_info: list[QuizAllDetail]
+    quizzes_info: list[QuizAllShortDetail]
 
 
 class QuizDetail(BaseModel):
