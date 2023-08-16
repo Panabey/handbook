@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 from core.settings import settings
 
@@ -117,6 +117,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+]
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -140,8 +145,15 @@ STATIC_ROOT = "staticfiles/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MDEDITOR_CONFIGS = {"default": {"emoji": False, "language": "en"}}
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
-PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
-]
+MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
+MEDIA_URL = "/media/"
+
+MDEDITOR_CONFIGS = {
+    "default": {
+        "emoji": False,
+        "language": "en",
+        "upload_image_formats": ["jpg", "jpeg", "gif", "png"],
+    }
+}
