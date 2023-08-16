@@ -1,13 +1,22 @@
-from sqlalchemy import select, func
-from sqlalchemy.orm import load_only, joinedload, contains_eager, defer
+from sqlalchemy import func
+from sqlalchemy import select
+from sqlalchemy.orm import defer
+from sqlalchemy.orm import load_only
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from modules.database.models import Quiz, Question, Answer, QuizTopic
+from modules.database.models import Tag
+from modules.database.models import Quiz
+from modules.database.models import Answer
+from modules.database.models import Question
+from modules.database.models import QuizTopic
 
 
 async def get_topics(
     session: AsyncSession, limit: int, count_content: int, continue_after: int
 ):
+    # отстортированный список последних добавленных тем
     subquery = (
         select(
             QuizTopic.id,
@@ -67,6 +76,37 @@ async def get_one(session: AsyncSession, quiz_id: int):
     return result.first()
 
 
+async def search_quiz(
+    session: AsyncSession,
+    topic_id: int,
+    query: str,
+    tags_id: list[int],
+    limit: int,
+    continue_after: int,
+):
+    smt = (
+        select(Quiz)
+        .join(Quiz.tags_info, isouter=True)
+        .where(Quiz.topic_id == topic_id)
+        .order_by(Quiz.id.desc())
+        .offset(continue_after)
+        .limit(limit)
+        .options(
+            defer(Quiz.description),
+            defer(Quiz.topic_id),
+            contains_eager(Quiz.tags_info),
+        )
+    )
+
+    if query:
+        smt = smt.where(Quiz.title.ilike(f"%{query}%"))
+    if tags_id:
+        smt = smt.where(Tag.id.in_(tags_id))
+
+    result = await session.scalars(smt)
+    return result.unique().all()
+
+
 async def get_question(session: AsyncSession, quiz_id: int, question_id: int):
     smt = (
         select(Question)
@@ -93,3 +133,10 @@ async def get_answer(session: AsyncSession, quiz_id: int, question_id: int):
     )
     result = await session.scalars(smt)
     return result.first()
+
+
+async def get_tags(session: AsyncSession, limit: int):
+    smt = select(Tag).order_by(Tag.id).limit(limit)
+
+    result = await session.scalars(smt)
+    return result.all()

@@ -9,20 +9,24 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from routers.api.deps import get_async_session
-from modules.database.orm.quiz import get_by_topic
+
 from modules.database.orm.quiz import get_one
+from modules.database.orm.quiz import get_tags
 from modules.database.orm.quiz import get_topics
 from modules.database.orm.quiz import get_answer
+from modules.database.orm.quiz import search_quiz
+from modules.database.orm.quiz import get_by_topic
 from modules.database.orm.quiz import get_question
 
 from modules.schemas.base import DetailInfo
+from modules.schemas.quiz import TagsDetail
 from modules.schemas.quiz import QuizDetail
 from modules.schemas.quiz import QuizAllDetail
+from modules.schemas.quiz import QuizAnswerView
+from modules.schemas.quiz import QuizTopicsDetail
+from modules.schemas.quiz import QuizSearchDetail
 from modules.schemas.quiz import QuizAnswerDetail
 from modules.schemas.quiz import QuizQuestionDetail
-from modules.schemas.quiz import QuizTopicsDetail
-
-from modules.schemas.quiz import QuizAnswerView
 
 router = APIRouter()
 
@@ -36,7 +40,7 @@ async def get_all_topic(
     session: Session,
     limit: Annotated[int, Query(ge=1, le=5)] = 5,
     count_content: Annotated[int, Query(ge=1, le=5)] = 3,
-    continue_after: Annotated[int, Query(ge=1, le=100)] = None,
+    continue_after: Annotated[int, Query(ge=1, le=100)] | None = None,
 ):
     """Получение полного списка доступных топиков для квизов.
 
@@ -51,7 +55,7 @@ async def get_topic_quiz(
     session: Session,
     topic_id: QueryId,
     limit: Annotated[int, Query(ge=1, le=20)] = 20,
-    continue_after: Annotated[int, Query(ge=1, le=1000)] = None,
+    continue_after: Annotated[int, Query(ge=1, le=1000)] | None = None,
 ):
     """Получения полного списка доступных тестов в текущем топике."""
     result = await get_by_topic(session, topic_id, limit, continue_after)
@@ -59,11 +63,11 @@ async def get_topic_quiz(
 
 
 @router.get(
-    "/{quiz_id}",
+    "/",
     response_model=QuizDetail,
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
-async def get_quiz(session: Session, quiz_id: PathId):
+async def get_quiz(session: Session, quiz_id: QueryId):
     """
     Получение подробной информации по тесте.
     Также включает вопросы и описание.
@@ -74,12 +78,53 @@ async def get_quiz(session: Session, quiz_id: PathId):
     return result
 
 
+@router.post(
+    "/search",
+    response_model=list[QuizAllDetail],
+    responses={
+        400: {"model": DetailInfo},
+        404: {"model": DetailInfo}
+    }
+)  # fmt: skip
+async def search_quizzez(session: Session, schema: QuizSearchDetail):
+    """Поиск квизов в топике.
+
+    Параметры query и tags опциональны, но не могут быть оба пустыми.
+    """
+    if not schema.q and not schema.tags:
+        raise HTTPException(400, "Одно из обязательных полей пустое..")
+
+    result = await search_quiz(
+        session,
+        schema.topic_id,
+        schema.q,
+        schema.tags,
+        schema.limit,
+        schema.continue_after,
+    )
+    if result is None:
+        raise HTTPException(404, "По Вашему запросу ничего не найдено..")
+    return result
+
+
+@router.get("/tags", response_model=list[TagsDetail])
+async def get_all_tags(
+    session: Session, limit: Annotated[int, Query(ge=1, le=15)] = 15
+):
+    """Получение всех тегов для квизов
+
+    По умолчанию ограничен 15 тегами.
+    """
+    result = await get_tags(session, limit)
+    return result
+
+
 @router.get(
-    "/{quiz_id}/question",
+    "/question",
     response_model=QuizQuestionDetail,
     responses={404: {"model": DetailInfo}},
 )
-async def get_quiz_question(session: Session, quiz_id: PathId, question_id: QueryId):
+async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: QueryId):
     """
     Получение вариантов ответа для конкретного вопроса теста.
     Также содержит подсказки.

@@ -4,8 +4,8 @@ from pydantic import AliasChoices
 
 
 """
-Данный блок представляет из себя ответы на конечные точки
-и не должны использоваться для валидации запросов
+Данный блок представляет из себя схемы ответов на
+конечные точки и не должны использоваться для валидации запросов
 """
 
 
@@ -70,8 +70,13 @@ class QuizAnswerDetail(BaseModel):
     )
 
 
+class TagsDetail(BaseModel):
+    id: int
+    title: str
+
+
 """
-Данный блок представляет из себя запросы для валидации
+Данный блок представляет из себя схемы запросов для валидации
 на конечные точки и не должны использоваться для валидации ответов
 """
 
@@ -79,3 +84,11 @@ class QuizAnswerDetail(BaseModel):
 class QuizAnswerView(BaseModel):
     quiz_id: int = Field(ge=1, le=2147483647)
     question_id: int = Field(ge=1, le=2147483647)
+
+
+class QuizSearchDetail(BaseModel):
+    topic_id: int = Field(ge=1, le=2147483647)
+    q: str | None = Field(None, min_length=1, max_length=80)
+    tags: list[int] | None = Field(None, min_length=1, max_length=4)
+    limit: int = Field(default=20, ge=1, le=20)
+    continue_after: int | None = Field(default=None, ge=1, le=1000)
