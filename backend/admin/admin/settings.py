@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -147,13 +148,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
-MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+MEDIA_URL = "media/"
 
 MDEDITOR_CONFIGS = {
     "default": {
         "emoji": False,
         "language": "en",
-        "upload_image_formats": ["jpg", "jpeg", "gif", "png"],
+        "upload_image_formats": ["jpg", "jpeg", "gif", "png", "bmp", "webp", "svg"],
+        "image_folder": "general/",
     }
 }

@@ -1,14 +1,18 @@
 import os
 import datetime
 
+from PIL import Image
+
 from django.conf import settings
+
 from django.views import generic
-from django.http import JsonResponse, HttpRequest
-from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpRequest
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.uploadedfile import UploadedFile
 
 from mdeditor.configs import MDConfig
-
 
 MDEDITOR_CONFIGS = MDConfig("default")
 
@@ -32,6 +36,7 @@ class UploadView(generic.View):
         file_name_list = upload_image.name.split(".")
         file_extension = file_name_list.pop(-1)
         file_name = ".".join(file_name_list)
+
         if file_extension not in MDEDITOR_CONFIGS["upload_image_formats"]:
             return JsonResponse(
                 {
@@ -44,23 +49,65 @@ class UploadView(generic.View):
 
         # image floder check
         file_path = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"])
-        if not os.path.exists(file_path):
-            try:
-                os.makedirs(file_path)
-            except Exception as err:
-                return JsonResponse(
-                    {"success": 0, "message": "上传失败：%s" % str(err), "url": ""}
-                )
+        os.makedirs(file_path, exist_ok=True)
 
         # save image
-        utc_date = datetime.datetime.utcnow().strftime("%Y_%m_%d-%H_%M_%S")
-        file_full_name = f"{file_name}_{utc_date}.{file_extension}"
-
-        with open(os.path.join(file_path, file_full_name), "wb+") as file:
-            for chunk in upload_image.chunks():
-                file.write(chunk)
+        if file_extension != "svg":
+            save_filename = self._compress_img(upload_image, file_name, file_path, 0.8)
+        else:
+            save_filename = self._no_compress_img(upload_image, file_name, file_path)
 
         path_url = os.path.join(
-            settings.MEDIA_URL, MDEDITOR_CONFIGS["image_folder"], file_full_name
+            settings.MEDIA_URL, MDEDITOR_CONFIGS["image_folder"], save_filename
         )
         return JsonResponse({"success": 1, "message": "上传成功！", "url": path_url})
+
+    def _compress_img(
+        self,
+        image: UploadedFile,
+        filename: str,
+        save_path: str,
+        new_size_ratio: float = 0.9,
+        quality: int = 90,
+        width: int | None = None,
+        height: int | None = None,
+    ) -> str:
+        """Оптимизация полученного изображения для уменьшения его размера
+        с последующим сохранением
+        """
+        utc_date = datetime.datetime.utcnow().strftime("%Y_%m_%d-%H_%M_%S")
+        img = Image.open(image)
+
+        if new_size_ratio < 1.0:
+            # если коэффициент изменения размера ниже 1,0, умножить ширину и
+            # высоту на этот коэффициент, чтобы уменьшить размер изображения.
+            img = img.resize(
+                (int(img.size[0] * new_size_ratio), int(img.size[1] * new_size_ratio)),
+                Image.BILINEAR,
+            )
+        elif width and height:
+            img = img.resize((width, height), Image.BILINEAR)
+
+        file_fullname = f"{filename}_{utc_date}.jpg"
+
+        img = img.convert("RGB")
+        img.save(
+            os.path.join(save_path, file_fullname),
+            quality=quality,
+            optimize=True,
+            exif=b"",
+        )
+        img.close()
+
+        return file_fullname
+
+    def _no_compress_img(self, image: UploadedFile, filename: str, save_path: str):
+        """Сохранение изображения без последующей оптимизации"""
+        utc_date = datetime.datetime.utcnow().strftime("%Y_%m_%d-%H_%M_%S")
+        file_fullname = f"{filename}_{utc_date}.svg"
+
+        with open(os.path.join(save_path, file_fullname), "wb") as file:
+            for chunk in image.chunks():
+                file.write(chunk)
+
+        return file_fullname

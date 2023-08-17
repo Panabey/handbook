@@ -25,14 +25,14 @@ class Status(models.Model):
 
     class Meta:
         managed = False
-        verbose_name = "Статус"
-        verbose_name_plural = "Статусы"
+        verbose_name = "Справочник (Статус)"
+        verbose_name_plural = "Справочник (Статусы)"
         db_table = "status"
 
 
 class Handbook(models.Model):
     logo_url = models.FileField(
-        "Изображение", upload_to="images/handbook", blank=True, null=True
+        "Изображение", upload_to="handbook", blank=True, null=True
     )
     title = models.CharField("Название справочника", max_length=80)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
@@ -71,8 +71,8 @@ class HandbookContent(models.Model):
 
     class Meta:
         managed = False
-        verbose_name = "Раздел справочника"
-        verbose_name_plural = "Разделы справочника"
+        verbose_name = "Справочники (Раздел)"
+        verbose_name_plural = "Справочники (Разделы)"
         db_table = "handbook_content"
 
 
@@ -105,8 +105,8 @@ class HandbookPage(models.Model):
 
     class Meta:
         managed = False
-        verbose_name = "Тема справочника"
-        verbose_name_plural = "Темы справочника"
+        verbose_name = "Справочник (Страница)"
+        verbose_name_plural = "Справочник (Страницы)"
         db_table = "handbook_page"
 
 
@@ -141,8 +141,8 @@ class QuizTopic(models.Model):
     class Meta:
         managed = False
         db_table = "quiz_topic"
-        verbose_name = "Тема тестов"
-        verbose_name_plural = "Темы тестов"
+        verbose_name = "Квиз (Топик)"
+        verbose_name_plural = "Квиз (Топики)"
 
 
 class Tag(models.Model):
@@ -154,15 +154,13 @@ class Tag(models.Model):
     class Meta:
         managed = False
         db_table = "tag"
-        verbose_name = "Тег квиза"
-        verbose_name_plural = "Теги квизов"
+        verbose_name = "Квиз (Тег)"
+        verbose_name_plural = "Квиз (Теги)"
 
 
 class Quiz(models.Model):
     topic = models.ForeignKey(QuizTopic, models.CASCADE, verbose_name="Тема")
-    logo_url = models.FileField(
-        "Изображение", upload_to="images/quiz", blank=True, null=True
-    )
+    logo_url = models.FileField("Изображение", upload_to="quiz", blank=True, null=True)
     title = models.CharField("Название", max_length=100)
     meta = models.TextField("Описание мета-тегов", max_length=80)
     description = MDTextField("Описание", blank=True, null=True)
@@ -173,8 +171,8 @@ class Quiz(models.Model):
     class Meta:
         managed = False
         db_table = "quiz"
-        verbose_name = "Тест"
-        verbose_name_plural = "Тесты"
+        verbose_name = "Квиз"
+        verbose_name_plural = "Квизы"
 
 
 class QuizTag(models.Model):
@@ -200,8 +198,8 @@ class QuizQuestion(models.Model):
     class Meta:
         managed = False
         db_table = "quiz_question"
-        verbose_name = "Вопрос к тесту"
-        verbose_name_plural = "Вопросы к тесту"
+        verbose_name = "Квиз (Вопрос)"
+        verbose_name_plural = "Квиз (Вопросы)"
 
 
 class QuizAnswer(models.Model):
@@ -216,5 +214,5 @@ class QuizAnswer(models.Model):
     class Meta:
         managed = False
         db_table = "quiz_answer"
-        verbose_name = "Ответ к тесту"
-        verbose_name_plural = "Ответы к тесту"
+        verbose_name = "Квиз (Ответ)"
+        verbose_name_plural = "Квиз (Ответы)"

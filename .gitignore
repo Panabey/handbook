@@ -8,6 +8,7 @@ env/
 images/
 
 staticfiles/
+media/
 
 # mypy cache
 .mypy_cache/
