@@ -52,6 +52,8 @@ services:
       - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
     depends_on:
       - postgresql
+    volumes:
+      - shared-media:/app/media
 
   postgresql:
     container_name: postgresql_handbook
@@ -97,3 +99,5 @@ services:
 volumes:
   pg-data:
   certificates:
+  shared-media:
+    external: true
