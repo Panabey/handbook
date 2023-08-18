@@ -16,6 +16,9 @@ from django.core.exceptions import ValidationError
 from mdeditor.fields import MDTextField
 from .ext.utils_admin import calculate_reading_time
 
+from core.storage import CompressImageStorage
+from django_cleanup import cleanup
+
 
 class Status(models.Model):
     title = models.CharField(max_length=25, verbose_name="Название статуса")
@@ -30,9 +33,14 @@ class Status(models.Model):
         db_table = "status"
 
 
+@cleanup.select
 class Handbook(models.Model):
     logo_url = models.FileField(
-        "Изображение", upload_to="handbook", blank=True, null=True
+        "Изображение",
+        upload_to="handbook/",
+        blank=True,
+        null=True,
+        storage=CompressImageStorage,
     )
     title = models.CharField("Название справочника", max_length=80)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
@@ -158,9 +166,16 @@ class Tag(models.Model):
         verbose_name_plural = "Квиз (Теги)"
 
 
+@cleanup.select
 class Quiz(models.Model):
     topic = models.ForeignKey(QuizTopic, models.CASCADE, verbose_name="Тема")
-    logo_url = models.FileField("Изображение", upload_to="quiz", blank=True, null=True)
+    logo_url = models.FileField(
+        "Изображение",
+        upload_to="quiz",
+        blank=True,
+        null=True,
+        storage=CompressImageStorage,
+    )
     title = models.CharField("Название", max_length=100)
     meta = models.TextField("Описание мета-тегов", max_length=80)
     description = MDTextField("Описание", blank=True, null=True)

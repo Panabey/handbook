@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "panel",
     "mdeditor",
     "corsheaders",
+    "django_cleanup.apps.CleanupConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
