@@ -18,6 +18,7 @@ CMD ["uvicorn", "main:app", \
     "--workers", "3", \
     "--host", "0.0.0.0", \
     "--port", "8000", \
+    "--log-level", "warning", \
     "--ws", "none", \
     "--interface", "asgi3", \
     "--loop", "uvloop", \

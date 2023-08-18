@@ -24,10 +24,10 @@ async def get_all(session: AsyncSession):
     return result.all()
 
 
-async def get_content(session: AsyncSession, handbook_id: int):
+async def get_content(session: AsyncSession, handbook_title: str):
     smt = (
         select(HBook)
-        .where(HBook.id == handbook_id)
+        .where(HBook.title.ilike(handbook_title))
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
             joinedload(HBook.content)

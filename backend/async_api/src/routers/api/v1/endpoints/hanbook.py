@@ -36,13 +36,15 @@ async def get_handbooks(session: Session):
 @router.get("/content", response_model=ContentDetail, responses={
     404: {"model": DetailInfo}
 })  # fmt: skip
-async def get_content_handbook(session: Session, handbook_id: Int):
+async def get_content_handbook(
+    session: Session, handbook: Annotated[str, Query(min_length=1, max_length=80)]
+):
     """Получение списка всех тем и подтем справочника.
 
     Полученнные данные (темы) приходят в сортированном виде,
     делать что то дополнительно не требуется.
     """
-    result = await get_content(session, handbook_id)
+    result = await get_content(session, handbook)
     if not result:
         raise HTTPException(404, "По Вашему запросу ничего не найдено..")
 
