@@ -6,6 +6,7 @@
 
 .vscode/
 .venv/
+tests/
 
 .env
 .mypy_cache/
