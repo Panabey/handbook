@@ -5,6 +5,12 @@ from pydantic import BaseModel
 from pydantic import AliasChoices
 
 
+"""
+Данный блок представляет из себя схемы ответов на
+конечные точки и не должны использоваться для валидации запросов
+"""
+
+
 class HBookPageDetail(BaseModel):
     id: int
     title: str
@@ -51,3 +57,15 @@ class PageDetail(BaseModel):
     reading_time: int
     create_date: datetime
     update_date: datetime
+
+
+"""
+Данный блок представляет из себя схемы запросов для валидации
+на конечные точки и не должны использоваться для валидации ответов
+"""
+
+
+class SearchDetail(BaseModel):
+    q: str = Field(min_length=1, max_length=80)
+    handbook_id: int | None = Field(None, ge=1, le=2147483647)
+    continue_after: int | None = Field(None, ge=1, le=100)

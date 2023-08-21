@@ -16,6 +16,7 @@ from modules.database.orm.handbook import search_page
 
 from modules.schemas.base import DetailInfo
 from modules.schemas.handbook import PageDetail
+from modules.schemas.handbook import SearchDetail
 from modules.schemas.handbook import ContentDetail
 from modules.schemas.handbook import HandbookDetail
 from modules.schemas.handbook import SearchPageDetail
@@ -75,17 +76,14 @@ async def get_page_handbook(session: Session, page_id: Int):
     return result
 
 
-@router.get("/search", response_model=list[SearchPageDetail])
-async def search_page_handbook(
-    session: Session,
-    q: Annotated[str, Query(min_length=1, max_length=80)],
-    handbook_id: Int | None = None,
-    continue_after: Int | None = None,
-):
+@router.post("/search", response_model=list[SearchPageDetail])
+async def search_page_handbook(session: Session, schema: SearchDetail):
     """Поиск тем по конкретному справочнику или по всем записям.
 
     Лимит установлен на 15 строк. Чтобы продолжить список
     требуется указать полю continue_after с какой записи продолжить. В теории :)
     """
-    result = await search_page(session, handbook_id, q, 15, continue_after)
+    result = await search_page(
+        session, schema.handbook_id, schema.q, 15, schema.continue_after
+    )
     return result
