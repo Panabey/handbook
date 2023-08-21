@@ -1,26 +1,16 @@
-import os
 import asyncio
 import pytest
 import pytest_asyncio
 
 from httpx import AsyncClient
 
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine
-
 from modules.database.models import Base
+from modules.database.engine import async_session, async_engine
+from core.settings import settings
 
-# изменения пути БД до инициализации приложения
-DATABASE_URL = (
-    "postgresql+asyncpg://postgres:postgres@192.168.1.3:5432/test_handbook"  # fmt: off
-)
-os.environ["URL_DATABASE"] = DATABASE_URL  # fmt: off
+from main import app
 
-from main import app  # noqa: E402
-
-
-test_engine = create_async_engine(DATABASE_URL, echo=True)
-test_session = async_sessionmaker(test_engine, expire_on_commit=False)
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@192.168.1.3:5432/test_handbook"
 
 
 @pytest.fixture(scope="session")
@@ -33,15 +23,16 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope="session")
 async def test_db_setup_sessionmaker() -> None:
-    # always drop and create test db tables between tests session
-    async with test_engine.begin() as conn:
+    assert settings.URL_DATABASE == DATABASE_URL
+    # всегда очищать и создавать тестовую БД между тестовыми сессиями
+    async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
 
 @pytest_asyncio.fixture(autouse=True)
 async def session(test_db_setup_sessionmaker):
-    async with test_session().begin() as session:
+    async with async_session() as session:
         yield session
 
 
