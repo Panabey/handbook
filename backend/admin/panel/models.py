@@ -26,11 +26,23 @@ class Status(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        existing_topic = (
+            Status.objects.using("handbook")
+            .filter(title=self.title)
+            .exclude(pk=self.pk)
+            .first()
+        )
+        if existing_topic:
+            raise ValidationError({"title": "Топик уже существует"})
+        return super().clean_fields(exclude)
+
     class Meta:
         managed = False
         verbose_name = "Справочник (Статус)"
         verbose_name_plural = "Справочник (Статусы)"
         db_table = "status"
+        unique_together = ("title",)
 
 
 @cleanup.select
@@ -50,6 +62,17 @@ class Handbook(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        existing_topic = (
+            Handbook.objects.using("handbook")
+            .filter(title=self.title)
+            .exclude(pk=self.pk)
+            .first()
+        )
+        if existing_topic:
+            raise ValidationError({"title": "Справочник уже существует"})
+        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -146,6 +169,17 @@ class QuizTopic(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        existing_topic = (
+            QuizTopic.objects.using("handbook")
+            .filter(title=self.title)
+            .exclude(pk=self.pk)
+            .first()
+        )
+        if existing_topic:
+            raise ValidationError({"title": "Топик уже существует"})
+        return super().clean_fields(exclude)
+
     class Meta:
         managed = False
         db_table = "quiz_topic"
@@ -158,6 +192,17 @@ class Tag(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        existing_topic = (
+            Tag.objects.using("handbook")
+            .filter(title=self.title)
+            .exclude(pk=self.pk)
+            .first()
+        )
+        if existing_topic:
+            raise ValidationError({"title": "Тег уже существует"})
+        return super().clean_fields(exclude)
 
     class Meta:
         managed = False

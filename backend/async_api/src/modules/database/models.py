@@ -20,7 +20,7 @@ class Handbook(Base):
     __tablename__ = "handbook"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(80))
+    title: Mapped[str] = mapped_column(String(80), unique=True)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     status_id: Mapped[int] = mapped_column(
@@ -75,7 +75,7 @@ class Status(Base):
     __tablename__ = "status"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(25))
+    title: Mapped[str] = mapped_column(String(25), unique=True)
 
     hbook_status: Mapped[list[Handbook]] = relationship(
         back_populates="status_info",
@@ -112,7 +112,7 @@ class Tag(Base):
     __tablename__ = "tag"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    title: Mapped[str] = mapped_column(String(60))
+    title: Mapped[str] = mapped_column(String(60), unique=True)
 
     quizzez_tag: Mapped[list["Quiz"]] = relationship(
         secondary="quiz_tag", back_populates="tags_info"
@@ -123,7 +123,7 @@ class QuizTopic(Base):
     __tablename__ = "quiz_topic"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(60))
+    title: Mapped[str] = mapped_column(String(60), unique=True)
 
     quizzes_info: Mapped[list["Quiz"]] = relationship(
         back_populates="topic_info",
