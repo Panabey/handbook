@@ -11,7 +11,8 @@ from .models import (
     QuizTopic,
     QuizAnswer,
     QuizQuestion,
-    Post,
+    Article,
+    ArticleTag,
     Status,
     Handbook,
     HandbookPage,
@@ -92,7 +93,15 @@ class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
 
 
-class PostAdmin(MultiplyModelAdmin):
+class ArticleTagInline(MultiModelTabularInline):
+    model = ArticleTag
+    extra = 1
+    max_num = 3
+
+
+class ArticleAdmin(MultiplyModelAdmin):
+    inlines = [ArticleTagInline]
+
     list_display = ("title", "create_date", "update_date")
     list_filter = ("create_date", "update_date")
     ordering = ("create_date", "update_date")
@@ -137,7 +146,7 @@ admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
 admin.site.register(QuizAnswer, MultiplyModelAdmin)
 
-admin.site.register(Post, PostAdmin)
+admin.site.register(Article, ArticleAdmin)
 
 admin.site.register(Status, MultiplyModelAdmin)
 admin.site.register(Handbook, HandbookAdmin)

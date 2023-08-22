@@ -35,7 +35,9 @@ class QuizAllDetail(BaseModel):
     logo_url: str | None
     title: str
     meta: str
-    tags: list[TagsDetail] = Field(validation_alias=AliasChoices("tags", "tags_info"))
+    tags: list[TagsDetail] = Field(
+        validation_alias=AliasChoices("tags", "tags_quiz_info")
+    )
 
 
 class QuizAllShortDetail(BaseModel):

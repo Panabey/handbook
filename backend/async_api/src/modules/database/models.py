@@ -84,16 +84,33 @@ class Status(Base):
     )
 
 
-class Post(Base):
-    __tablename__ = "post"
+class Article(Base):
+    __tablename__ = "article"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    logo_url: Mapped[str] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String(80))
     anons: Mapped[str] = mapped_column(String(255))
     text: Mapped[str] = mapped_column(Text)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
     reading_time: Mapped[int] = mapped_column(Integer)
+
+    tags_article_info: Mapped[list["Tag"]] = relationship(
+        secondary="article_tag", back_populates="articles_tag"
+    )
+
+
+class ArticleTag(Base):
+    __tablename__ = "article_tag"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    article_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("article.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
+    tag_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("tag.id", ondelete="CASCADE", onupdate="CASCADE")
+    )
 
 
 class QuizTag(Base):
@@ -115,7 +132,10 @@ class Tag(Base):
     title: Mapped[str] = mapped_column(String(60), unique=True)
 
     quizzez_tag: Mapped[list["Quiz"]] = relationship(
-        secondary="quiz_tag", back_populates="tags_info"
+        secondary="quiz_tag", back_populates="tags_quiz_info"
+    )
+    articles_tag: Mapped[list["Article"]] = relationship(
+        secondary="article_tag", back_populates="tags_article_info"
     )
 
 
@@ -150,7 +170,7 @@ class Quiz(Base):
         cascade="all, delete",
         passive_deletes=True,
     )
-    tags_info: Mapped[list["Tag"]] = relationship(
+    tags_quiz_info: Mapped[list["Tag"]] = relationship(
         secondary="quiz_tag", back_populates="quizzez_tag"
     )
 

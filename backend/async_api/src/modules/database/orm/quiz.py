@@ -58,7 +58,9 @@ async def get_by_topic(
         .offset(continue_after)
         .limit(limit)
         .options(
-            defer(Quiz.description), defer(Quiz.topic_id), joinedload(Quiz.tags_info)
+            defer(Quiz.description),
+            defer(Quiz.topic_id),
+            joinedload(Quiz.tags_quiz_info),
         )
     )
 
@@ -86,7 +88,7 @@ async def search_quiz(
 ):
     smt = (
         select(Quiz)
-        .join(Quiz.tags_info, isouter=True)
+        .join(Quiz.tags_quiz_info, isouter=True)
         .where(Quiz.topic_id == topic_id)
         .order_by(Quiz.id.desc())
         .offset(continue_after)
@@ -94,7 +96,7 @@ async def search_quiz(
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
-            contains_eager(Quiz.tags_info),
+            contains_eager(Quiz.tags_quiz_info),
         )
     )
 

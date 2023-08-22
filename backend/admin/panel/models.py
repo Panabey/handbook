@@ -20,6 +20,30 @@ from core.storage import CompressImageStorage
 from django_cleanup import cleanup
 
 
+class Tag(models.Model):
+    title = models.CharField("Название тега", max_length=60)
+
+    def __str__(self) -> str:
+        return self.title
+
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        existing_topic = (
+            Tag.objects.using("handbook")
+            .filter(title=self.title)
+            .exclude(pk=self.pk)
+            .first()
+        )
+        if existing_topic:
+            raise ValidationError({"title": "Тег уже существует"})
+        return super().clean_fields(exclude)
+
+    class Meta:
+        managed = False
+        db_table = "tag"
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
+
+
 class Status(models.Model):
     title = models.CharField(max_length=25, verbose_name="Название статуса")
 
@@ -141,7 +165,15 @@ class HandbookPage(models.Model):
         db_table = "handbook_page"
 
 
-class Post(models.Model):
+@cleanup.select
+class Article(models.Model):
+    logo_url = models.FileField(
+        "Изображение",
+        upload_to="articles/",
+        blank=True,
+        null=True,
+        storage=CompressImageStorage,
+    )
     title = models.CharField("Название поста", max_length=80)
     anons = models.TextField("Краткое содержание", max_length=255)
     text = MDTextField("Текст")
@@ -158,9 +190,21 @@ class Post(models.Model):
 
     class Meta:
         managed = False
-        verbose_name = "Пост"
-        verbose_name_plural = "Посты"
-        db_table = "post"
+        verbose_name = "Статья"
+        verbose_name_plural = "Статьи"
+        db_table = "article"
+
+
+class ArticleTag(models.Model):
+    article = models.ForeignKey(Article, models.CASCADE)
+    tag = models.ForeignKey(Tag, models.CASCADE)
+
+    def __str__(self) -> str:
+        return "Тег квизов"
+
+    class Meta:
+        managed = False
+        db_table = "article_tag"
 
 
 class QuizTopic(models.Model):
@@ -185,30 +229,6 @@ class QuizTopic(models.Model):
         db_table = "quiz_topic"
         verbose_name = "Квиз (Топик)"
         verbose_name_plural = "Квиз (Топики)"
-
-
-class Tag(models.Model):
-    title = models.CharField("Название тега", max_length=60)
-
-    def __str__(self) -> str:
-        return self.title
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_topic = (
-            Tag.objects.using("handbook")
-            .filter(title=self.title)
-            .exclude(pk=self.pk)
-            .first()
-        )
-        if existing_topic:
-            raise ValidationError({"title": "Тег уже существует"})
-        return super().clean_fields(exclude)
-
-    class Meta:
-        managed = False
-        db_table = "tag"
-        verbose_name = "Квиз (Тег)"
-        verbose_name_plural = "Квиз (Теги)"
 
 
 @cleanup.select
