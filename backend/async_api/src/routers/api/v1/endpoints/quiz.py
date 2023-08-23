@@ -11,7 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from routers.api.deps import get_async_session
 
 from modules.database.orm.quiz import get_one
-from modules.database.orm.quiz import get_tags
 from modules.database.orm.quiz import get_topics
 from modules.database.orm.quiz import get_answer
 from modules.database.orm.quiz import search_quiz
@@ -19,7 +18,6 @@ from modules.database.orm.quiz import get_by_topic
 from modules.database.orm.quiz import get_question
 
 from modules.schemas.base import DetailInfo
-from modules.schemas.quiz import TagsDetail
 from modules.schemas.quiz import QuizDetail
 from modules.schemas.quiz import QuizAllDetail
 from modules.schemas.quiz import QuizAnswerView
@@ -53,11 +51,16 @@ async def get_all_topic(
 @router.get("/topic", response_model=list[QuizAllDetail])
 async def get_topic_quiz(
     session: Session,
-    topic_id: QueryId,
+    topic_id: QueryId | None = None,
     limit: Annotated[int, Query(ge=1, le=20)] = 20,
     continue_after: Annotated[int, Query(ge=1, le=1000)] | None = None,
 ):
-    """Получения полного списка доступных тестов в текущем топике."""
+    """
+    Если указан топик, то  происходит получение полного списка
+    доступных квизов в текущем топике.
+
+    Если топик не указан, получаем полный список доступных квизов.
+    """
     result = await get_by_topic(session, topic_id, limit, continue_after)
     return result
 
@@ -104,18 +107,6 @@ async def search_quizzez(session: Session, schema: QuizSearchDetail):
     )
     if result is None:
         raise HTTPException(404, "По Вашему запросу ничего не найдено..")
-    return result
-
-
-@router.get("/tags", response_model=list[TagsDetail])
-async def get_all_tags(
-    session: Session, limit: Annotated[int, Query(ge=1, le=15)] = 15
-):
-    """Получение всех тегов для квизов
-
-    По умолчанию ограничен 15 тегами.
-    """
-    result = await get_tags(session, limit)
     return result
 
 

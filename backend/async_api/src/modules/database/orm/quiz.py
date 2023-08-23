@@ -17,17 +17,13 @@ async def get_topics(
     session: AsyncSession, limit: int, count_content: int, continue_after: int
 ):
     # отстортированный список последних добавленных тем
-    subquery = (
-        select(
-            QuizTopic.id,
-            Quiz.id.label("quiz_id"),
-            func.row_number()
-            .over(partition_by=QuizTopic.id, order_by=Quiz.id.desc())
-            .label("row_num"),
-        )
-        .join(Quiz, Quiz.topic_id == QuizTopic.id)
-        .subquery()
-    )
+    subquery = select(
+        Quiz.topic_id,
+        Quiz.id.label("quiz_id"),
+        func.row_number()
+        .over(partition_by=Quiz.topic_id, order_by=Quiz.id.desc())
+        .label("row_num"),
+    ).subquery()
 
     smt = (
         select(QuizTopic)
@@ -53,7 +49,6 @@ async def get_by_topic(
 ):
     smt = (
         select(Quiz)
-        .where(Quiz.topic_id == topic_id)
         .order_by(Quiz.id.desc())
         .offset(continue_after)
         .limit(limit)
@@ -63,6 +58,8 @@ async def get_by_topic(
             joinedload(Quiz.tags_quiz_info),
         )
     )
+    if topic_id:
+        smt = smt.where(Quiz.topic_id == topic_id)
 
     result = await session.scalars(smt)
     return result.unique().all()
@@ -135,10 +132,3 @@ async def get_answer(session: AsyncSession, quiz_id: int, question_id: int):
     )
     result = await session.scalars(smt)
     return result.first()
-
-
-async def get_tags(session: AsyncSession, limit: int):
-    smt = select(Tag).order_by(Tag.id).limit(limit)
-
-    result = await session.scalars(smt)
-    return result.all()

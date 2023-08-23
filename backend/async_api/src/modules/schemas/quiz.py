@@ -2,6 +2,7 @@ from pydantic import Field
 from pydantic import BaseModel
 from pydantic import AliasChoices
 
+from .tags import TagsDetail
 
 """
 Данный блок представляет из себя схемы ответов на
@@ -23,11 +24,6 @@ class AnswerDetail(BaseModel):
     title: str
     is_correct: bool
     explanation: str | None
-
-
-class TagsDetail(BaseModel):
-    id: int
-    title: str
 
 
 class QuizAllDetail(BaseModel):

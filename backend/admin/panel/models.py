@@ -233,7 +233,9 @@ class QuizTopic(models.Model):
 
 @cleanup.select
 class Quiz(models.Model):
-    topic = models.ForeignKey(QuizTopic, models.CASCADE, verbose_name="Тема")
+    topic = models.ForeignKey(
+        QuizTopic, models.CASCADE, verbose_name="Тема", null=True, blank=True
+    )
     logo_url = models.FileField(
         "Изображение",
         upload_to="quiz",

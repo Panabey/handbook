@@ -4,16 +4,12 @@ from pydantic import Field
 from pydantic import BaseModel
 from pydantic import AliasChoices
 
+from .tags import TagsDetail
 
 """
 Данный блок представляет из себя схемы ответов на
 конечные точки и не должны использоваться для валидации запросов
 """
-
-
-class TagsDetail(BaseModel):
-    id: int
-    title: str
 
 
 class ArticleDetail(BaseModel):

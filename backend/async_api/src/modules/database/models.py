@@ -157,7 +157,9 @@ class Quiz(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     topic_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("quiz_topic.id", ondelete="CASCADE", onupdate="CASCADE")
+        Integer,
+        ForeignKey("quiz_topic.id", ondelete="SET NULL", onupdate="CASCADE"),
+        nullable=True,
     )
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String(100))
