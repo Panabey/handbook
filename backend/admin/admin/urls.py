@@ -23,7 +23,7 @@ from core.custom_upload import UploadView
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("ui-admin/", admin.site.urls),
     re_path(r"^mdeditor/uploads/$", UploadView.as_view(), name="uploads"),
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ]

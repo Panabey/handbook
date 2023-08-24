@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 EXPOSE 8001
 
@@ -8,10 +8,16 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY backend/admin/requirements.txt .
-
-RUN pip install -r requirements.txt --no-cache-dir -U
-
 COPY backend/admin /app
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+RUN pip install -r requirements.txt --no-cache-dir -U && python manage.py collectstatic
+
+CMD ["uvicorn", "admin.asgi:application", \
+    "--workers", "1", \
+    "--host", "0.0.0.0", \
+    "--port", "8001", \
+    "--lifespan", "off", \
+    "--ws", "none", \
+    "--proxy-headers", \
+    "--no-server-header" \
+    ]
