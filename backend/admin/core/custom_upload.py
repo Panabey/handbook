@@ -48,7 +48,8 @@ class UploadView(generic.View):
             )
 
         # image floder check
-        file_path = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"])
+        date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+        file_path = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"], date)
         os.makedirs(file_path, exist_ok=True)
 
         # save image
@@ -58,8 +59,8 @@ class UploadView(generic.View):
             save_filename = self._no_compress_img(upload_image, file_name, file_path)
 
         path_url = os.path.join(
-            settings.MEDIA_URL, MDEDITOR_CONFIGS["image_folder"], save_filename
-        )
+            settings.MEDIA_URL, MDEDITOR_CONFIGS["image_folder"], date, save_filename
+        ).replace("\\", "/")
         return JsonResponse({"success": 1, "message": "上传成功！", "url": path_url})
 
     def _compress_img(
@@ -75,7 +76,6 @@ class UploadView(generic.View):
         """Оптимизация полученного изображения для уменьшения его размера
         с последующим сохранением
         """
-        utc_date = datetime.datetime.utcnow().strftime("%Y_%m_%d-%H_%M_%S")
         img = Image.open(image)
 
         if new_size_ratio < 1.0:
@@ -88,11 +88,19 @@ class UploadView(generic.View):
         elif width and height:
             img = img.resize((width, height), Image.BILINEAR)
 
-        file_fullname = f"{filename}_{utc_date}.jpg"
+        # имя файла
+        file_fullname = f"{filename}.jpeg"
+        # конвертация прозрачности в белый цвет
+        if img.mode == "LA":
+            img = img.convert("RGBA")
+        if img.mode == "RGBA":
+            new_image = Image.new("RGB", img.size, (255, 255, 255))
+            new_image.paste(img, mask=img.split()[3])
+            img = new_image
 
-        img = img.convert("RGB")
         img.save(
             os.path.join(save_path, file_fullname),
+            format="JPEG",
             quality=quality,
             optimize=True,
             exif=b"",
@@ -103,8 +111,7 @@ class UploadView(generic.View):
 
     def _no_compress_img(self, image: UploadedFile, filename: str, save_path: str):
         """Сохранение изображения без последующей оптимизации"""
-        utc_date = datetime.datetime.utcnow().strftime("%Y_%m_%d-%H_%M_%S")
-        file_fullname = f"{filename}_{utc_date}.svg"
+        file_fullname = f"{filename}.svg"
 
         with open(os.path.join(save_path, file_fullname), "wb") as file:
             for chunk in image.chunks():
