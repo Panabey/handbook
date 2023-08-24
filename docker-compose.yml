@@ -42,6 +42,7 @@ services:
       - DB_ADMIN_PASSWORD=<password> # change
       # other
       - CSRF_COOKIE_SECURE=True
+      - SESSION_COOKIE_SECURE=True
       - CORS_ALLOWED_ORIGINS=["https://<host>"] # change
       - CSRF_TRUSTED_ORIGINS=["https://<host>"] # change
       - SECRET_APP=<token> # without symbols$

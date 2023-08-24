@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     # csrf
     CSRF_COOKIE_SECURE: bool = Field(default=False)
     CSRF_TRUSTED_ORIGINS: list[str | None] = Field(default=list())
+    # session
+    SESSION_COOKIE_SECURE: bool = Field(default=False)
 
 
 settings = Settings()

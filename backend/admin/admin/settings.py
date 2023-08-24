@@ -25,6 +25,8 @@ SECRET_KEY = settings.SECRET_APP
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = settings.DEBUG_MODE
 
+# Application PROTECTION
+
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 CSRF_COOKIE_SECURE = settings.CSRF_COOKIE_SECURE
@@ -32,6 +34,8 @@ CSRF_COOKIE_SECURE = settings.CSRF_COOKIE_SECURE
 CSRF_TRUSTED_ORIGINS = settings.CSRF_TRUSTED_ORIGINS
 
 CORS_ALLOWED_ORIGINS = settings.CORS_ALLOWED_ORIGINS
+
+SESSION_COOKIE_SECURE = settings.SESSION_COOKIE_SECURE
 
 # Application definition
 
@@ -146,8 +150,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-X_FRAME_OPTIONS = "SAMEORIGIN"
 
 MEDIA_URL = "media/"
 

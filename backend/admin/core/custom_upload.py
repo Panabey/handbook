@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.uploadedfile import UploadedFile
 
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+
 from mdeditor.configs import MDConfig
 
 MDEDITOR_CONFIGS = MDConfig("default")
@@ -22,6 +24,7 @@ class UploadView(generic.View):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    @xframe_options_sameorigin
     def post(self, request: HttpRequest, *args, **kwargs):
         upload_image = request.FILES.get("editormd-image-file", None)
         media_root = settings.MEDIA_ROOT
