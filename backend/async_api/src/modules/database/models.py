@@ -184,8 +184,8 @@ class Question(Base):
     quiz_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quiz.id", ondelete="CASCADE", onupdate="CASCADE")
     )
-    title: Mapped[str] = mapped_column(String(200))
-    hint: Mapped[str] = mapped_column(String(200), nullable=True)
+    text: Mapped[str] = mapped_column(String(255))
+    hint: Mapped[str] = mapped_column(String(255), nullable=True)
 
     answers_info: Mapped[list["Answer"]] = relationship(
         back_populates="question_info",
@@ -202,8 +202,8 @@ class Answer(Base):
     question_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quiz_question.id", ondelete="CASCADE", onupdate="CASCADE")
     )
-    title: Mapped[str] = mapped_column(String(200))
+    text: Mapped[str] = mapped_column(String(255))
     is_correct: Mapped[bool] = mapped_column(Boolean)
-    explanation: Mapped[str] = mapped_column(String(200), nullable=True)
+    explanation: Mapped[str] = mapped_column(String(255), nullable=True)
 
     question_info: Mapped["Question"] = relationship(back_populates="answers_info")

@@ -68,10 +68,11 @@ async def get_by_topic(
 async def get_one(session: AsyncSession, quiz_id: int):
     smt = (
         select(Quiz)
+        .join(Quiz.topic_info, isouter=True)
         .where(Quiz.id == quiz_id)
         .options(
             joinedload(Quiz.questions_info).load_only(Question.id),
-            joinedload(Quiz.topic_info).load_only(QuizTopic.id, QuizTopic.title),
+            contains_eager(Quiz.topic_info).load_only(QuizTopic.id, QuizTopic.title),
         )
     )
     result = await session.scalars(smt)
@@ -114,8 +115,8 @@ async def get_question(session: AsyncSession, quiz_id: int, question_id: int):
         select(Question)
         .where(Question.quiz_id == quiz_id, Question.id == question_id)
         .options(
-            load_only(Question.id, Question.title, Question.hint),
-            joinedload(Question.answers_info).load_only(Answer.id, Answer.title),
+            load_only(Question.id, Question.text, Question.hint),
+            joinedload(Question.answers_info).load_only(Answer.id, Answer.text),
         )
     )
     result = await session.scalars(smt)
@@ -129,7 +130,7 @@ async def get_answer(session: AsyncSession, quiz_id: int, question_id: int):
         .options(
             load_only(Question.id),
             joinedload(Question.answers_info).load_only(
-                Answer.id, Answer.title, Answer.is_correct, Answer.explanation
+                Answer.id, Answer.text, Answer.is_correct, Answer.explanation
             ),
         )
     )

@@ -275,11 +275,11 @@ class QuizTag(models.Model):
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, models.CASCADE, verbose_name="Тест")
-    title = MDTextField("Текст вопроса")
-    hint = models.CharField("Подсказка", max_length=200, blank=True, null=True)
+    text = MDTextField("Текст вопроса", max_length=255)
+    hint = models.CharField("Подсказка", max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
-        return self.title
+        return self.text
 
     class Meta:
         managed = False
@@ -290,12 +290,12 @@ class QuizQuestion(models.Model):
 
 class QuizAnswer(models.Model):
     question = models.ForeignKey(QuizQuestion, models.CASCADE)
-    title = models.CharField("Ответ", max_length=100)
+    text = models.CharField("Ответ", max_length=255)
     is_correct = models.BooleanField("Правильный?", default=False)
-    explanation = models.TextField("Объсянение", max_length=200, blank=True, null=True)
+    explanation = models.TextField("Объсянение", max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
-        return self.title
+        return self.text
 
     class Meta:
         managed = False

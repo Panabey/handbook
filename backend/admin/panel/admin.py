@@ -101,7 +101,7 @@ class QuestionAdmin(MultiplyModelAdmin):
 
 
 class AnswerAdmin(MultiplyModelAdmin):
-    list_display = ("title", "get_question", "get_quiz")
+    list_display = ("text", "get_question", "get_quiz")
 
     search_fields = ("question__quiz__title",)
 

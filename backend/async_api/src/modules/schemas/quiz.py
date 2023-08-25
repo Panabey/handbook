@@ -17,12 +17,12 @@ class QuestionShortDetail(BaseModel):
 
 class AnswerShortDetail(BaseModel):
     id: int
-    title: str
+    text: str
 
 
 class AnswerDetail(BaseModel):
     id: int
-    title: str
+    text: str
     is_correct: bool
     explanation: str | None
 
@@ -63,10 +63,11 @@ class QuizDetail(BaseModel):
     logo_url: str | None
     title: str
     short_description: str
+    description: str
     questions: list[int] = Field(
         validation_alias=AliasChoices("questions", "questions_info")
     )
-    topic: QuizTopicShortDetail = Field(
+    topic: QuizTopicShortDetail | None = Field(
         validation_alias=AliasChoices("topic", "topic_info")
     )
 
@@ -78,7 +79,7 @@ class QuizDetail(BaseModel):
 
 class QuizQuestionDetail(BaseModel):
     id: int
-    title: str
+    text: str
     hint: str | None
     answers: list[AnswerShortDetail] = Field(
         validation_alias=AliasChoices("answer", "answers_info")
