@@ -62,7 +62,7 @@ class HandbookPage(Base):
         ForeignKey("handbook_content.id", ondelete="CASCADE", onupdate="CASCADE"),
     )
     title: Mapped[str] = mapped_column(String(80))
-    meta: Mapped[str] = mapped_column(String(120))
+    meta: Mapped[str] = mapped_column(String(160))
     text: Mapped[str] = mapped_column(Text)
     reading_time: Mapped[int] = mapped_column(Integer)
     update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
@@ -163,7 +163,7 @@ class Quiz(Base):
     )
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String(100))
-    meta: Mapped[str] = mapped_column(String(80))
+    short_description: Mapped[str] = mapped_column(String(160))
     description: Mapped[str] = mapped_column(String(255))
 
     topic_info: Mapped[QuizTopic] = relationship(back_populates="quizzes_info")

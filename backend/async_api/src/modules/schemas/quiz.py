@@ -30,7 +30,7 @@ class QuizAllDetail(BaseModel):
     id: int
     logo_url: str | None
     title: str
-    meta: str
+    short_description: str
     tags: list[TagsDetail] = Field(
         validation_alias=AliasChoices("tags", "tags_quiz_info")
     )
@@ -40,7 +40,12 @@ class QuizAllShortDetail(BaseModel):
     id: int
     logo_url: str | None
     title: str
-    meta: str
+    short_description: str
+
+
+class QuizTopicShortDetail(BaseModel):
+    id: int
+    title: str
 
 
 class QuizTopicsDetail(BaseModel):
@@ -53,9 +58,12 @@ class QuizDetail(BaseModel):
     id: int
     logo_url: str | None
     title: str
-    meta: str
+    short_description: str
     questions: list[QuestionShortDetail] = Field(
         validation_alias=AliasChoices("questions", "questions_info")
+    )
+    topic: QuizTopicShortDetail = Field(
+        validation_alias=AliasChoices("topic", "topic_info")
     )
 
 

@@ -36,7 +36,7 @@ async def get_topics(
         .options(
             load_only(QuizTopic.id, QuizTopic.title),
             contains_eager(QuizTopic.quizzes_info).load_only(
-                Quiz.id, Quiz.logo_url, Quiz.title, Quiz.meta
+                Quiz.id, Quiz.logo_url, Quiz.title, Quiz.short_description
             ),
         )
     )
@@ -69,7 +69,10 @@ async def get_one(session: AsyncSession, quiz_id: int):
     smt = (
         select(Quiz)
         .where(Quiz.id == quiz_id)
-        .options(joinedload(Quiz.questions_info).load_only(Question.id))
+        .options(
+            joinedload(Quiz.questions_info).load_only(Question.id),
+            joinedload(Quiz.topic_info).load_only(QuizTopic.id, QuizTopic.title),
+        )
     )
     result = await session.scalars(smt)
     return result.first()
