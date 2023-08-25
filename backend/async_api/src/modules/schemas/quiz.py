@@ -1,6 +1,7 @@
 from pydantic import Field
 from pydantic import BaseModel
 from pydantic import AliasChoices
+from pydantic import field_validator
 
 from .tags import TagsDetail
 
@@ -31,9 +32,12 @@ class QuizAllDetail(BaseModel):
     logo_url: str | None
     title: str
     short_description: str
-    tags: list[TagsDetail] = Field(
-        validation_alias=AliasChoices("tags", "tags_quiz_info")
-    )
+    tags: list[str] = Field(validation_alias=AliasChoices("tags", "tags_quiz_info"))
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def tags_to_list(cls, v: list[TagsDetail]) -> list[str]:
+        return [tag.title for tag in v]
 
 
 class QuizAllShortDetail(BaseModel):
@@ -59,12 +63,17 @@ class QuizDetail(BaseModel):
     logo_url: str | None
     title: str
     short_description: str
-    questions: list[QuestionShortDetail] = Field(
+    questions: list[int] = Field(
         validation_alias=AliasChoices("questions", "questions_info")
     )
     topic: QuizTopicShortDetail = Field(
         validation_alias=AliasChoices("topic", "topic_info")
     )
+
+    @field_validator("questions", mode="before")
+    @classmethod
+    def questions_to_list(cls, v: list[QuestionShortDetail]) -> list[int]:
+        return [tag.id for tag in v]
 
 
 class QuizQuestionDetail(BaseModel):

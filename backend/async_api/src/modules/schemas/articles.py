@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic import BaseModel
 from pydantic import AliasChoices
 
@@ -23,6 +23,11 @@ class ArticleDetail(BaseModel):
     create_date: datetime
     update_date: datetime
 
+    @field_validator("tags", mode="before")
+    @classmethod
+    def tags_to_list(cls, v: list[TagsDetail]) -> list[str]:
+        return [tag.title for tag in v]
+
 
 class ArticleShortDetail(BaseModel):
     id: int
@@ -34,11 +39,14 @@ class ArticleAllDetail(BaseModel):
     logo_url: str | None
     title: str
     anons: str
-    tags: list[TagsDetail] = Field(
-        validation_alias=AliasChoices("tags", "tags_article_info")
-    )
+    tags: list[str] = Field(validation_alias=AliasChoices("tags", "tags_article_info"))
     reading_time: int
     create_date: datetime
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def tags_to_list(cls, v: list[TagsDetail]) -> list[str]:
+        return [tag.title for tag in v]
 
 
 class ArticleAllDetail(BaseModel):
