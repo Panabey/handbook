@@ -19,15 +19,15 @@ class Settings(BaseSettings):
     SECRET_APP: str | None = Field(default=None)
 
     # databse
-    DATABASE_HOST: str
+    DATABASE_HOST: str | None = Field(default=None)
 
-    DB_BACKEND_NAME: str
-    DB_BACKEND_USER: str
-    DB_BACKEND_PASSWORD: str
+    DB_BACKEND_NAME: str | None = Field(default=None)
+    DB_BACKEND_USER: str | None = Field(default=None)
+    DB_BACKEND_PASSWORD: str | None = Field(default=None)
 
-    DB_ADMIN_NAME: str
-    DB_ADMIN_USER: str
-    DB_ADMIN_PASSWORD: str
+    DB_ADMIN_NAME: str | None = Field(default=None)
+    DB_ADMIN_USER: str | None = Field(default=None)
+    DB_ADMIN_PASSWORD: str | None = Field(default=None)
 
     # cors
     CORS_ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost"])

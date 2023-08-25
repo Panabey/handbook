@@ -90,6 +90,7 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.email=<email>" # change
       - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
     ports:
       - 80:80
       - 443:443

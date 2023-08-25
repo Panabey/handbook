@@ -15,7 +15,7 @@ RUN pip install uvloop httptools -r requirements.txt --no-cache-dir -U
 WORKDIR /app/src
 
 CMD ["uvicorn", "main:app", \
-    "--workers", "3", \
+    "--workers", "4", \
     "--host", "0.0.0.0", \
     "--port", "8000", \
     "--log-level", "warning", \

@@ -10,7 +10,7 @@ WORKDIR /app
 
 COPY backend/admin /app
 
-RUN pip install httptools -r requirements.txt --no-cache-dir -U
+RUN pip install httptools -r requirements.txt --no-cache-dir -U && python manage.py collectstatic --noinput
 
 CMD ["uvicorn", "admin.wsgi:application", \
     "--workers", "1", \
