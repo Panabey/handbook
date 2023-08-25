@@ -85,12 +85,34 @@ class QuizTopicAdmin(MultiplyModelAdmin):
 class QuizAdmin(MultiplyModelAdmin):
     inlines = [QuizTagInline]
     list_display = ("title", "topic")
-    search_fields = ("title", "topic")
+    search_fields = ("title", "topic__title")
     list_per_page = 20
 
 
 class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
+    list_display = ("question_number", "quiz")
+    search_fields = ("quiz__title",)
+
+    def question_number(self, obj: QuizQuestion) -> str:
+        return f"Вопрос #{obj.pk}"
+
+    question_number.short_description = "Вопрос"
+
+
+class AnswerAdmin(MultiplyModelAdmin):
+    list_display = ("title", "get_question", "get_quiz")
+
+    search_fields = ("question__quiz__title",)
+
+    def get_quiz(self, obj: QuizAnswer):
+        return obj.question.quiz.title
+
+    def get_question(self, obj: QuizAnswer):
+        return f"Вопрос #{obj.question.pk}"
+
+    get_quiz.short_description = "Квиз"
+    get_question.short_description = "Вопрос"
 
 
 class ArticleTagInline(MultiModelTabularInline):
@@ -144,7 +166,7 @@ admin.site.register(Tag, MultiplyModelAdmin)
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
-admin.site.register(QuizAnswer, MultiplyModelAdmin)
+admin.site.register(QuizAnswer, AnswerAdmin)
 
 admin.site.register(Article, ArticleAdmin)
 

@@ -136,7 +136,7 @@ class HandbookPage(models.Model):
     title = models.CharField(
         "Название темы", help_text="Например: 1.1 Циклы", max_length=80
     )
-    meta = models.TextField("Описание мета-тегов", max_length=120)
+    meta = models.TextField("Описание мета-тегов", max_length=160)
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField("Дата создания", auto_now=True)
@@ -244,7 +244,11 @@ class Quiz(models.Model):
         storage=CompressImageStorage,
     )
     title = models.CharField("Название", max_length=100)
-    meta = models.TextField("Описание мета-тегов", max_length=80)
+    short_description = models.TextField(
+        "Короткое опписание",
+        help_text="Так же используется для мета тегов",
+        max_length=160,
+    )
     description = MDTextField("Описание", blank=True, null=True)
 
     def __str__(self) -> str:
