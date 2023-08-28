@@ -91,12 +91,15 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--providers.file.directory=/etc/traefik_conf"
+      - "--providers.file.watch=true"
     ports:
       - 80:80
       - 443:443
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./certificates:/certificates"
+      - "./conf:/etc/traefik_conf"
 
 volumes:
   pg-data:
