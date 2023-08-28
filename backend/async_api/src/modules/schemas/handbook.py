@@ -68,4 +68,5 @@ class PageDetail(BaseModel):
 class SearchDetail(BaseModel):
     q: str = Field(min_length=1, max_length=80)
     handbook_id: int | None = Field(None, ge=1, le=2147483647)
+    limit: int = Field(15, ge=1, le=15)
     continue_after: int | None = Field(None, ge=1, le=100)

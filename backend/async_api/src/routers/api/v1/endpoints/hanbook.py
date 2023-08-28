@@ -84,6 +84,6 @@ async def search_page_handbook(session: Session, schema: SearchDetail):
     требуется указать полю continue_after с какой записи продолжить. В теории :)
     """
     result = await search_page(
-        session, schema.handbook_id, schema.q, 15, schema.continue_after
+        session, schema.handbook_id, schema.q, schema.limit, schema.continue_after
     )
     return result

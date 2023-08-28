@@ -55,7 +55,9 @@ class QuizTopicShortDetail(BaseModel):
 class QuizTopicsDetail(BaseModel):
     id: int
     title: str
-    quizzes_info: list[QuizAllShortDetail]
+    quizzes: list[QuizAllShortDetail] = Field(
+        validation_alias=AliasChoices("quizzes", "quizzes_info")
+    )
 
 
 class QuizDetail(BaseModel):
