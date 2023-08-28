@@ -3,6 +3,7 @@ import pytest
 import pytest_asyncio
 
 from httpx import AsyncClient
+from sqlalchemy import delete
 
 from modules.database.models import Base
 from modules.database.engine import async_session, async_engine
@@ -34,6 +35,11 @@ async def test_db_setup_sessionmaker() -> None:
 async def session(test_db_setup_sessionmaker):
     async with async_session() as session:
         yield session
+
+        # удалить все данные после теста
+        for _, table in Base.metadata.tables.items():
+            await session.execute(delete(table))
+        await session.commit()
 
 
 @pytest_asyncio.fixture(scope="session")
