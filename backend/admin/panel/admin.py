@@ -19,6 +19,8 @@ from .models import (
     HandbookContent,
 )
 
+from .forms import AnswerForm
+
 
 class MultiplyModelAdmin(admin.ModelAdmin):
     """Расширеная модель для подключения сторонней базы данных"""
@@ -66,6 +68,7 @@ class MultiModelTabularInline(admin.TabularInline):
 
 class AnswerInline(MultiModelTabularInline):
     model = QuizAnswer
+    formset = AnswerForm
     extra = 1
     min_num = 2
     max_num = 4
