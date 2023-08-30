@@ -109,7 +109,7 @@ class CompressImageStorage(Storage, StorageSettingsMixin):
 
         filename, ext = os.path.splitext(full_path)
 
-        if ext != ".svg":
+        if ext not in [".svg", ".gif"]:
             new_size_ratio = 0.9
 
             with Image.open(content) as img:
@@ -120,8 +120,15 @@ class CompressImageStorage(Storage, StorageSettingsMixin):
                     ),
                     Image.BILINEAR,
                 )
-                img = img.convert("RGB")
                 full_path = f"{filename}.jpeg"
+
+                if img.mode == "LA":
+                    img = img.convert("RGBA")
+                if img.mode == "RGBA":
+                    new_image = Image.new("RGB", img.size, (255, 255, 255))
+                    new_image.paste(img, mask=img.split()[3])
+                    img = new_image
+
                 img.save(full_path, "JPEG", quality=90, optimize=True, exif=b"")
         else:
             while True:
