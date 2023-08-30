@@ -51,7 +51,7 @@ class ContentDetail(HandbookDetailShort):
 
 class PageDetail(BaseModel):
     id: int
-    meta: str
+    short_description: str
     title: str
     text: str
     reading_time: int

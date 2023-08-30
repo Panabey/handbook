@@ -93,7 +93,11 @@ async def test_handbook_page(client: AsyncClient, session: AsyncSession):
     payload = {"title": "Python"}
     handbook_id = await insert_value(Handbook, session, Handbook.id, **payload)
 
-    payload = {"handbook_id": handbook_id, "title": "1. Основы", "description": "Empty"}
+    payload = {
+        "handbook_id": handbook_id,
+        "title": "1. Основы",
+        "short_description": "Empty",
+    }
     content_id = await insert_value(
         HandbookContent, session, HandbookContent.id, **payload
     )
@@ -101,7 +105,7 @@ async def test_handbook_page(client: AsyncClient, session: AsyncSession):
     payload = {
         "content_id": content_id,
         "title": "Test",
-        "meta": "Test",
+        "short_description": "Test",
         "text": "Test",
         "reading_time": 1,
     }

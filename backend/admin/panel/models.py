@@ -136,7 +136,11 @@ class HandbookPage(models.Model):
     title = models.CharField(
         "Название темы", help_text="Например: 1.1 Циклы", max_length=80
     )
-    meta = models.TextField("Описание мета-тегов", max_length=160)
+    short_description = models.TextField(
+        "Короткое описание",
+        help_text="Так же используется для мета тегов",
+        max_length=160,
+    )
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField("Дата создания", auto_now=True)
