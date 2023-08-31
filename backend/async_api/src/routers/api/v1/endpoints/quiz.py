@@ -24,6 +24,7 @@ from modules.schemas.quiz import QuizAnswerView
 from modules.schemas.quiz import QuizTopicsDetail
 from modules.schemas.quiz import QuizSearchDetail
 from modules.schemas.quiz import QuizAnswerDetail
+from modules.schemas.quiz import QuizInTopicDetail
 from modules.schemas.quiz import QuizQuestionDetail
 
 router = APIRouter()
@@ -48,7 +49,11 @@ async def get_all_topic(
     return result
 
 
-@router.get("/topic", response_model=list[QuizAllDetail])
+@router.get(
+    "/topic",
+    response_model=QuizInTopicDetail,
+    responses={404: {"model": DetailInfo}}
+)  # fmt: skip
 async def get_topic_quiz(
     session: Session,
     topic_id: QueryId | None = None,
@@ -62,6 +67,8 @@ async def get_topic_quiz(
     Если топик не указан, получаем полный список доступных квизов.
     """
     result = await get_by_topic(session, topic_id, limit, continue_after)
+    if result is None:
+        raise HTTPException(404, "По Вашему запросу ничего не найдено..")
     return result
 
 
@@ -114,7 +121,7 @@ async def search_quizzez(session: Session, schema: QuizSearchDetail):
     "/question",
     response_model=QuizQuestionDetail,
     responses={404: {"model": DetailInfo}},
-)
+)  # fmt: skip
 async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: QueryId):
     """
     Получение вариантов ответа для конкретного вопроса теста.
@@ -130,7 +137,7 @@ async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: Que
     "/answer/view",
     response_model=QuizAnswerDetail,
     responses={404: {"model": DetailInfo}},
-)
+)  # fmt: skip
 async def get_quiz_answer(session: Session, schema: QuizAnswerView):
     """
     Получение ответа/ов для конкретного вопроса теста.

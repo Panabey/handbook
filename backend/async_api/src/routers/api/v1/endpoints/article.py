@@ -37,9 +37,11 @@ async def get_all_articles(
     return result
 
 
-@router.get("/", response_model=ArticleDetail, responses={
-    404: {"model": DetailInfo}
-})  # fmt: skip
+@router.get(
+    "/",
+    response_model=ArticleDetail,
+    responses={404: {"model": DetailInfo}}
+)  # fmt: skip
 async def get_page_article(
     session: Session, post_id: Annotated[int, Query(ge=1, le=2147483647)]
 ):

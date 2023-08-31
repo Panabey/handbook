@@ -47,6 +47,24 @@ async def get_topics(
 async def get_by_topic(
     session: AsyncSession, topic_id: int, limit: int, continue_after: int
 ):
+    if topic_id:
+        smt = (
+            select(QuizTopic)
+            .where(Quiz.topic_id == topic_id)
+            .order_by(Quiz.id.desc())
+            .offset(continue_after)
+            .limit(limit)
+            .options(
+                joinedload(QuizTopic.quizzes_info)
+                .defer(Quiz.description)
+                .defer(Quiz.topic_id)
+                .joinedload(Quiz.tags_quiz_info)
+                .defer(Tag.status_id),
+            )
+        )
+        result = await session.scalars(smt)
+        return result.first()
+
     smt = (
         select(Quiz)
         .order_by(Quiz.id.desc())
@@ -55,14 +73,14 @@ async def get_by_topic(
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
-            joinedload(Quiz.tags_quiz_info),
+            joinedload(Quiz.tags_quiz_info).defer(Tag.status_id),
         )
     )
-    if topic_id:
-        smt = smt.where(Quiz.topic_id == topic_id)
 
     result = await session.scalars(smt)
-    return result.unique().all()
+    if result:
+        return {"id": None, "title": None, "quizzes_info": result.unique().all()}
+    return None
 
 
 async def get_one(session: AsyncSession, quiz_id: int):
@@ -97,7 +115,7 @@ async def search_quiz(
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
-            contains_eager(Quiz.tags_quiz_info),
+            contains_eager(Quiz.tags_quiz_info).defer(Tag.status_id),
         )
     )
 

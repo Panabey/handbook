@@ -7,7 +7,7 @@ from sqlalchemy.orm import load_only
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from modules.database.models import Article
+from modules.database.models import Article, Tag
 
 
 async def get_all_article(session: AsyncSession, page: int, limit: int):
@@ -23,7 +23,7 @@ async def get_all_article(session: AsyncSession, page: int, limit: int):
         .options(
             defer(Article.text),
             defer(Article.update_date),
-            contains_eager(Article.tags_article_info),
+            contains_eager(Article.tags_article_info).defer(Tag.status_id),
         )
     )
     result = await session.scalars(smt)
@@ -41,8 +41,7 @@ async def get_article(session: AsyncSession, post_id: int):
         .where(Article.id == post_id)
         .options(
             defer(Article.logo_url),
-            defer(Article.anons),
-            contains_eager(Article.tags_article_info),
+            contains_eager(Article.tags_article_info).defer(Tag.status_id),
         )
     )
 

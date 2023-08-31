@@ -40,6 +40,14 @@ class QuizAllDetail(BaseModel):
         return [tag.title for tag in v]
 
 
+class QuizInTopicDetail(BaseModel):
+    id: int | None
+    title: str | None
+    quizzes: list[QuizAllDetail] = Field(
+        validation_alias=AliasChoices("quizzes", "quizzes_info")
+    )
+
+
 class QuizAllShortDetail(BaseModel):
     id: int
     logo_url: str | None

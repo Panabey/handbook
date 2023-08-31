@@ -15,6 +15,7 @@ from .tags import TagsDetail
 class ArticleDetail(BaseModel):
     id: int
     title: str
+    anons: str
     text: str
     tags: list[TagsDetail] = Field(
         validation_alias=AliasChoices("tags", "tags_article_info")
