@@ -125,12 +125,30 @@ class QuizTag(Base):
     )
 
 
+class TagStatus(Base):
+    __tablename__ = "tag_status"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(60), unique=True)
+
+    tag_info: Mapped[list["Tag"]] = relationship(
+        back_populates="status_info",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+
+
 class Tag(Base):
     __tablename__ = "tag"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(60), unique=True)
+    status_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("tag_status.id", ondelete="CASCADE", onupdate="CASCADE"),
+        nullable=True,
+    )
 
+    status_info: Mapped[TagStatus] = relationship(back_populates="tag_info")
     quizzez_tag: Mapped[list["Quiz"]] = relationship(
         secondary="quiz_tag", back_populates="tags_quiz_info"
     )

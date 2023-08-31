@@ -11,6 +11,7 @@ from .models import (
     QuizTopic,
     QuizAnswer,
     QuizQuestion,
+    TagStatus,
     Article,
     ArticleTag,
     Status,
@@ -64,6 +65,12 @@ class MultiModelTabularInline(admin.TabularInline):
         return super().formfield_for_manytomany(
             db_field, request, using=self.using, **kwargs
         )
+
+
+class TagAdmin(MultiplyModelAdmin):
+    list_display = ("title", "status")
+    search_fields = ("title", "status")
+    list_per_page = 20
 
 
 class AnswerInline(MultiModelTabularInline):
@@ -173,7 +180,9 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     get_content.short_description = "Раздел"
 
 
-admin.site.register(Tag, MultiplyModelAdmin)
+admin.site.register(Tag, TagAdmin)
+admin.site.register(TagStatus, MultiplyModelAdmin)
+
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)

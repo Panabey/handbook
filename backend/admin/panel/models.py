@@ -20,20 +20,47 @@ from core.storage import CompressImageStorage
 from django_cleanup import cleanup
 
 
-class Tag(models.Model):
-    title = models.CharField("Название тега", max_length=60)
+class TagStatus(models.Model):
+    title = models.CharField("Название статуса", max_length=60)
 
     def __str__(self) -> str:
         return self.title
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_topic = (
+        existing_value = (
             Tag.objects.using("handbook")
             .filter(title=self.title)
             .exclude(pk=self.pk)
             .first()
         )
-        if existing_topic:
+        if existing_value:
+            raise ValidationError({"title": "Статус уже существует"})
+        return super().clean_fields(exclude)
+
+    class Meta:
+        managed = False
+        db_table = "tag_status"
+        verbose_name = "Статус тег"
+        verbose_name_plural = "Статус теги"
+
+
+class Tag(models.Model):
+    title = models.CharField("Название тега", max_length=60)
+    status = models.ForeignKey(
+        "TagStatus", models.CASCADE, blank=True, null=True, verbose_name="Статус"
+    )
+
+    def __str__(self) -> str:
+        return self.title
+
+    def clean_fields(self, exclude: Collection[str] | None) -> None:
+        existing_value = (
+            Tag.objects.using("handbook")
+            .filter(title=self.title)
+            .exclude(pk=self.pk)
+            .first()
+        )
+        if existing_value:
             raise ValidationError({"title": "Тег уже существует"})
         return super().clean_fields(exclude)
 
@@ -51,13 +78,13 @@ class Status(models.Model):
         return self.title
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_topic = (
+        existing_value = (
             Status.objects.using("handbook")
             .filter(title=self.title)
             .exclude(pk=self.pk)
             .first()
         )
-        if existing_topic:
+        if existing_value:
             raise ValidationError({"title": "Топик уже существует"})
         return super().clean_fields(exclude)
 
@@ -88,13 +115,13 @@ class Handbook(models.Model):
         return self.title
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_topic = (
+        existing_value = (
             Handbook.objects.using("handbook")
             .filter(title=self.title)
             .exclude(pk=self.pk)
             .first()
         )
-        if existing_topic:
+        if existing_value:
             raise ValidationError({"title": "Справочник уже существует"})
         return super().clean_fields(exclude)
 
@@ -220,13 +247,13 @@ class QuizTopic(models.Model):
         return self.title
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_topic = (
+        existing_value = (
             QuizTopic.objects.using("handbook")
             .filter(title=self.title)
             .exclude(pk=self.pk)
             .first()
         )
-        if existing_topic:
+        if existing_value:
             raise ValidationError({"title": "Топик уже существует"})
         return super().clean_fields(exclude)
 
