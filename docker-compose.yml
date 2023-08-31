@@ -17,11 +17,13 @@ services:
       - "traefik.http.routers.fastapi.rule=Host(`<domain>`)" # change
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+      # middlewares
       - "traefik.http.routers.fastapi.middlewares=security"
       - "traefik.http.middlewares.security.headers.accesscontrolallowmethods=GET,POST,HEAD"
-      - "traefik.http.middlewares.security.headers.accesscontrolalloworiginlist=*"
+      - "traefik.http.middlewares.security.headers.accesscontrolalloworiginlist=*" # change
       - "traefik.http.middlewares.security.headers.accesscontrolmaxage=600"
       - "traefik.http.middlewares.security.headers.framedeny=true"
+      - "traefik.http.middlewares.security.headers.stsseconds=31536000"
     depends_on:
       - postgresql
 
@@ -56,6 +58,9 @@ services:
       - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
       - "traefik.http.routers.admin.tls=true"
       - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
+      # middlewares
+      - "traefik.http.routers.admin.middlewares=admin_security"
+      - "traefik.http.middlewares.admin_security.headers.stsseconds=31536000"
     depends_on:
       - postgresql
     volumes:
