@@ -103,6 +103,7 @@ class Handbook(models.Model):
         verbose_name = "Справочник"
         verbose_name_plural = "Справочники"
         db_table = "handbook"
+        ordering = ["-id"]
 
 
 class HandbookContent(models.Model):
@@ -113,7 +114,7 @@ class HandbookContent(models.Model):
     description = models.TextField("Описание раздела", max_length=255)
 
     def __str__(self) -> str:
-        return self.title
+        return f"{self.title} // {self.handbook.title}"
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
         errors = {}
@@ -129,6 +130,7 @@ class HandbookContent(models.Model):
         verbose_name = "Справочники (Раздел)"
         verbose_name_plural = "Справочники (Разделы)"
         db_table = "handbook_content"
+        ordering = ["-id"]
 
 
 class HandbookPage(models.Model):
@@ -233,6 +235,7 @@ class QuizTopic(models.Model):
         db_table = "quiz_topic"
         verbose_name = "Квиз (Топик)"
         verbose_name_plural = "Квиз (Топики)"
+        ordering = ["-id"]
 
 
 @cleanup.select
@@ -263,6 +266,7 @@ class Quiz(models.Model):
         db_table = "quiz"
         verbose_name = "Квиз"
         verbose_name_plural = "Квизы"
+        ordering = ["-id"]
 
 
 class QuizTag(models.Model):

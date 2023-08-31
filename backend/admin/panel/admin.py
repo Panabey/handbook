@@ -90,12 +90,14 @@ class QuizAdmin(MultiplyModelAdmin):
     list_display = ("title", "topic")
     search_fields = ("title", "topic__title")
     list_per_page = 20
+    autocomplete_fields = ("topic",)
 
 
 class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
     list_display = ("question_number", "quiz")
     search_fields = ("quiz__title",)
+    autocomplete_fields = ("quiz",)
 
     def question_number(self, obj: QuizQuestion) -> str:
         return f"Вопрос #{obj.pk}"
@@ -144,12 +146,13 @@ class HandbookContentAdmin(MultiplyModelAdmin):
     list_display = ("handbook", "title")
     search_fields = ("title", "handbook__title")
     list_per_page = 20
+    autocomplete_fields = ("handbook",)
 
 
 class HandbookPageAdmin(MultiplyModelAdmin):
     list_display = (
         "title",
-        "content",
+        "get_content",
         "get_handbook",
         "create_date",
         "update_date",
@@ -158,11 +161,16 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     ordering = ("create_date", "update_date")
     search_fields = ("title", "content__handbook__title")
     list_per_page = 20
+    autocomplete_fields = ("content",)
 
     def get_handbook(self, obj: HandbookPage):
         return obj.content.handbook.title
 
+    def get_content(self, obj: HandbookPage):
+        return obj.content.title
+
     get_handbook.short_description = "Справочник"
+    get_content.short_description = "Раздел"
 
 
 admin.site.register(Tag, MultiplyModelAdmin)
