@@ -14,6 +14,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from mdeditor.fields import MDTextField
+from .ext.utils_admin import replace_char
 from .ext.utils_admin import calculate_reading_time
 
 from core.storage import CompressImageStorage
@@ -113,6 +114,10 @@ class Handbook(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.title = replace_char(r"[-\s]+", self.title.strip())
+        super().save(*args, **kwargs)
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
         existing_value = (

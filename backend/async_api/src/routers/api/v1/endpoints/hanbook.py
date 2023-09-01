@@ -45,6 +45,8 @@ async def get_content_handbook(
     Полученнные данные (темы) приходят в сортированном виде,
     делать что то дополнительно не требуется.
     """
+    handbook = re.sub(r"[-\s]+", " ", handbook.strip())
+
     result = await get_content(session, handbook)
     if not result:
         raise HTTPException(404, "По Вашему запросу ничего не найдено..")
