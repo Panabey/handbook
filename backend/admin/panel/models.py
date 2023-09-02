@@ -14,6 +14,8 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 from mdeditor.fields import MDTextField
+from colorfield.fields import ColorField
+
 from .ext.utils_admin import replace_char
 from .ext.utils_admin import calculate_reading_time
 
@@ -71,15 +73,17 @@ class Tag(models.Model):
         ordering = ["-id"]
 
 
-class Status(models.Model):
+class HandBookStatus(models.Model):
     title = models.CharField(max_length=25, verbose_name="Название статуса")
+    color_text = ColorField("Цвет текста", default="#5573f3")
+    color_background = ColorField("Цвет фона", default="#e2e8ff")
 
     def __str__(self) -> str:
         return self.title
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
         existing_value = (
-            Status.objects.using("handbook")
+            HandBookStatus.objects.using("handbook")
             .filter(title=self.title)
             .exclude(pk=self.pk)
             .first()
@@ -92,8 +96,7 @@ class Status(models.Model):
         managed = False
         verbose_name = "Справочник (Статус)"
         verbose_name_plural = "Справочник (Статусы)"
-        db_table = "status"
-        unique_together = ("title",)
+        db_table = "handbook_status"
 
 
 @cleanup.select
@@ -108,7 +111,7 @@ class Handbook(models.Model):
     title = models.CharField("Название справочника", max_length=80)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
     status = models.ForeignKey(
-        "Status", models.SET_NULL, blank=True, null=True, verbose_name="Статус"
+        "HandBookStatus", models.SET_NULL, blank=True, null=True, verbose_name="Статус"
     )
 
     def __str__(self) -> str:
@@ -176,8 +179,8 @@ class HandbookPage(models.Model):
     )
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
-    update_date = models.DateTimeField("Дата создания", auto_now=True)
-    create_date = models.DateTimeField("Дата редактирования", auto_now_add=True)
+    update_date = models.DateTimeField("Дата редактирования", auto_now=True)
+    create_date = models.DateTimeField("Дата создания", auto_now_add=True)
 
     def __str__(self) -> str:
         return self.title
@@ -215,8 +218,8 @@ class Article(models.Model):
     anons = models.TextField("Краткое содержание", max_length=255)
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
-    update_date = models.DateTimeField("Дата создания", auto_now=True)
-    create_date = models.DateTimeField("Дата редактирования", auto_now_add=True)
+    update_date = models.DateTimeField("Дата редактирования", auto_now=True)
+    create_date = models.DateTimeField("Дата создания", auto_now_add=True)
 
     def __str__(self) -> str:
         return self.title

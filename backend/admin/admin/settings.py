@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "panel",
     "mdeditor",
+    "colorfield",
     "corsheaders",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.admin",

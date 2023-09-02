@@ -4,7 +4,12 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tests.utils.orm import insert_value
-from modules.database.models import Handbook, HandbookContent, HandbookPage, Status
+from modules.database.models import (
+    Handbook,
+    HandbookContent,
+    HandbookPage,
+    HandBookStatus,
+)
 
 pytestmark = pytest.mark.asyncio
 
@@ -32,7 +37,7 @@ async def test_handbook_all_without_status(client: AsyncClient, session: AsyncSe
 
 async def test_handbook_all_with_status(client: AsyncClient, session: AsyncSession):
     payload = {"title": "Дополняется"}
-    status = await insert_value(Status, session, None, **payload)
+    status = await insert_value(HandBookStatus, session, None, **payload)
 
     payload = {"title": "Python", "status_id": status.id}
     handbook_id = await insert_value(Handbook, session, Handbook.id, **payload)

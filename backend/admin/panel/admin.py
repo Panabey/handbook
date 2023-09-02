@@ -14,7 +14,7 @@ from .models import (
     TagStatus,
     Article,
     ArticleTag,
-    Status,
+    HandBookStatus,
     Handbook,
     HandbookPage,
     HandbookContent,
@@ -149,6 +149,12 @@ class HandbookAdmin(MultiplyModelAdmin):
     list_per_page = 20
 
 
+class HandbookStatusAdmin(MultiplyModelAdmin):
+    list_display = ("title", "color_text", "color_background")
+    search_fields = ("title",)
+    list_per_page = 20
+
+
 class HandbookContentAdmin(MultiplyModelAdmin):
     list_display = ("handbook", "title")
     search_fields = ("title", "handbook__title")
@@ -190,7 +196,7 @@ admin.site.register(QuizAnswer, AnswerAdmin)
 
 admin.site.register(Article, ArticleAdmin)
 
-admin.site.register(Status, MultiplyModelAdmin)
+admin.site.register(HandBookStatus, HandbookStatusAdmin)
 admin.site.register(Handbook, HandbookAdmin)
 admin.site.register(HandbookPage, HandbookPageAdmin)
 admin.site.register(HandbookContent, HandbookContentAdmin)

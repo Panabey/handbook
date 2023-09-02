@@ -4,7 +4,6 @@ from pydantic import Field
 from pydantic import BaseModel
 from pydantic import AliasChoices
 
-
 """
 Данный блок представляет из себя схемы ответов на
 конечные точки и не должны использоваться для валидации запросов
@@ -31,12 +30,19 @@ class HBookContentDetail(BaseModel):
     )
 
 
+class HandbookStatusDetail(BaseModel):
+    title: str
+    color_text: str
+    color_background: str
+
+
 class HandbookDetail(BaseModel):
     id: int
     title: str
-    description: str | None
     logo_url: str | None
-    status: str | None
+    status: HandbookStatusDetail | None = Field(
+        validation_alias=AliasChoices("status", "status_info")
+    )
 
 
 class HandbookDetailShort(BaseModel):

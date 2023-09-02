@@ -2,9 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import defer
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from modules.database.models import Status
 from modules.database.models import Handbook as HBook
 from modules.database.models import HandbookPage as HBookPage
 from modules.database.models import HandbookContent as HBookContent
@@ -12,15 +12,16 @@ from modules.database.models import HandbookContent as HBookContent
 
 async def get_all(session: AsyncSession):
     smt = (
-        select(
-            HBook.id, HBook.title, HBook.description, HBook.logo_url,
-            Status.title.label("status")  # fmt: skip
-        )
+        select(HBook)
         .join(HBook.status_info, isouter=True)
         .order_by(HBook.id)
+        .options(
+            load_only(HBook.id, HBook.title, HBook.logo_url),
+            contains_eager(HBook.status_info),
+        )
     )
 
-    result = await session.execute(smt)
+    result = await session.scalars(smt)
     return result.all()
 
 

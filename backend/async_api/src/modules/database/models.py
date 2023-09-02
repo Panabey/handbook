@@ -25,7 +25,7 @@ class Handbook(Base):
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     status_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("status.id", ondelete="SET NULL", onupdate="CASCADE"),
+        ForeignKey("handbook_status.id", ondelete="SET NULL", onupdate="CASCADE"),
         nullable=True,
     )
 
@@ -34,7 +34,7 @@ class Handbook(Base):
         cascade="all, delete",
         passive_deletes=True,
     )
-    status_info: Mapped["Status"] = relationship(back_populates="hbook_status")
+    status_info: Mapped["HandBookStatus"] = relationship(back_populates="hbook_status")
 
 
 class HandbookContent(Base):
@@ -71,11 +71,13 @@ class HandbookPage(Base):
     hbook_content: Mapped["HandbookContent"] = relationship(back_populates="hbook_page")
 
 
-class Status(Base):
-    __tablename__ = "status"
+class HandBookStatus(Base):
+    __tablename__ = "handbook_status"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(25), unique=True)
+    color_text: Mapped[str] = mapped_column(String(7))
+    color_background: Mapped[str] = mapped_column(String(7))
 
     hbook_status: Mapped[list[Handbook]] = relationship(
         back_populates="status_info",
