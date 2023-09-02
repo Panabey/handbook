@@ -47,12 +47,10 @@ class TagStatus(models.Model):
 
 class Tag(models.Model):
     title = models.CharField("Название тега", max_length=60)
-    status = models.ForeignKey(
-        "TagStatus", models.CASCADE, blank=True, null=True, verbose_name="Статус"
-    )
+    status = models.ForeignKey("TagStatus", models.CASCADE, verbose_name="Статус")
 
     def __str__(self) -> str:
-        return self.title
+        return f"{self.title} ({self.status})"
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
         existing_value = (
@@ -70,6 +68,7 @@ class Tag(models.Model):
         db_table = "tag"
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
+        ordering = ["-id"]
 
 
 class Status(models.Model):
@@ -146,7 +145,7 @@ class HandbookContent(models.Model):
     description = models.TextField("Описание раздела", max_length=255)
 
     def __str__(self) -> str:
-        return f"{self.title} // {self.handbook.title}"
+        return f"{self.title} ({self.handbook.title})"
 
     def clean_fields(self, exclude: Collection[str] | None) -> None:
         errors = {}

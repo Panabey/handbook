@@ -20,6 +20,7 @@ async def get_all_article(session: AsyncSession, page: int, limit: int):
         .join(Article.tags_article_info, isouter=True)
         .order_by(Article.create_date.asc())
         .limit(limit)
+        .offset((page - 1) * limit)
         .options(
             defer(Article.text),
             defer(Article.update_date),

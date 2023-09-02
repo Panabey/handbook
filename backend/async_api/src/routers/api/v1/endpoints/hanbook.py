@@ -34,9 +34,11 @@ async def get_handbooks(session: Session):
     return result
 
 
-@router.get("/content", response_model=ContentDetail, responses={
-    404: {"model": DetailInfo}
-})  # fmt: skip
+@router.get(
+    "/content",
+    response_model=ContentDetail,
+    responses={404: {"model": DetailInfo}}
+)  # fmt: skip
 async def get_content_handbook(
     session: Session, handbook: Annotated[str, Query(min_length=1, max_length=80)]
 ):
@@ -64,9 +66,11 @@ async def get_content_handbook(
     return result
 
 
-@router.get("/", response_model=PageDetail, responses={
-    404: {"model": DetailInfo}
-})  # fmt: skip
+@router.get(
+    "/",
+    response_model=PageDetail,
+    responses={404: {"model": DetailInfo}}
+)  # fmt: skip
 async def get_page_handbook(session: Session, page_id: Int):
     """Получение содержимого подтемы справочника.
 

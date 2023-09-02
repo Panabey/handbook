@@ -143,9 +143,7 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(60), unique=True)
     status_id: Mapped[int] = mapped_column(
-        Integer,
-        ForeignKey("tag_status.id", ondelete="CASCADE", onupdate="CASCADE"),
-        nullable=True,
+        Integer, ForeignKey("tag_status.id", ondelete="CASCADE", onupdate="CASCADE")
     )
 
     status_info: Mapped[TagStatus] = relationship(back_populates="tag_info")
