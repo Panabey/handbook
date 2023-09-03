@@ -17,9 +17,7 @@ class ArticleDetail(BaseModel):
     title: str
     anons: str
     text: str
-    tags: list[TagsDetail] = Field(
-        validation_alias=AliasChoices("tags", "tags_article_info")
-    )
+    tags: list[str] = Field(validation_alias=AliasChoices("tags", "tags_article_info"))
     reading_time: int
     create_date: datetime
     update_date: datetime
@@ -65,4 +63,5 @@ class ArticleAllDetail(BaseModel):
 class SearchDetail(BaseModel):
     q: str | None = Field(None, min_length=1, max_length=80)
     limit: int = Field(default=20, ge=1, le=20)
+    tags: list[int] | None = Field(None, min_length=1, max_length=4)
     continue_after: int | None = Field(default=None, ge=1, le=1000)

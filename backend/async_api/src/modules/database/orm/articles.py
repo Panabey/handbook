@@ -51,15 +51,23 @@ async def get_article(session: AsyncSession, post_id: int):
 
 
 async def search_article(
-    session: AsyncSession, query: str, continue_after: int, limit: int
+    session: AsyncSession,
+    query: str | None,
+    tags_id: list[int] | None,
+    continue_after: int | None,
+    limit: int,
 ):
     smt = (
         select(Article)
-        .where(Article.title.ilike(f"%{query}%"))
         .order_by(Article.create_date.asc())
         .offset(continue_after)
         .limit(limit)
         .options(load_only(Article.id, Article.title))
     )
+    if query:
+        smt = smt.where(Article.title.ilike(f"%{query}%"))
+    if tags_id:
+        smt = smt.where(Tag.id.in_(tags_id))
+
     result = await session.scalars(smt)
     return result.all()

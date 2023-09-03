@@ -54,10 +54,17 @@ async def get_page_article(
     return result
 
 
-@router.post("/search", response_model=list[ArticleShortDetail])
+@router.post(
+    "/search",
+    response_model=list[ArticleShortDetail],
+    responses={400: {"model": DetailInfo}}
+)  # fmt: skip
 async def get_search_article(session: Session, schema: SearchDetail):
-    """Поиск по названию статьи"""
+    """Поиск по названию статьи (Включая теги)"""
+    if not schema.q and not schema.tags:
+        raise HTTPException(400, "Одно из обязательных полей пустое..")
+
     result = await search_article(
-        session, schema.q, schema.continue_after, schema.limit
+        session, schema.q, schema.tags, schema.continue_after, schema.limit
     )
     return result

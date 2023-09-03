@@ -14,7 +14,7 @@ from modules.database.models import QuizTopic
 
 
 async def get_topics(
-    session: AsyncSession, limit: int, count_content: int, continue_after: int
+    session: AsyncSession, limit: int, count_content: int, continue_after: int | None
 ):
     # отстортированный список последних добавленных тем
     subquery = select(
@@ -45,7 +45,7 @@ async def get_topics(
 
 
 async def get_by_topic(
-    session: AsyncSession, topic_id: int, limit: int, continue_after: int
+    session: AsyncSession, topic_id: int, limit: int, continue_after: int | None
 ):
     if topic_id:
         smt = (
@@ -100,8 +100,8 @@ async def get_one(session: AsyncSession, quiz_id: int):
 async def search_quiz(
     session: AsyncSession,
     topic_id: int,
-    query: str,
-    tags_id: list[int],
+    query: str | None,
+    tags_id: list[int] | None,
     limit: int,
     continue_after: int,
 ):

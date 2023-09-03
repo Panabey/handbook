@@ -9,7 +9,7 @@ from routers.api.v1.router import router
 app = FastAPI(
     debug=settings.DEBUG_MODE,
     title="Handbook API",
-    version="0.5.2",
+    version="0.6.0",
     default_response_class=ORJSONResponse,
 )
 app.include_router(router, prefix="/api")
