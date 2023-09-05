@@ -20,15 +20,14 @@ async def test_empty_handbook_all(client: AsyncClient):
 
 
 async def test_handbook_all_without_status(client: AsyncClient, session: AsyncSession):
-    payload = {"title": "Python"}
-    handbook_id = await insert_value(Handbook, session, Handbook.id, **payload)
+    data = {"title": "Python"}
+    handbook_id = await insert_value(Handbook, session, Handbook.id, **data)
 
     resposne = await client.get(url="/api/v1/handbook/all")
     assert resposne.json() == [
         {
             "id": handbook_id,
             "title": "Python",
-            "description": None,
             "logo_url": None,
             "status": None,
         }
@@ -36,27 +35,34 @@ async def test_handbook_all_without_status(client: AsyncClient, session: AsyncSe
 
 
 async def test_handbook_all_with_status(client: AsyncClient, session: AsyncSession):
-    payload = {"title": "Дополняется"}
-    status = await insert_value(HandBookStatus, session, None, **payload)
+    data = {
+        "title": "Дополняется",
+        "color_text": "#ffffff",
+        "color_background": "#000000",
+    }
+    status = await insert_value(HandBookStatus, session, None, **data)
 
-    payload = {"title": "Python", "status_id": status.id}
-    handbook_id = await insert_value(Handbook, session, Handbook.id, **payload)
+    data = {"title": "Python", "status_id": status.id}
+    handbook_id = await insert_value(Handbook, session, Handbook.id, **data)
 
     resposne = await client.get(url="/api/v1/handbook/all")
     assert resposne.json() == [
         {
             "id": handbook_id,
             "title": "Python",
-            "description": None,
             "logo_url": None,
-            "status": status.title,
+            "status": {
+                "title": status.title,
+                "color_text": status.color_text,
+                "color_background": status.color_background,
+            },
         }
     ]
 
 
 async def test_handbook_empty_content(client: AsyncClient, session: AsyncSession):
-    parmas = {"handbook": "javascripts"}
-    resposne = await client.get(url="/api/v1/handbook/content", params=parmas)
+    payload = {"handbook": "javascripts"}
+    resposne = await client.get(url="/api/v1/handbook/content", params=payload)
     assert resposne.status_code == 404
 
 
@@ -95,26 +101,26 @@ async def test_emtpy_handbook_page(client: AsyncClient):
 
 
 async def test_handbook_page(client: AsyncClient, session: AsyncSession):
-    payload = {"title": "Python"}
-    handbook_id = await insert_value(Handbook, session, Handbook.id, **payload)
+    data = {"title": "Python"}
+    handbook_id = await insert_value(Handbook, session, Handbook.id, **data)
 
-    payload = {
+    data = {
         "handbook_id": handbook_id,
         "title": "1. Основы",
-        "short_description": "Empty",
+        "description": "Empty",
     }
     content_id = await insert_value(
-        HandbookContent, session, HandbookContent.id, **payload
+        HandbookContent, session, HandbookContent.id, **data
     )
 
-    payload = {
+    data = {
         "content_id": content_id,
         "title": "Test",
         "short_description": "Test",
         "text": "Test",
         "reading_time": 1,
     }
-    page_id = await insert_value(HandbookPage, session, HandbookPage.id, **payload)
+    page_id = await insert_value(HandbookPage, session, HandbookPage.id, **data)
 
     resposne = await client.get(url="/api/v1/handbook/", params={"page_id": page_id})
     assert resposne.status_code == 200

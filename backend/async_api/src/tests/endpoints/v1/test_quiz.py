@@ -4,7 +4,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tests.utils.orm import insert_value
-from modules.database.models import QuizTopic, Quiz, Question
+from modules.database.models import QuizTopic, Quiz, Question, Answer
 
 pytestmark = pytest.mark.asyncio
 
@@ -111,29 +111,27 @@ async def test_empty_quiz_answer(client: AsyncClient):
     assert response.status_code == 404
 
 
-# async def test_quiz_answer(client: AsyncClient, session: AsyncSession):
-#     data = {
-#         "title": "test",
-#         "short_description": "test",
-#         "description": "test"
-#     }
-#     quiz = await insert_value(Quiz, session, None, **data)
+async def test_quiz_answer(client: AsyncClient, session: AsyncSession):
+    data = {"title": "test", "short_description": "test", "description": "test"}
+    quiz = await insert_value(Quiz, session, None, **data)
 
-#     data = {"quiz_id": quiz.id, "text": "test"}
-#     question = await insert_value(Question, session, None, **data)
+    data = {"quiz_id": quiz.id, "text": "test"}
+    question = await insert_value(Question, session, None, **data)
 
-#     data = {"question_id": quiz.id, "text": "test", "is_correct": True}
-#     answer = await insert_value(Answer, session, None, **data)
+    data = {"question_id": question.id, "text": "test", "is_correct": True}
+    answer = await insert_value(Answer, session, None, **data)
 
-#     data = {"quiz_id": quiz.id, "question_id": question.id}
-#     response = await client.post("/api/v1/quiz/answer/view", json=data)
-#     assert response.status_code == 200
-#     assert response.json() == {
-#         "id": question.id,
-#         "answers": [{
-#             "id": answer.id,
-#             "text": answer.text,
-#             "is_correct": answer.is_correct,
-#             "explanation": answer.explanation
-#         }]
-#     }
+    data = {"quiz_id": quiz.id, "question_id": question.id}
+    response = await client.post("/api/v1/quiz/answer/view", json=data)
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": question.id,
+        "answers": [
+            {
+                "id": answer.id,
+                "text": answer.text,
+                "is_correct": answer.is_correct,
+                "explanation": answer.explanation,
+            }
+        ],
+    }
