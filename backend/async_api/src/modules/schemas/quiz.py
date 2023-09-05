@@ -103,11 +103,6 @@ class QuizAnswerDetail(BaseModel):
     )
 
 
-class TagsDetail(BaseModel):
-    id: int
-    title: str
-
-
 """
 Данный блок представляет из себя схемы запросов для валидации
 на конечные точки и не должны использоваться для валидации ответов
