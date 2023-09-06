@@ -126,7 +126,7 @@ async def test_handbook_page(client: AsyncClient, session: AsyncSession):
     assert resposne.status_code == 200
 
 
-async def test_search_empty_page(client: AsyncClient):
+async def test_empty_search_page(client: AsyncClient):
     payload = {"q": "string", "limit": 15}
     resposne = await client.post(url="/api/v1/handbook/search", json=payload)
     assert resposne.status_code == 200
