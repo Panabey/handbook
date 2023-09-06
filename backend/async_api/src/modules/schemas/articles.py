@@ -30,11 +30,6 @@ class ArticleDetail(BaseModel):
 
 class ArticleShortDetail(BaseModel):
     id: int
-    title: str
-
-
-class ArticleAllDetail(BaseModel):
-    id: int
     logo_url: str | None
     title: str
     anons: str
@@ -49,7 +44,7 @@ class ArticleAllDetail(BaseModel):
 
 
 class ArticleAllDetail(BaseModel):
-    items: list[ArticleAllDetail]
+    items: list[ArticleShortDetail]
     current_page: int
     total_page: int
 

@@ -20,7 +20,7 @@ services:
       # middlewares
       - "traefik.http.routers.fastapi.middlewares=security"
       - "traefik.http.middlewares.security.headers.accesscontrolallowmethods=GET,POST,HEAD"
-      - "traefik.http.middlewares.security.headers.accesscontrolallowheaders=application/json"
+      - "traefik.http.middlewares.security.headers.accesscontrolallowheaders=Content-Type"
       - "traefik.http.middlewares.security.headers.accesscontrolalloworiginlist=*" # change
       - "traefik.http.middlewares.security.headers.accesscontrolmaxage=600"
       - "traefik.http.middlewares.security.headers.framedeny=true"

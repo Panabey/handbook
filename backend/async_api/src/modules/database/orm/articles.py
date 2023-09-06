@@ -3,7 +3,6 @@ from math import ceil
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.orm import defer
-from sqlalchemy.orm import load_only
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,10 +58,15 @@ async def search_article(
 ):
     smt = (
         select(Article)
+        .join(Article.tags_article_info, isouter=True)
         .order_by(Article.create_date.asc())
         .offset(continue_after)
         .limit(limit)
-        .options(load_only(Article.id, Article.title))
+        .options(
+            defer(Article.text),
+            defer(Article.update_date),
+            contains_eager(Article.tags_article_info).defer(Tag.status_id),
+        )
     )
     if query:
         smt = smt.where(Article.title.ilike(f"%{query}%"))
@@ -70,4 +74,4 @@ async def search_article(
         smt = smt.where(Tag.id.in_(tags_id))
 
     result = await session.scalars(smt)
-    return result.all()
+    return result.unique().all()

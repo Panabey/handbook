@@ -1,9 +1,11 @@
 from datetime import datetime
 
+from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy import String
 from sqlalchemy import Integer
 from sqlalchemy import Boolean
+from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 
 from sqlalchemy.orm import Mapped
@@ -65,8 +67,12 @@ class HandbookPage(Base):
     short_description: Mapped[str] = mapped_column(String(160))
     text: Mapped[str] = mapped_column(Text)
     reading_time: Mapped[int] = mapped_column(Integer)
-    update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
-    create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
+    update_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+    create_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
 
     hbook_content: Mapped["HandbookContent"] = relationship(back_populates="hbook_page")
 
@@ -94,8 +100,12 @@ class Article(Base):
     title: Mapped[str] = mapped_column(String(80))
     anons: Mapped[str] = mapped_column(String(255))
     text: Mapped[str] = mapped_column(Text)
-    update_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
-    create_date: Mapped[datetime] = mapped_column(default=datetime.utcnow())
+    update_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+    create_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
     reading_time: Mapped[int] = mapped_column(Integer)
 
     tags_article_info: Mapped[list["Tag"]] = relationship(

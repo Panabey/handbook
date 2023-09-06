@@ -43,12 +43,12 @@ async def get_all_articles(
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_page_article(
-    session: Session, post_id: Annotated[int, Query(ge=1, le=2147483647)]
+    session: Session, article_id: Annotated[int, Query(ge=1, le=2147483647)]
 ):
     """Получение полной ифнормации о странице, за исключением
     логотипа страницы.
     """
-    result = await get_article(session, post_id)
+    result = await get_article(session, article_id)
     if not result:
         raise HTTPException(404, "Данный пост не существует")
     return result
