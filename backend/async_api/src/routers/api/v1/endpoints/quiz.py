@@ -97,7 +97,7 @@ async def get_quiz(session: Session, quiz_id: QueryId):
     }
 )  # fmt: skip
 async def search_quizzez(session: Session, schema: QuizSearchDetail):
-    """Поиск квизов в топике.
+    """Поиск квизов по всем топикам
 
     Параметры query и tags опциональны, но не могут быть оба пустыми.
     """
@@ -106,7 +106,6 @@ async def search_quizzez(session: Session, schema: QuizSearchDetail):
 
     result = await search_quiz(
         session,
-        schema.topic_id,
         schema.q,
         schema.tags,
         schema.limit,

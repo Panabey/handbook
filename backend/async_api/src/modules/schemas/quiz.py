@@ -115,7 +115,6 @@ class QuizAnswerView(BaseModel):
 
 
 class QuizSearchDetail(BaseModel):
-    topic_id: int = Field(ge=1, le=2147483647)
     q: str | None = Field(None, min_length=1, max_length=80)
     tags: list[int] | None = Field(None, min_length=1, max_length=4)
     limit: int = Field(default=20, ge=1, le=20)

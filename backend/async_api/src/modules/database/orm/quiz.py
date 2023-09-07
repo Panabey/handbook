@@ -99,7 +99,6 @@ async def get_one(session: AsyncSession, quiz_id: int):
 
 async def search_quiz(
     session: AsyncSession,
-    topic_id: int,
     query: str | None,
     tags_id: list[int] | None,
     limit: int,
@@ -108,8 +107,7 @@ async def search_quiz(
     smt = (
         select(Quiz)
         .join(Quiz.tags_quiz_info, isouter=True)
-        .where(Quiz.topic_id == topic_id)
-        .order_by(Quiz.id.desc())
+        .order_by(Quiz.id)
         .offset(continue_after)
         .limit(limit)
         .options(
