@@ -15,7 +15,6 @@ from core.settings import settings
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -128,7 +127,6 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -147,14 +145,17 @@ STATIC_URL = "static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+MEDIA_URL = "media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MEDIA_URL = "media/"
-
-MEDIA_ROOT = BASE_DIR / "media"
+# Markdown v2 editor
+# https://github.com/pylixm/django-mdeditor
 
 MDEDITOR_CONFIGS = {
     "default": {
@@ -162,5 +163,6 @@ MDEDITOR_CONFIGS = {
         "language": "en",
         "upload_image_formats": ["jpg", "jpeg", "gif", "png", "bmp", "webp", "svg"],
         "image_folder": "general/",
+        "lineWrapping": True,
     }
 }
