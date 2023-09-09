@@ -8,6 +8,7 @@
 #       modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 import re
+import threading
 
 from typing import Collection
 from django.db import models
@@ -17,6 +18,7 @@ from mdeditor.fields import MDTextField
 from colorfield.fields import ColorField
 
 from .ext.utils_admin import replace_char
+from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
 
 from core.storage import CompressImageStorage
@@ -196,7 +198,11 @@ class HandbookPage(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
+        old_text = HandbookPage.objects.using("handbook").get(pk=self.pk).text
+
         super().save(*args, **kwargs)
+        thread = threading.Thread(target=remove_old_images, args=(old_text, self.text))
+        thread.start()
 
     class Meta:
         managed = False
@@ -226,7 +232,11 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
+        old_text = Article.objects.using("handbook").get(pk=self.pk).text
+
         super().save(*args, **kwargs)
+        thread = threading.Thread(target=remove_old_images, args=(old_text, self.text))
+        thread.start()
 
     class Meta:
         managed = False
