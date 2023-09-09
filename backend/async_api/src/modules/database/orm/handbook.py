@@ -46,7 +46,13 @@ async def get_page_by_id(session: AsyncSession, page_id: int):
     smt = (
         select(HBookPage)
         .where(HBookPage.id == page_id)
-        .options(defer(HBookPage.content_id))
+        .options(
+            defer(HBookPage.content_id),
+            joinedload(HBookPage.hbook_content)
+            .load_only(HBookContent.id)
+            .joinedload(HBookContent.hbook)
+            .load_only(HBook.id, HBook.title),
+        )
     )
 
     result = await session.scalars(smt)

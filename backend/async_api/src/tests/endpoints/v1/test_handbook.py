@@ -4,6 +4,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tests.utils.orm import insert_value
+from tests.utils.type import pydantic_datetime
 from modules.database.models import (
     Handbook,
     HandbookContent,
@@ -102,10 +103,10 @@ async def test_emtpy_handbook_page(client: AsyncClient):
 
 async def test_handbook_page(client: AsyncClient, session: AsyncSession):
     data = {"title": "Python"}
-    handbook_id = await insert_value(Handbook, session, Handbook.id, **data)
+    handbook = await insert_value(Handbook, session, Handbook, **data)
 
     data = {
-        "handbook_id": handbook_id,
+        "handbook_id": handbook.id,
         "title": "1. Основы",
         "description": "Empty",
     }
@@ -120,10 +121,20 @@ async def test_handbook_page(client: AsyncClient, session: AsyncSession):
         "text": "Test",
         "reading_time": 1,
     }
-    page_id = await insert_value(HandbookPage, session, HandbookPage.id, **data)
+    page = await insert_value(HandbookPage, session, HandbookPage, **data)
 
-    resposne = await client.get(url="/api/v1/handbook/", params={"page_id": page_id})
+    resposne = await client.get(url="/api/v1/handbook/", params={"page_id": page.id})
     assert resposne.status_code == 200
+    assert resposne.json() == {
+        "id": page.id,
+        "short_description": page.short_description,
+        "title": page.title,
+        "text": page.text,
+        "reading_time": page.reading_time,
+        "create_date": pydantic_datetime(page.create_date),
+        "update_date": pydantic_datetime(page.update_date),
+        "handbook": {"id": handbook.id, "title": handbook.title},
+    }
 
 
 async def test_empty_search_page(client: AsyncClient):
