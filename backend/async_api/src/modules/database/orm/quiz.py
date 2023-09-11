@@ -50,7 +50,7 @@ async def get_by_topic(
     if topic_id:
         smt = (
             select(QuizTopic)
-            .where(Quiz.topic_id == topic_id)
+            .where(QuizTopic.id == topic_id)
             .order_by(Quiz.id.desc())
             .offset(continue_after)
             .limit(limit)
