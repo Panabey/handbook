@@ -18,6 +18,7 @@ from .models import (
     Handbook,
     HandbookPage,
     HandbookContent,
+    ProjectNews,
 )
 
 from .forms import AnswerForm
@@ -65,6 +66,13 @@ class MultiModelTabularInline(admin.TabularInline):
         return super().formfield_for_manytomany(
             db_field, request, using=self.using, **kwargs
         )
+
+
+class ProjectNewsAdmin(MultiplyModelAdmin):
+    list_display = ("title", "create_date")
+    search_fields = ("title",)
+    ordering = ("create_date",)
+    list_per_page = 20
 
 
 class TagAdmin(MultiplyModelAdmin):
@@ -186,16 +194,23 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     get_content.short_description = "Раздел"
 
 
+# Общие теги
 admin.site.register(Tag, TagAdmin)
 admin.site.register(TagStatus, MultiplyModelAdmin)
 
+# Квизы
 admin.site.register(Quiz, QuizAdmin)
 admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
 admin.site.register(QuizAnswer, AnswerAdmin)
 
+# Статьи
 admin.site.register(Article, ArticleAdmin)
 
+# Новости проекта
+admin.site.register(ProjectNews, ProjectNewsAdmin)
+
+# Справочники
 admin.site.register(HandBookStatus, HandbookStatusAdmin)
 admin.site.register(Handbook, HandbookAdmin)
 admin.site.register(HandbookPage, HandbookPageAdmin)

@@ -18,6 +18,7 @@ from mdeditor.fields import MDTextField
 from colorfield.fields import ColorField
 
 from .ext.utils_admin import replace_char
+from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
 
@@ -198,11 +199,14 @@ class HandbookPage(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = HandbookPage.objects.using("handbook").get(pk=self.pk).text
+        old_text = get_text_or_none(ProjectNews, self.pk)
 
         super().save(*args, **kwargs)
-        thread = threading.Thread(target=remove_old_images, args=(old_text, self.text))
-        thread.start()
+        if not old_text:
+            thread = threading.Thread(
+                target=remove_old_images, args=(old_text, self.text)
+            )
+            thread.start()
 
     class Meta:
         managed = False
@@ -232,11 +236,14 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = Article.objects.using("handbook").get(pk=self.pk).text
+        old_text = get_text_or_none(ProjectNews, self.pk)
 
         super().save(*args, **kwargs)
-        thread = threading.Thread(target=remove_old_images, args=(old_text, self.text))
-        thread.start()
+        if not old_text:
+            thread = threading.Thread(
+                target=remove_old_images, args=(old_text, self.text)
+            )
+            thread.start()
 
     class Meta:
         managed = False
@@ -354,3 +361,31 @@ class QuizAnswer(models.Model):
         db_table = "quiz_answer"
         verbose_name = "Квиз (Ответ)"
         verbose_name_plural = "Квиз (Ответы)"
+
+
+class ProjectNews(models.Model):
+    title = models.CharField("Заголовок", max_length=80)
+    text = MDTextField("Текст")
+    reading_time = models.IntegerField(default=0, editable=False)
+    create_date = models.DateTimeField("Дата создания", auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.reading_time = calculate_reading_time(self.text)
+        old_text = get_text_or_none(ProjectNews, self.pk)
+
+        super().save(*args, **kwargs)
+        if not old_text:
+            thread = threading.Thread(
+                target=remove_old_images, args=(old_text, self.text)
+            )
+            thread.start()
+
+    class Meta:
+        managed = False
+        db_table = "project_news"
+        verbose_name = "Новость проекта"
+        verbose_name_plural = "Новости проекта"
+        ordering = ["-id"]

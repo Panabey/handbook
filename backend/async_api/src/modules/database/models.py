@@ -235,3 +235,15 @@ class Answer(Base):
     explanation: Mapped[str] = mapped_column(String(255), nullable=True)
 
     question_info: Mapped["Question"] = relationship(back_populates="answers_info")
+
+
+class ProjectNews(Base):
+    __tablename__ = "project_news"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(80))
+    text: Mapped[str] = mapped_column(Text)
+    reading_time: Mapped[int] = mapped_column(Integer)
+    create_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )

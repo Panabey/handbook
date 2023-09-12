@@ -17,7 +17,7 @@ async def get_all_article(session: AsyncSession, page: int, limit: int):
     smt = (
         select(Article)
         .join(Article.tags_article_info, isouter=True)
-        .order_by(Article.create_date.asc())
+        .order_by(Article.create_date.desc())
         .limit(limit)
         .offset((page - 1) * limit)
         .options(

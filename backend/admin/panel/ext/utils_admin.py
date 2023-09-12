@@ -36,3 +36,10 @@ def remove_old_images(old_text: str, new_text: str):
                 os.remove(image_path)
         finally:
             lock.release()
+
+
+def get_text_or_none(classmodel, pk):
+    try:
+        return classmodel.objects.using("handbook").get(pk=pk).text
+    except classmodel.DoesNotExist:
+        return None
