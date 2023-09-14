@@ -41,7 +41,7 @@ class UploadView(generic.View):
         # image format check
         file_name_list = upload_image.name.split(".")
         file_extension = file_name_list.pop(-1)
-        file_name = re.sub(r"[\s./\\|@!]+", "_", ".".join(file_name_list))
+        file_name = self.normalize_filename(".".join(file_name_list))
 
         if file_extension not in MDEDITOR_CONFIGS["upload_image_formats"]:
             return JsonResponse(
@@ -138,4 +138,15 @@ class UploadView(generic.View):
             filename = f"{filename}_{random_choice}{extension}"
         else:
             filename = f"{filename}{extension}"
+        return filename
+
+    def normalize_filename(self, filename):
+        # Удаление пробелов и замена на подчеркивания
+        filename = re.sub(r"[\s]+", "_", filename)
+        # Удаление специальных символов
+        filename = re.sub(r"[^\w]+", "", filename)
+
+        max_length = 255  # Максимальная длина имени файла для URL
+        if len(filename) > 255:
+            filename = filename[:max_length]
         return filename
