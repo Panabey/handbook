@@ -199,10 +199,10 @@ class HandbookPage(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(ProjectNews, self.pk)
+        old_text = get_text_or_none(HandbookPage, self.pk)
 
         super().save(*args, **kwargs)
-        if not old_text:
+        if old_text:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_text, self.text)
             )
@@ -236,10 +236,10 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(ProjectNews, self.pk)
+        old_text = get_text_or_none(Article, self.pk)
 
         super().save(*args, **kwargs)
-        if not old_text:
+        if old_text:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_text, self.text)
             )
@@ -312,6 +312,16 @@ class Quiz(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    def save(self, *args, **kwargs):
+        old_description = get_text_or_none(Quiz, self.pk)
+
+        super().save(*args, **kwargs)
+        if old_description:
+            thread = threading.Thread(
+                target=remove_old_images, args=(old_description, self.description)
+            )
+            thread.start()
+
     class Meta:
         managed = False
         db_table = "quiz"
@@ -377,7 +387,7 @@ class ProjectNews(models.Model):
         old_text = get_text_or_none(ProjectNews, self.pk)
 
         super().save(*args, **kwargs)
-        if not old_text:
+        if old_text:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_text, self.text)
             )

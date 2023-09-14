@@ -1,4 +1,7 @@
 import os
+import re
+import string
+import random
 import datetime
 
 from PIL import Image
@@ -38,7 +41,7 @@ class UploadView(generic.View):
         # image format check
         file_name_list = upload_image.name.split(".")
         file_extension = file_name_list.pop(-1)
-        file_name = ".".join(file_name_list)
+        file_name = re.sub(r"[\s./\\|@!]+", "_", ".".join(file_name_list))
 
         if file_extension not in MDEDITOR_CONFIGS["upload_image_formats"]:
             return JsonResponse(
@@ -92,7 +95,11 @@ class UploadView(generic.View):
             img = img.resize((width, height), Image.BILINEAR)
 
         # имя файла
-        file_fullname = f"{filename}.jpeg"
+        file_fullname = self.generate_filename(
+            save_path,
+            filename,
+            ".jpeg",
+        )
         # конвертация прозрачности в белый цвет
         if img.mode == "LA":
             img = img.convert("RGBA")
@@ -114,10 +121,21 @@ class UploadView(generic.View):
 
     def _no_compress_img(self, image: UploadedFile, filename: str, save_path: str):
         """Сохранение изображения без последующей оптимизации"""
-        file_fullname = f"{filename}.svg"
+        file_fullname = self.generate_filename(save_path, filename, ".svg")
 
         with open(os.path.join(save_path, file_fullname), "wb") as file:
             for chunk in image.chunks():
                 file.write(chunk)
 
         return file_fullname
+
+    def generate_filename(self, save_path: str, filename: str, extension: str):
+        full_path = os.path.join(save_path, f"{filename}{extension}")
+        if os.path.exists(full_path):
+            random_choice = "".join(
+                random.choices(string.ascii_lowercase + string.digits, k=6)
+            )
+            filename = f"{filename}_{random_choice}{extension}"
+        else:
+            filename = f"{filename}{extension}"
+        return filename

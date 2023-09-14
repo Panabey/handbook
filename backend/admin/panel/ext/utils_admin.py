@@ -17,7 +17,14 @@ def replace_char(pattern: str, text: str) -> str:
 
 
 def find_image(markdown_text: str):
-    return re.findall(r"!\[.*?\]\((/media/.*?)\)", markdown_text)
+    combined_pattern = r'!\[.*\]\((\/media\/.*?)\)|<img.*?src=["\'](/media\/.*?)["\']'
+    # поиск пути к изображениям
+    matches = re.findall(combined_pattern, markdown_text)
+    # удаление пустых строк
+    image_paths = []
+    for match in matches:
+        image_paths.append(match[0] if match[0] else match[1])
+    return image_paths
 
 
 def remove_old_images(old_text: str, new_text: str):
@@ -27,13 +34,16 @@ def remove_old_images(old_text: str, new_text: str):
 
     # Находим изображения, которые были удалены из нового текста
     missing_images = [image for image in old_images if image not in new_images]
-
     for image in missing_images:
         image_path = os.path.join(settings.BASE_DIR, image[1:])
         lock.acquire()
         try:
+            parent_dir = os.path.dirname(image_path)
             if os.path.exists(image_path):
                 os.remove(image_path)
+
+            if not os.listdir(parent_dir):
+                os.rmdir(parent_dir)
         finally:
             lock.release()
 
