@@ -14,12 +14,18 @@ async def get_all_article(session: AsyncSession, page: int, limit: int):
     count = await session.scalar(smt_page)
     total_page = ceil(count / limit) if count else 0
 
-    smt = (
-        select(Article)
-        .join(Article.tags_article_info, isouter=True)
+    subquery = (
+        select(Article.id)
         .order_by(Article.create_date.desc())
         .limit(limit)
         .offset((page - 1) * limit)
+        .subquery()
+    )
+
+    smt = (
+        select(Article)
+        .join(subquery, Article.id == subquery.c.id)
+        .join(Article.tags_article_info, isouter=True)
         .options(
             defer(Article.text),
             defer(Article.update_date),

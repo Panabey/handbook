@@ -21,7 +21,7 @@ from .models import (
     ProjectNews,
 )
 
-from .forms import AnswerForm
+from .forms import AnswerForm, TagsForm
 
 
 class MultiplyModelAdmin(admin.ModelAdmin):
@@ -91,6 +91,7 @@ class AnswerInline(MultiModelTabularInline):
 
 class QuizTagInline(MultiModelTabularInline):
     model = QuizTag
+    formset = TagsForm
     extra = 1
     max_num = 3
 
@@ -137,6 +138,7 @@ class AnswerAdmin(MultiplyModelAdmin):
 
 class ArticleTagInline(MultiModelTabularInline):
     model = ArticleTag
+    formset = TagsForm
     extra = 1
     max_num = 3
 
