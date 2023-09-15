@@ -15,7 +15,7 @@ async def get_all_news(session: AsyncSession, page: int, limit: int):
 
     smt = (
         select(ProjectNews)
-        .order_by(ProjectNews.create_date.asc())
+        .order_by(ProjectNews.create_date.desc())
         .limit(limit)
         .offset((page - 1) * limit)
         .options(

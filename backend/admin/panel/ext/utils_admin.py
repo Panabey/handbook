@@ -4,6 +4,7 @@ import math
 
 from threading import Lock
 from django.conf import settings
+from django.db import models
 
 
 def calculate_reading_time(text: str, char_per_second: int = 1200) -> int:
@@ -44,12 +45,14 @@ def remove_old_images(old_text: str, new_text: str):
 
             if not os.listdir(parent_dir):
                 os.rmdir(parent_dir)
-        finally:
-            lock.release()
+        except OSError:
+            pass
+        lock.release()
 
 
-def get_text_or_none(classmodel, pk):
+def get_text_or_none(classmodel: models.Model, pk: int, field_name: str):
     try:
-        return classmodel.objects.using("handbook").get(pk=pk).text
+        data = classmodel.objects.using("handbook").values_list(field_name).get(pk=pk)
+        return data[0]
     except classmodel.DoesNotExist:
         return None

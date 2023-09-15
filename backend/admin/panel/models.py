@@ -199,7 +199,7 @@ class HandbookPage(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(HandbookPage, self.pk)
+        old_text = get_text_or_none(HandbookPage, self.pk, "text")
 
         super().save(*args, **kwargs)
         if old_text:
@@ -236,7 +236,7 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(Article, self.pk)
+        old_text = get_text_or_none(Article, self.pk, "text")
 
         super().save(*args, **kwargs)
         if old_text:
@@ -257,7 +257,7 @@ class ArticleTag(models.Model):
     tag = models.ForeignKey(Tag, models.CASCADE)
 
     def __str__(self) -> str:
-        return "Тег квизов"
+        return "Тег статьи"
 
     class Meta:
         managed = False
@@ -313,7 +313,7 @@ class Quiz(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        old_description = get_text_or_none(Quiz, self.pk)
+        old_description = get_text_or_none(Quiz, self.pk, "description")
 
         super().save(*args, **kwargs)
         if old_description:
@@ -384,7 +384,7 @@ class ProjectNews(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(ProjectNews, self.pk)
+        old_text = get_text_or_none(ProjectNews, self.pk, "text")
 
         super().save(*args, **kwargs)
         if old_text:
