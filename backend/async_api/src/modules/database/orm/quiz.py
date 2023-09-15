@@ -104,23 +104,24 @@ async def search_quiz(
     limit: int,
     continue_after: int,
 ):
+    subquery = select(Quiz.id).order_by(Quiz.id).limit(limit).offset(continue_after)
+
+    if query:
+        subquery = subquery.where(Quiz.title.ilike(f"%{query}%"))
+    if tags_id:
+        smt = subquery.where(Tag.id.in_(tags_id))
+    subquery = subquery.subquery()
+
     smt = (
         select(Quiz)
+        .join(subquery, Quiz.id == subquery.c.id)
         .join(Quiz.tags_quiz_info, isouter=True)
-        .order_by(Quiz.id)
-        .offset(continue_after)
-        .limit(limit)
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
             contains_eager(Quiz.tags_quiz_info).defer(Tag.status_id),
         )
     )
-
-    if query:
-        smt = smt.where(Quiz.title.ilike(f"%{query}%"))
-    if tags_id:
-        smt = smt.where(Tag.id.in_(tags_id))
 
     result = await session.scalars(smt)
     return result.unique().all()

@@ -62,22 +62,29 @@ async def search_article(
     continue_after: int | None,
     limit: int,
 ):
+    subquery = (
+        select(Article.id)
+        .order_by(Article.create_date.desc())
+        .limit(limit)
+        .offset(continue_after)
+    )
+
+    if query:
+        subquery = subquery.where(Article.title.ilike(f"%{query}%"))
+    if tags_id:
+        subquery = subquery.where(Tag.id.in_(tags_id))
+    subquery = subquery.subquery()
+
     smt = (
         select(Article)
+        .join(subquery, Article.id == subquery.c.id)
         .join(Article.tags_article_info, isouter=True)
-        .order_by(Article.create_date.asc())
-        .offset(continue_after)
-        .limit(limit)
         .options(
             defer(Article.text),
             defer(Article.update_date),
             contains_eager(Article.tags_article_info).defer(Tag.status_id),
         )
     )
-    if query:
-        smt = smt.where(Article.title.ilike(f"%{query}%"))
-    if tags_id:
-        smt = smt.where(Tag.id.in_(tags_id))
 
     result = await session.scalars(smt)
     return result.unique().all()
