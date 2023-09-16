@@ -22,10 +22,6 @@ class AnswerForm(forms.BaseInlineFormSet):
 
 
 class TagsForm(forms.BaseInlineFormSet):
-    """Частичный фикс, который не позволяет создавать одинаковые теги к одной записи.
-    Одинаковые теги приводят к ошибкам в limit, при выводе
-    """
-
     def clean(self) -> None:
         queryset = self.get_queryset()
         tags_id = []

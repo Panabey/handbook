@@ -73,7 +73,6 @@ class Tag(models.Model):
         db_table = "tag"
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
-        ordering = ["-id"]
 
 
 class HandBookStatus(models.Model):
@@ -140,7 +139,6 @@ class Handbook(models.Model):
         verbose_name = "Справочник"
         verbose_name_plural = "Справочники"
         db_table = "handbook"
-        ordering = ["-id"]
 
 
 class HandbookContent(models.Model):
@@ -167,7 +165,6 @@ class HandbookContent(models.Model):
         verbose_name = "Справочники (Раздел)"
         verbose_name_plural = "Справочники (Разделы)"
         db_table = "handbook_content"
-        ordering = ["-id"]
 
 
 class HandbookPage(models.Model):
@@ -286,7 +283,6 @@ class QuizTopic(models.Model):
         db_table = "quiz_topic"
         verbose_name = "Квиз (Топик)"
         verbose_name_plural = "Квиз (Топики)"
-        ordering = ["-id"]
 
 
 @cleanup.select
@@ -327,7 +323,6 @@ class Quiz(models.Model):
         db_table = "quiz"
         verbose_name = "Квиз"
         verbose_name_plural = "Квизы"
-        ordering = ["-id"]
 
 
 class QuizTag(models.Model):
@@ -398,4 +393,3 @@ class ProjectNews(models.Model):
         db_table = "project_news"
         verbose_name = "Новость проекта"
         verbose_name_plural = "Новости проекта"
-        ordering = ["-id"]

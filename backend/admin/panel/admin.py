@@ -71,12 +71,14 @@ class MultiModelTabularInline(admin.TabularInline):
 class ProjectNewsAdmin(MultiplyModelAdmin):
     list_display = ("title", "create_date")
     search_fields = ("title",)
-    ordering = ("create_date",)
+    list_filter = ("create_date",)
+    ordering = ("-create_date",)
     list_per_page = 20
 
 
 class TagAdmin(MultiplyModelAdmin):
     list_display = ("title", "status")
+    list_filter = ("status",)
     search_fields = ("title", "status")
     list_per_page = 20
 
@@ -98,13 +100,16 @@ class QuizTagInline(MultiModelTabularInline):
 
 class QuizTopicAdmin(MultiplyModelAdmin):
     search_fields = ("title",)
+    ordering = ("-id",)
     list_per_page = 20
 
 
 class QuizAdmin(MultiplyModelAdmin):
     inlines = [QuizTagInline]
     list_display = ("title", "topic")
+    list_filter = ("topic",)
     search_fields = ("title", "topic__title")
+    ordering = ("-id",)
     list_per_page = 20
     autocomplete_fields = ("topic",)
 
@@ -113,6 +118,7 @@ class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
     list_display = ("question_number", "quiz")
     search_fields = ("quiz__title",)
+    ordering = ("-id",)
     autocomplete_fields = ("quiz",)
 
     def question_number(self, obj: QuizQuestion) -> str:
@@ -123,8 +129,8 @@ class QuestionAdmin(MultiplyModelAdmin):
 
 class AnswerAdmin(MultiplyModelAdmin):
     list_display = ("text", "get_question", "get_quiz")
-
     search_fields = ("question__quiz__title",)
+    ordering = ("-id",)
 
     def get_quiz(self, obj: QuizAnswer):
         return obj.question.quiz.title
@@ -148,7 +154,7 @@ class ArticleAdmin(MultiplyModelAdmin):
 
     list_display = ("title", "create_date", "update_date")
     list_filter = ("create_date", "update_date")
-    ordering = ("create_date", "update_date")
+    ordering = ("-create_date",)
     search_fields = ("title",)
     list_per_page = 20
 
@@ -156,6 +162,7 @@ class ArticleAdmin(MultiplyModelAdmin):
 class HandbookAdmin(MultiplyModelAdmin):
     list_display = ("title",)
     search_fields = ("title",)
+    ordering = ("-id",)
     list_per_page = 20
 
 
@@ -168,6 +175,8 @@ class HandbookStatusAdmin(MultiplyModelAdmin):
 class HandbookContentAdmin(MultiplyModelAdmin):
     list_display = ("handbook", "title")
     search_fields = ("title", "handbook__title")
+    list_filter = ("handbook",)
+    ordering = ("-id",)
     list_per_page = 20
     autocomplete_fields = ("handbook",)
 
@@ -180,8 +189,8 @@ class HandbookPageAdmin(MultiplyModelAdmin):
         "create_date",
         "update_date",
     )
-    list_filter = ("create_date", "update_date")
-    ordering = ("create_date", "update_date")
+    list_filter = ("create_date", "update_date", "content__handbook")
+    ordering = ("-update_date",)
     search_fields = ("title", "content__handbook__title")
     list_per_page = 20
     autocomplete_fields = ("content",)
