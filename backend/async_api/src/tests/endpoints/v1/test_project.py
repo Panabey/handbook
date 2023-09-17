@@ -11,12 +11,19 @@ pytestmark = pytest.mark.asyncio
 
 
 async def test_empty_project_news(client: AsyncClient):
-    payload = {"news_id": "9999"}
+    """Тестирование получения новости по id, если той
+    НЕ существует в базе данных
+    """
+    payload = {"news_id": 99999999}
     resposne = await client.get(url="/api/v1/project/news/", params=payload)
     assert resposne.status_code == 404
 
 
 async def test_project_news(client: AsyncClient, session: AsyncSession):
+    """Тестирование получения новости по id, если та
+    существует в базе данных
+    """
+    # Добавление новости
     data = {"title": "test_title", "text": "test_text", "reading_time": 1}
     project_news = await insert_value(ProjectNews, session, None, **data)
 
@@ -33,6 +40,10 @@ async def test_project_news(client: AsyncClient, session: AsyncSession):
 
 
 async def test_all_news(client: AsyncClient, session: AsyncSession):
+    """Тестирование получения всех новостей проекта, если те
+    существует в базе данных
+    """
+    # Добавление новости
     data = {"title": "test_title", "text": "test_text", "reading_time": 1}
     project_news = await insert_value(ProjectNews, session, None, **data)
 
@@ -54,6 +65,10 @@ async def test_all_news(client: AsyncClient, session: AsyncSession):
 
 
 async def test_widget_news(client: AsyncClient, session: AsyncSession):
+    """Тестирование получения новостей проекта в виде маленького списка,
+    если те существует в базе данных
+    """
+    # Добавление нескольких новостей
     data = {"title": "test_title", "text": "test_text", "reading_time": 1}
     project_news_1 = await insert_value(ProjectNews, session, None, **data)
     project_news_2 = await insert_value(ProjectNews, session, None, **data)

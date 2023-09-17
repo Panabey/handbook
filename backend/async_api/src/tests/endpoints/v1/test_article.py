@@ -11,6 +11,9 @@ pytestmark = pytest.mark.asyncio
 
 
 async def test_empty_all_articles(client: AsyncClient):
+    """Тестирование получения всех статей, если тех
+    нет в базе данных
+    """
     payload = {"page": 1}
     resposne = await client.get(url="/api/v1/article/all", params=payload)
     assert resposne.status_code == 200
@@ -22,6 +25,10 @@ async def test_empty_all_articles(client: AsyncClient):
 
 
 async def test_all_articles(client: AsyncClient, session: AsyncSession):
+    """Тестирование получения всех справочников, если тех
+    есть в базе данных
+    """
+    # Добавление статьи
     data = {"title": "test", "anons": "test", "text": "test", "reading_time": 1}
     article = await insert_value(Article, session, None, **data)
 
@@ -46,12 +53,19 @@ async def test_all_articles(client: AsyncClient, session: AsyncSession):
 
 
 async def test_empty_article(client: AsyncClient):
-    payload = {"article_id": 100000}
+    """Тестирование получения конеркетной статьи, если той
+    нет в базе данных
+    """
+    payload = {"article_id": 10000000}
     resposne = await client.get(url="/api/v1/article/", params=payload)
     assert resposne.status_code == 404
 
 
 async def test_article(client: AsyncClient, session: AsyncSession):
+    """Тестирование получения конеркетной статьи, если та
+    есть в базе данных
+    """
+    # Добавление статьи
     data = {"title": "test", "anons": "test", "text": "test", "reading_time": 1}
     article = await insert_value(Article, session, None, **data)
 
@@ -71,6 +85,9 @@ async def test_article(client: AsyncClient, session: AsyncSession):
 
 
 async def test_empty_search_article(client: AsyncClient):
+    """Тестирование поиска по названию статьи, если той
+    не существует в базе данных
+    """
     payload = {"q": "test"}
     resposne = await client.post(url="/api/v1/article/search", json=payload)
     assert resposne.status_code == 200
@@ -78,16 +95,23 @@ async def test_empty_search_article(client: AsyncClient):
 
 
 async def test_invalid_search_article(client: AsyncClient):
+    """Тестирование поиска по названию статьи, если не указан
+    обязательный атрибут поиска по названию или тегу
+    """
     payload = {"limit": 20}
     resposne = await client.post(url="/api/v1/article/search", json=payload)
     assert resposne.status_code == 400
 
 
 async def test_search_article(client: AsyncClient, session: AsyncSession):
+    """Тестирование поиска по названию статьи, если та
+    существует в базе данных
+    """
+    # Добавление статьи для поиска
     data = {"title": "test", "anons": "test", "text": "test", "reading_time": 1}
     article = await insert_value(Article, session, None, **data)
-    payload = {"q": article.title}
 
+    payload = {"q": article.title}
     resposne = await client.post(url="/api/v1/article/search", json=payload)
     assert resposne.status_code == 200
     assert resposne.json() == [
