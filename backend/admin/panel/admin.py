@@ -106,8 +106,8 @@ class QuizTopicAdmin(MultiplyModelAdmin):
 
 class QuizAdmin(MultiplyModelAdmin):
     inlines = [QuizTagInline]
-    list_display = ("title", "topic")
-    list_filter = ("topic",)
+    list_display = ("title", "topic", "is_visible")
+    list_filter = ("topic", "is_visible")
     search_fields = ("title", "topic__title")
     ordering = ("-id",)
     list_per_page = 20
