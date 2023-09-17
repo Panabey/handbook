@@ -305,6 +305,9 @@ class Quiz(models.Model):
         max_length=160,
     )
     description = MDTextField("Описание", blank=True, null=True)
+    is_visible = models.BooleanField(
+        "Видимый?", default=False, help_text="Не скрывает вопросы и ответы"
+    )
 
     def __str__(self) -> str:
         return self.title

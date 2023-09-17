@@ -194,6 +194,7 @@ class Quiz(Base):
     title: Mapped[str] = mapped_column(String(100))
     short_description: Mapped[str] = mapped_column(String(160))
     description: Mapped[str] = mapped_column(String(255))
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     topic_info: Mapped[QuizTopic] = relationship(back_populates="quizzes_info")
     questions_info: Mapped[list["Question"]] = relationship(

@@ -17,13 +17,17 @@ async def get_topics(
     session: AsyncSession, limit: int, count_content: int, continue_after: int | None
 ):
     # отстортированный список последних добавленных тем
-    subquery = select(
-        Quiz.topic_id,
-        Quiz.id.label("quiz_id"),
-        func.row_number()
-        .over(partition_by=Quiz.topic_id, order_by=Quiz.id.desc())
-        .label("row_num"),
-    ).subquery()
+    subquery = (
+        select(
+            Quiz.topic_id,
+            Quiz.id.label("quiz_id"),
+            func.row_number()
+            .over(partition_by=Quiz.topic_id, order_by=Quiz.id.desc())
+            .label("row_num"),
+        )
+        .where(Quiz.is_visible)
+        .subquery()
+    )
 
     smt = (
         select(QuizTopic)
@@ -50,14 +54,16 @@ async def get_by_topic(
     if topic_id:
         smt = (
             select(QuizTopic)
-            .where(QuizTopic.id == topic_id)
+            .join(QuizTopic.quizzes_info)
+            .where(QuizTopic.id == topic_id, Quiz.is_visible)
             .order_by(Quiz.id.desc())
             .offset(continue_after)
             .limit(limit)
             .options(
-                joinedload(QuizTopic.quizzes_info)
+                contains_eager(QuizTopic.quizzes_info)
                 .defer(Quiz.description)
                 .defer(Quiz.topic_id)
+                .defer(Quiz.is_visible)
                 .joinedload(Quiz.tags_quiz_info)
                 .defer(Tag.status_id),
             )
@@ -67,12 +73,14 @@ async def get_by_topic(
 
     smt = (
         select(Quiz)
+        .where(Quiz.is_visible)
         .order_by(Quiz.id.desc())
         .offset(continue_after)
         .limit(limit)
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
+            defer(Quiz.is_visible),
             joinedload(Quiz.tags_quiz_info).defer(Tag.status_id),
         )
     )
@@ -87,8 +95,9 @@ async def get_one(session: AsyncSession, quiz_id: int):
     smt = (
         select(Quiz)
         .join(Quiz.topic_info, isouter=True)
-        .where(Quiz.id == quiz_id)
+        .where(Quiz.id == quiz_id, Quiz.is_visible)
         .options(
+            defer(Quiz.is_visible),
             joinedload(Quiz.questions_info).load_only(Question.id),
             contains_eager(Quiz.topic_info).load_only(QuizTopic.id, QuizTopic.title),
         )
@@ -104,7 +113,13 @@ async def search_quiz(
     limit: int,
     continue_after: int,
 ):
-    subquery = select(Quiz.id).order_by(Quiz.id).limit(limit).offset(continue_after)
+    subquery = (
+        select(Quiz.id)
+        .where(Quiz.is_visible)
+        .order_by(Quiz.id)
+        .limit(limit)
+        .offset(continue_after)
+    )
 
     if query:
         subquery = subquery.where(Quiz.title.ilike(f"%{query}%"))
@@ -119,6 +134,7 @@ async def search_quiz(
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
+            defer(Quiz.is_visible),
             contains_eager(Quiz.tags_quiz_info).defer(Tag.status_id),
         )
     )
