@@ -54,7 +54,7 @@ async def get_page_by_id(session: AsyncSession, page_id: int):
             contains_eager(HBookPage.hbook_content)
             .load_only(HBookContent.id)
             .contains_eager(HBookContent.hbook)
-            .load_only(HBook.id, HBook.title, HBook.is_visible),
+            .load_only(HBook.id, HBook.title),
         )
     )
 
