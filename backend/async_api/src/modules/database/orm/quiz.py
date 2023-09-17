@@ -16,7 +16,6 @@ from modules.database.models import QuizTopic
 async def get_topics(
     session: AsyncSession, limit: int, count_content: int, continue_after: int | None
 ):
-    # отстортированный список последних добавленных тем
     subquery = (
         select(
             Quiz.topic_id,
@@ -29,14 +28,20 @@ async def get_topics(
         .subquery()
     )
 
+    subquery_topic = (
+        select(QuizTopic.id)
+        .order_by(QuizTopic.id)
+        .limit(limit)
+        .offset(continue_after)
+        .subquery()
+    )
+
     smt = (
         select(QuizTopic)
+        .join(subquery_topic, QuizTopic.id == subquery_topic.c.id)
         .join(QuizTopic.quizzes_info)
         .join(subquery, subquery.c.quiz_id == Quiz.id)
         .where(subquery.c.row_num <= count_content)
-        .order_by(QuizTopic.id)
-        .offset(continue_after)
-        .limit(limit)
         .options(
             load_only(QuizTopic.id, QuizTopic.title),
             contains_eager(QuizTopic.quizzes_info).load_only(
