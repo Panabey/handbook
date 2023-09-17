@@ -14,6 +14,7 @@ async def get_all(session: AsyncSession):
     smt = (
         select(HBook)
         .join(HBook.status_info, isouter=True)
+        .where(HBook.is_visible)
         .order_by(HBook.id)
         .options(
             load_only(HBook.id, HBook.title, HBook.logo_url),
@@ -28,7 +29,7 @@ async def get_all(session: AsyncSession):
 async def get_content(session: AsyncSession, handbook_title: str):
     smt = (
         select(HBook)
-        .where(HBook.title.ilike(handbook_title))
+        .where(HBook.title.ilike(handbook_title), HBook.is_visible)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
             joinedload(HBook.content)
@@ -45,13 +46,15 @@ async def get_content(session: AsyncSession, handbook_title: str):
 async def get_page_by_id(session: AsyncSession, page_id: int):
     smt = (
         select(HBookPage)
-        .where(HBookPage.id == page_id)
+        .join(HBookPage.hbook_content)
+        .join(HBookContent.hbook)
+        .where(HBookPage.id == page_id, HBook.is_visible)
         .options(
             defer(HBookPage.content_id),
-            joinedload(HBookPage.hbook_content)
+            contains_eager(HBookPage.hbook_content)
             .load_only(HBookContent.id)
-            .joinedload(HBookContent.hbook)
-            .load_only(HBook.id, HBook.title),
+            .contains_eager(HBookContent.hbook)
+            .load_only(HBook.id, HBook.title, HBook.is_visible),
         )
     )
 
@@ -75,7 +78,7 @@ async def search_page(
         )
         .join(HBook.content)
         .join(HBookContent.hbook_page)
-        .where(HBookPage.title.ilike(f"%{search_text}%"))
+        .where(HBookPage.title.ilike(f"%{search_text}%"), HBook.is_visible)
         .order_by(HBookPage.id)
         .offset(continue_after)
         .limit(limit)

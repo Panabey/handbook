@@ -25,6 +25,7 @@ class Handbook(Base):
     title: Mapped[str] = mapped_column(String(80), unique=True)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
     status_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("handbook_status.id", ondelete="SET NULL", onupdate="CASCADE"),

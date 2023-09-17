@@ -112,6 +112,7 @@ class Handbook(models.Model):
     )
     title = models.CharField("Название справочника", max_length=80)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
+    is_visible = models.BooleanField("Видимый?", default=False)
     status = models.ForeignKey(
         "HandBookStatus", models.SET_NULL, blank=True, null=True, verbose_name="Статус"
     )

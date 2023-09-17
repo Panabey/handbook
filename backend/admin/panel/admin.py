@@ -160,8 +160,9 @@ class ArticleAdmin(MultiplyModelAdmin):
 
 
 class HandbookAdmin(MultiplyModelAdmin):
-    list_display = ("title",)
+    list_display = ("title", "is_visible")
     search_fields = ("title",)
+    list_filter = ("is_visible",)
     ordering = ("-id",)
     list_per_page = 20
 
