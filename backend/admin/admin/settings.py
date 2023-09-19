@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "axes",
 ]
 
 MIDDLEWARE = [
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "admin.urls"
@@ -130,6 +132,29 @@ AUTH_PASSWORD_VALIDATORS = [
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
+
+# Security
+# https://django-axes.readthedocs.io/en/latest/4_configuration.html
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    # Django ModelBackend is the default authentication backend.
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+AXES_IPWARE_META_PRECEDENCE_ORDER = [
+    "HTTP_X_FORWARDED_FOR",
+    "REMOTE_ADDR",
+]
+
+AXES_FAILURE_LIMIT = 5
+AXES_RESET_ON_SUCCESS = True
+AXES_ONLY_ADMIN_SITE = True
+AXES_ACCESS_FAILURE_LOG_PER_USER_LIMIT = 50
+AXES_HANDLER = "core.axes_handler.AxesCustomHandler"
+# custom settings
+# если True, то очищает все данные из GET и POST для записи в БД
+AXES_CLEAR_DATA = settings.AXES_CLEAR_DATA
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

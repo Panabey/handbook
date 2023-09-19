@@ -38,5 +38,8 @@ class Settings(BaseSettings):
     # session
     SESSION_COOKIE_SECURE: bool = Field(default=False)
 
+    # axes security
+    AXES_CLEAR_DATA: bool = Field(default=True)
+
 
 settings = Settings()
