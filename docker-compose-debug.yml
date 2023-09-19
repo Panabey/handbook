@@ -1,0 +1,94 @@
+version: "3.8"
+
+services:
+  async_api:
+    image: async_api
+    restart: always
+    build:
+      context: .
+      dockerfile: backend/async_api/Dockerfile
+    expose:
+      - 8000
+    environment:
+      - DEBUG_MODE=true
+      - URL_DATABASE=postgresql+asyncpg://handbook_user:<password>@postgresql/handbook # change
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)" # change
+      # middlewares
+      - "traefik.http.routers.fastapi.middlewares=security"
+      - "traefik.http.middlewares.security.headers.accesscontrolallowmethods=GET,POST,HEAD"
+      - "traefik.http.middlewares.security.headers.accesscontrolallowheaders=Content-Type"
+      - "traefik.http.middlewares.security.headers.accesscontrolalloworiginlist=*" # change
+      - "traefik.http.middlewares.security.headers.accesscontrolmaxage=600"
+      - "traefik.http.middlewares.security.headers.framedeny=true"
+    depends_on:
+      - postgresql
+
+  admin:
+    image: admin
+    restart: always
+    build:
+      context: .
+      dockerfile: backend/admin/Dockerfile
+    expose:
+      - 8001
+    environment:
+      - DEBUG_MODE=true
+      - DATABASE_HOST=postgresql
+      # for db async_api
+      - DB_BACKEND_NAME=handbook
+      - DB_BACKEND_USER=handbook_user
+      - DB_BACKEND_PASSWORD=<password> # change
+      # for db admin
+      - DB_ADMIN_NAME=django_handbook
+      - DB_ADMIN_USER=django_user
+      - DB_ADMIN_PASSWORD=<password> # change
+      # other
+      - CORS_ALLOWED_ORIGINS=["http://localhost"] # change
+      - SECRET_APP=<token> # without symbols $
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
+    depends_on:
+      - postgresql
+    volumes:
+      - shared-media:/app/media
+
+  postgresql:
+    container_name: postgresql_handbook
+    image: postgres:15.3
+    restart: always
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD=<password> # change
+      # for async_api
+      - BACKEND_USER=handbook_user
+      - BACKEND_PASSWORD=<password> # change
+      - BACKEND_DB=handbook
+      # for admin
+      - ADMIN_USER=django_user
+      - ADMIN_PASSWORD=<password> # change
+      - ADMIN_DB=django_handbook
+    volumes:
+      - ./scripts/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+      - pg-data:/var/lib/postgresql/data
+
+  traefik:
+    image: traefik:2.10
+    restart: always
+    container_name: "traefik"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - 80:80
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  pg-data:
+  shared-media:
+    external: true
