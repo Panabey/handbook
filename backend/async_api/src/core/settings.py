@@ -1,9 +1,9 @@
 import os
 
-from pydantic import Field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
+# Базовый путь к файлу конфигурации
 BASE_URL = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -13,9 +13,16 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         env_file=(os.path.join(BASE_URL, ".env"), ".env"),
     )
-    DEBUG_MODE: bool = Field(default=False)
+    # general
+    DEBUG_MODE: bool = False
 
+    # database
     URL_DATABASE: str
+
+    # docs
+    OPEN_API_URL: str | None = "/openapi.json"
+    DOCS_URL: str | None = "/docs"
+    REDOC_URL: str | None = "/redoc"
 
 
 settings = Settings()

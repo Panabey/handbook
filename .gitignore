@@ -1,25 +1,21 @@
-.vscode
+.vscode/
 
 # backend
 .venv/
 *.db
+.env
 
-images/
-
+# files
 staticfiles/
 media/
 
-# mypy cache
+# cache
 .mypy_cache/
-
-# ruff cache
 .ruff_cache/
+.pytest_cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-
-# pytest cache
-.pytest_cache/
 
 # coverage test
 .coverage

@@ -1,9 +1,9 @@
 import os
 
-from pydantic import Field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
+# Базовый путь к файлу конфигурации
 BASE_URL = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -14,32 +14,34 @@ class Settings(BaseSettings):
         env_file=(os.path.join(BASE_URL, ".env"), ".env"),
     )
     # general
-    DEBUG_MODE: bool = Field(default=False)
-    ALLOWED_HOSTS: list[str] = Field(default=["*"])
-    SECRET_APP: str | None = Field(default=None)
+    DEBUG_MODE: bool = False
+    ALLOWED_HOSTS: list[str] = ["*"]
+    SECRET_APP: str | None = None
 
-    # databse
-    DATABASE_HOST: str | None = Field(default=None)
+    # database
+    DATABASE_HOST: str | None = None
 
-    DB_BACKEND_NAME: str | None = Field(default=None)
-    DB_BACKEND_USER: str | None = Field(default=None)
-    DB_BACKEND_PASSWORD: str | None = Field(default=None)
+    DB_BACKEND_NAME: str | None = None
+    DB_BACKEND_USER: str | None = None
+    DB_BACKEND_PASSWORD: str | None = None
 
-    DB_ADMIN_NAME: str | None = Field(default=None)
-    DB_ADMIN_USER: str | None = Field(default=None)
-    DB_ADMIN_PASSWORD: str | None = Field(default=None)
+    DB_ADMIN_NAME: str | None = None
+    DB_ADMIN_USER: str | None = None
+    DB_ADMIN_PASSWORD: str | None = None
 
     # cors
-    CORS_ALLOWED_ORIGINS: list[str] = Field(default=["http://localhost"])
+    CORS_ALLOWED_ORIGINS: list[str] = ["http://localhost"]
 
     # csrf
-    CSRF_COOKIE_SECURE: bool = Field(default=False)
-    CSRF_TRUSTED_ORIGINS: list[str | None] = Field(default=list())
+    CSRF_COOKIE_SECURE: bool = False
+    CSRF_TRUSTED_ORIGINS: list[str | None] = []
+
     # session
-    SESSION_COOKIE_SECURE: bool = Field(default=False)
+    SESSION_COOKIE_SECURE: bool = False
 
     # axes security
-    AXES_CLEAR_DATA: bool = Field(default=True)
+    AXES_CLEAR_DATA: bool = True
+    AXES_DISABLE_ACCESS_LOG: bool = True
 
 
 settings = Settings()
