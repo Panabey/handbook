@@ -1,12 +1,3 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to
-#       the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create,
-#       modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 import re
 import threading
 
@@ -27,21 +18,10 @@ from django_cleanup import cleanup
 
 
 class TagStatus(models.Model):
-    title = models.CharField("Название статуса", max_length=60)
+    title = models.CharField("Название статуса", max_length=60, unique=True)
 
     def __str__(self) -> str:
         return self.title
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_value = (
-            Tag.objects.using("handbook")
-            .filter(title=self.title)
-            .exclude(pk=self.pk)
-            .first()
-        )
-        if existing_value:
-            raise ValidationError({"title": "Статус уже существует"})
-        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -51,22 +31,11 @@ class TagStatus(models.Model):
 
 
 class Tag(models.Model):
-    title = models.CharField("Название тега", max_length=60)
+    title = models.CharField("Название тега", max_length=60, unique=True)
     status = models.ForeignKey("TagStatus", models.CASCADE, verbose_name="Статус")
 
     def __str__(self) -> str:
         return f"{self.title} ({self.status})"
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_value = (
-            Tag.objects.using("handbook")
-            .filter(title=self.title)
-            .exclude(pk=self.pk)
-            .first()
-        )
-        if existing_value:
-            raise ValidationError({"title": "Тег уже существует"})
-        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -76,23 +45,14 @@ class Tag(models.Model):
 
 
 class HandBookStatus(models.Model):
-    title = models.CharField(max_length=25, verbose_name="Название статуса")
+    title = models.CharField(
+        max_length=25, verbose_name="Название статуса", unique=True
+    )
     color_text = ColorField("Цвет текста", default="#5573f3")
     color_background = ColorField("Цвет фона", default="#e2e8ff")
 
     def __str__(self) -> str:
         return self.title
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_value = (
-            HandBookStatus.objects.using("handbook")
-            .filter(title=self.title)
-            .exclude(pk=self.pk)
-            .first()
-        )
-        if existing_value:
-            raise ValidationError({"title": "Топик уже существует"})
-        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -125,7 +85,7 @@ class Handbook(models.Model):
         null=True,
         storage=CompressImageStorage,
     )
-    title = models.CharField("Название справочника", max_length=80)
+    title = models.CharField("Название справочника", max_length=80, unique=True)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
     is_visible = models.BooleanField("Видимый?", default=False)
     category = models.ForeignKey(
@@ -145,17 +105,6 @@ class Handbook(models.Model):
     def save(self, *args, **kwargs):
         self.title = replace_char(r"[-\s]+", self.title.strip())
         super().save(*args, **kwargs)
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_value = (
-            Handbook.objects.using("handbook")
-            .filter(title=self.title)
-            .exclude(pk=self.pk)
-            .first()
-        )
-        if existing_value:
-            raise ValidationError({"title": "Справочник уже существует"})
-        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -285,21 +234,10 @@ class ArticleTag(models.Model):
 
 
 class QuizTopic(models.Model):
-    title = models.CharField("Название", max_length=60)
+    title = models.CharField("Название", max_length=60, unique=True)
 
     def __str__(self) -> str:
         return self.title
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        existing_value = (
-            QuizTopic.objects.using("handbook")
-            .filter(title=self.title)
-            .exclude(pk=self.pk)
-            .first()
-        )
-        if existing_value:
-            raise ValidationError({"title": "Топик уже существует"})
-        return super().clean_fields(exclude)
 
     class Meta:
         managed = False

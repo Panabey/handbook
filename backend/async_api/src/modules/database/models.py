@@ -45,7 +45,7 @@ class Handbook(Base):
     category_info: Mapped["HandbookСategory"] = relationship(
         back_populates="hbook_category"
     )
-    status_info: Mapped["HandBookStatus"] = relationship(back_populates="hbook_status")
+    status_info: Mapped["HandbookStatus"] = relationship(back_populates="hbook_status")
 
 
 class HandbookContent(Base):
@@ -86,7 +86,7 @@ class HandbookPage(Base):
     hbook_content: Mapped["HandbookContent"] = relationship(back_populates="hbook_page")
 
 
-class HandBookStatus(Base):
+class HandbookStatus(Base):
     __tablename__ = "handbook_status"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

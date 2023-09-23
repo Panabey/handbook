@@ -9,7 +9,7 @@ from modules.database.models import (
     Handbook,
     HandbookContent,
     HandbookPage,
-    HandBookStatus,
+    HandbookStatus,
 )
 
 pytestmark = pytest.mark.asyncio
@@ -52,7 +52,7 @@ async def test_handbook_all_with_status(client: AsyncClient, session: AsyncSessi
         "color_text": "#ffffff",
         "color_background": "#000000",
     }
-    status = await insert_value(HandBookStatus, session, None, **data)
+    status = await insert_value(HandbookStatus, session, None, **data)
 
     # Добавление справочника
     data = {"title": "Python", "status_id": status.id, "is_visible": True}
