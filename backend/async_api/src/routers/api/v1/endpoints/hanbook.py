@@ -18,7 +18,7 @@ from modules.schemas.base import DetailInfo
 from modules.schemas.handbook import PageDetail
 from modules.schemas.handbook import SearchDetail
 from modules.schemas.handbook import ContentDetail
-from modules.schemas.handbook import HandbookDetail
+from modules.schemas.handbook import CategoryDetail
 from modules.schemas.handbook import SearchPageDetail
 
 router = APIRouter()
@@ -27,9 +27,9 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 Int = Annotated[int, Query(ge=1, le=2147483647)]
 
 
-@router.get("/all", response_model=list[HandbookDetail])
+@router.get("/all", response_model=list[CategoryDetail])
 async def get_handbooks(session: Session):
-    """Получение списка всех доступных справочников"""
+    """Получение списка всех доступных категорий и их справочников"""
     result = await get_all(session)
     return result
 

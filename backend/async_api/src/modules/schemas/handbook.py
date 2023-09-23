@@ -45,6 +45,13 @@ class HandbookDetail(BaseModel):
     )
 
 
+class CategoryDetail(BaseModel):
+    title: str
+    handbook: list[HandbookDetail] = Field(
+        validation_alias=AliasChoices("handbook", "hbook_category")
+    )
+
+
 class HandbookDetailShort(BaseModel):
     id: int
     title: str

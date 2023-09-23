@@ -8,22 +8,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from modules.database.models import Handbook as HBook
 from modules.database.models import HandbookPage as HBookPage
 from modules.database.models import HandbookContent as HBookContent
+from modules.database.models import HandbookСategory as HBookCategory
 
 
 async def get_all(session: AsyncSession):
     smt = (
-        select(HBook)
+        select(HBookCategory)
+        .join(HBookCategory.hbook_category)
         .join(HBook.status_info, isouter=True)
         .where(HBook.is_visible)
-        .order_by(HBook.id)
+        .order_by(HBook.id, HBookCategory.id)
         .options(
-            load_only(HBook.id, HBook.title, HBook.logo_url),
-            contains_eager(HBook.status_info),
+            contains_eager(HBookCategory.hbook_category)
+            .load_only(HBook.id, HBook.title, HBook.logo_url)
+            .contains_eager(HBook.status_info),
         )
     )
 
     result = await session.scalars(smt)
-    return result.all()
+    return result.unique().all()
 
 
 async def get_content(session: AsyncSession, handbook_title: str):
