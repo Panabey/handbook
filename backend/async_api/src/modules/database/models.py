@@ -26,6 +26,11 @@ class Handbook(Base):
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
+    category_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("handbook_category.id", ondelete="SET NULL", onupdate="CASCADE"),
+        nullable=True,
+    )
     status_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("handbook_status.id", ondelete="SET NULL", onupdate="CASCADE"),
@@ -36,6 +41,9 @@ class Handbook(Base):
         back_populates="hbook",
         cascade="all, delete",
         passive_deletes=True,
+    )
+    category_info: Mapped["HandbookСategory"] = relationship(
+        back_populates="hbook_category"
     )
     status_info: Mapped["HandBookStatus"] = relationship(back_populates="hbook_status")
 
@@ -90,6 +98,17 @@ class HandBookStatus(Base):
         back_populates="status_info",
         cascade="all, delete",
         passive_deletes=True,
+    )
+
+
+class HandbookСategory(Base):
+    __tablename__ = "handbook_category"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(50), unique=True)
+
+    hbook_category: Mapped[list["Handbook"]] = relationship(
+        back_populates="category_info"
     )
 
 

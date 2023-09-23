@@ -101,6 +101,21 @@ class HandBookStatus(models.Model):
         db_table = "handbook_status"
 
 
+class HandbookCategory(models.Model):
+    title = models.CharField(
+        "Название категории справочников", max_length=50, unique=True
+    )
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        managed = False
+        verbose_name = "Справочник (Категории)"
+        verbose_name_plural = "Справочник (Категория)"
+        db_table = "handbook_category"
+
+
 @cleanup.select
 class Handbook(models.Model):
     logo_url = models.FileField(
@@ -113,6 +128,13 @@ class Handbook(models.Model):
     title = models.CharField("Название справочника", max_length=80)
     description = models.TextField("Описание", max_length=255, blank=True, null=True)
     is_visible = models.BooleanField("Видимый?", default=False)
+    category = models.ForeignKey(
+        "HandbookCategory",
+        models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name="Категория",
+    )
     status = models.ForeignKey(
         "HandBookStatus", models.SET_NULL, blank=True, null=True, verbose_name="Статус"
     )

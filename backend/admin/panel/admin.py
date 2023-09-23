@@ -15,6 +15,7 @@ from .models import (
     Article,
     ArticleTag,
     HandBookStatus,
+    HandbookCategory,
     Handbook,
     HandbookPage,
     HandbookContent,
@@ -160,9 +161,17 @@ class ArticleAdmin(MultiplyModelAdmin):
 
 
 class HandbookAdmin(MultiplyModelAdmin):
-    list_display = ("title", "is_visible")
+    list_display = ("title", "category", "is_visible")
     search_fields = ("title",)
     list_filter = ("is_visible",)
+    autocomplete_fields = ("category",)
+    ordering = ("-id",)
+    list_per_page = 20
+
+
+class HandbookCategoryAdmin(MultiplyModelAdmin):
+    list_display = ("title",)
+    search_fields = ("title",)
     ordering = ("-id",)
     list_per_page = 20
 
@@ -223,6 +232,7 @@ admin.site.register(Article, ArticleAdmin)
 admin.site.register(ProjectNews, ProjectNewsAdmin)
 
 # Справочники
+admin.site.register(HandbookCategory, HandbookCategoryAdmin)
 admin.site.register(HandBookStatus, HandbookStatusAdmin)
 admin.site.register(Handbook, HandbookAdmin)
 admin.site.register(HandbookPage, HandbookPageAdmin)
