@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "panel",
     "mdeditor",
     "colorfield",
+    "django_admin_logs",
     "corsheaders",
     "django_cleanup.apps.CleanupConfig",
     "django.contrib.admin",
@@ -196,3 +197,8 @@ MDEDITOR_CONFIGS = {
         "lineWrapping": True,
     }
 }
+
+# admin logs
+# https://github.com/radwon/django-admin-logs
+
+DJANGO_ADMIN_LOGS_ENABLED = settings.ADMIN_LOGS_ENABLED

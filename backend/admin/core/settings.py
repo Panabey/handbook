@@ -43,5 +43,8 @@ class Settings(BaseSettings):
     AXES_CLEAR_DATA: bool = True
     AXES_DISABLE_ACCESS_LOG: bool = True
 
+    # admin logs
+    ADMIN_LOGS_ENABLED: bool = False
+
 
 settings = Settings()
