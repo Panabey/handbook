@@ -114,6 +114,7 @@ class UploadView(generic.View):
             quality=quality,
             optimize=True,
             exif=b"",
+            progressive=True,
         )
         img.close()
 

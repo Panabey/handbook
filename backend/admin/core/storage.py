@@ -129,7 +129,14 @@ class CompressImageStorage(Storage, StorageSettingsMixin):
                     new_image.paste(img, mask=img.split()[3])
                     img = new_image
 
-                img.save(full_path, "JPEG", quality=90, optimize=True, exif=b"")
+                img.save(
+                    full_path,
+                    "JPEG",
+                    quality=90,
+                    optimize=True,
+                    exif=b"",
+                    progressive=True,
+                )
         else:
             while True:
                 try:
