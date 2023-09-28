@@ -5,6 +5,7 @@ import math
 from threading import Lock
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 def calculate_reading_time(text: str, char_per_second: int = 1200) -> int:
@@ -56,3 +57,8 @@ def get_text_or_none(classmodel: models.Model, pk: int, field_name: str):
         return data[0]
     except classmodel.DoesNotExist:
         return None
+
+
+def validate_uint(value: int):
+    if value < 1:
+        raise ValidationError("Убедитесь, что это значение больше либо равно 1.")

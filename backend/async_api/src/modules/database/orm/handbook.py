@@ -36,9 +36,9 @@ async def get_content(session: AsyncSession, handbook_title: str):
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
             joinedload(HBook.content)
-            .load_only(HBookContent.title, HBookContent.description)
+            .load_only(HBookContent.part, HBookContent.title, HBookContent.description)
             .joinedload(HBookContent.hbook_page)
-            .load_only(HBookPage.id, HBookPage.title),
+            .load_only(HBookPage.id, HBookPage.subpart, HBookPage.title),
         )
     )
 
@@ -55,7 +55,7 @@ async def get_page_by_id(session: AsyncSession, page_id: int):
         .options(
             defer(HBookPage.content_id),
             contains_eager(HBookPage.hbook_content)
-            .load_only(HBookContent.id)
+            .load_only(HBookContent.id, HBookContent.part)
             .contains_eager(HBookContent.hbook)
             .load_only(HBook.id, HBook.title),
         )

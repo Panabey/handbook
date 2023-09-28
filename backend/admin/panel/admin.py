@@ -183,17 +183,22 @@ class HandbookStatusAdmin(MultiplyModelAdmin):
 
 
 class HandbookContentAdmin(MultiplyModelAdmin):
-    list_display = ("handbook", "title")
+    list_display = ("handbook", "get_full_title")
     search_fields = ("title", "handbook__title")
     list_filter = ("handbook",)
     ordering = ("-id",)
     list_per_page = 20
     autocomplete_fields = ("handbook",)
 
+    def get_full_title(self, obj: HandbookContent):
+        return f"{obj.part}. {obj.title}"
+
+    get_full_title.short_description = "Название раздела"
+
 
 class HandbookPageAdmin(MultiplyModelAdmin):
     list_display = (
-        "title",
+        "get_full_title",
         "get_content",
         "get_handbook",
         "create_date",
@@ -205,12 +210,16 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     list_per_page = 20
     autocomplete_fields = ("content",)
 
+    def get_full_title(self, obj: HandbookPage):
+        return f"{obj.content.part}.{obj.subpart} {obj.title}"
+
     def get_handbook(self, obj: HandbookPage):
         return obj.content.handbook.title
 
     def get_content(self, obj: HandbookPage):
         return obj.content.title
 
+    get_full_title.short_description = "Название страницы"
     get_handbook.short_description = "Справочник"
     get_content.short_description = "Раздел"
 

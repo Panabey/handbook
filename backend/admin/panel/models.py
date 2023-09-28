@@ -1,14 +1,12 @@
-import re
 import threading
 
-from typing import Collection
 from django.db import models
-from django.core.exceptions import ValidationError
 
 from mdeditor.fields import MDTextField
 from colorfield.fields import ColorField
 
 from .ext.utils_admin import replace_char
+from .ext.utils_admin import validate_uint
 from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
@@ -115,22 +113,20 @@ class Handbook(models.Model):
 
 class HandbookContent(models.Model):
     handbook = models.ForeignKey(Handbook, models.CASCADE, verbose_name="Справочник")
+    part = models.SmallIntegerField(
+        "Номер раздела справочника",
+        help_text="Например: 1",
+        validators=[
+            validate_uint,
+        ],
+    )
     title = models.CharField(
-        "Раздел справочника", help_text="Например: 1. Основы", max_length=80
+        "Название раздела справочника", help_text="Например: Основы", max_length=80
     )
     description = models.TextField("Описание раздела", max_length=255)
 
     def __str__(self) -> str:
-        return f"{self.title} ({self.handbook.title})"
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        errors = {}
-        # шаблон <число>. <текст>
-        if not re.match(r"^\d+\.\s.+", self.title):
-            errors["title"] = ValidationError("Несоответствие шаблону")
-        if errors:
-            raise ValidationError(errors)
-        return super().clean_fields(exclude)
+        return f"{self.part}. {self.title} ({self.handbook.title})"
 
     class Meta:
         managed = False
@@ -141,8 +137,15 @@ class HandbookContent(models.Model):
 
 class HandbookPage(models.Model):
     content = models.ForeignKey(HandbookContent, models.CASCADE, verbose_name="Раздел")
+    subpart = models.SmallIntegerField(
+        "Номер темы раздела справочника",
+        help_text="Например: 1",
+        validators=[
+            validate_uint,
+        ],
+    )
     title = models.CharField(
-        "Название темы", help_text="Например: 1.1 Циклы", max_length=80
+        "Название темы", help_text="Например: Циклы", max_length=80
     )
     short_description = models.TextField(
         "Короткое описание",
@@ -156,15 +159,6 @@ class HandbookPage(models.Model):
 
     def __str__(self) -> str:
         return self.title
-
-    def clean_fields(self, exclude: Collection[str] | None) -> None:
-        errors = {}
-        # шаблон <число>.<число>. <текст>
-        if not re.match(r"^\d+\.\d+\s.+", self.title):
-            errors["title"] = ValidationError("Несоответствие шаблону")
-        if errors:
-            raise ValidationError(errors)
-        return super().clean_fields(exclude)
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)

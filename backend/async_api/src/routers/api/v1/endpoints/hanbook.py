@@ -54,15 +54,10 @@ async def get_content_handbook(
         raise HTTPException(404, "По Вашему запросу ничего не найдено..")
 
     # сортировка тем и подтем от меньшего к большему
-    result.content = sorted(  # сортировка по названию тем
-        result.content, key=lambda x: int(re.search(r"^(\d+)\.", x.title).group(1))
-    )
-    for content_item in result.content:
-        content_item.hbook_page = sorted(  # сортировка по названию страниц
-            content_item.hbook_page,
-            key=lambda x: int(re.search(r"\.(\d+)", x.title).group(1)),
-        )
+    result.content.sort(key=lambda x: x.part)
 
+    for content_item in result.content:
+        content_item.hbook_page.sort(key=lambda x: x.subpart)
     return result
 
 

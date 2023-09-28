@@ -7,6 +7,7 @@ from sqlalchemy import Integer
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
+from sqlalchemy import SmallInteger
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
@@ -55,6 +56,7 @@ class HandbookContent(Base):
     handbook_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("handbook.id", ondelete="CASCADE", onupdate="CASCADE")
     )
+    part: Mapped[int] = mapped_column(SmallInteger)
     title: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(255))
 
@@ -72,6 +74,7 @@ class HandbookPage(Base):
         Integer,
         ForeignKey("handbook_content.id", ondelete="CASCADE", onupdate="CASCADE"),
     )
+    subpart: Mapped[int] = mapped_column(SmallInteger)
     title: Mapped[str] = mapped_column(String(80))
     short_description: Mapped[str] = mapped_column(String(160))
     text: Mapped[str] = mapped_column(Text)

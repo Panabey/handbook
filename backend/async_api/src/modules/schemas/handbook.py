@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import Field, field_validator
+from pydantic import Field
 from pydantic import BaseModel
 from pydantic import AliasChoices
 
@@ -12,6 +12,7 @@ from pydantic import AliasChoices
 
 class HBookPageDetail(BaseModel):
     id: int
+    subpart: int
     title: str
 
 
@@ -23,6 +24,7 @@ class SearchPageDetail(BaseModel):
 
 
 class HBookContentDetail(BaseModel):
+    part: int
     title: str
     description: str
     page: list[HBookPageDetail] = Field(
@@ -52,6 +54,11 @@ class CategoryDetail(BaseModel):
     )
 
 
+class HandbookDetailUShort(BaseModel):
+    id: int
+    title: str
+
+
 class HandbookDetailShort(BaseModel):
     id: int
     title: str
@@ -62,22 +69,25 @@ class ContentDetail(HandbookDetailShort):
     content: list[HBookContentDetail]
 
 
+class PageInfoDetail(BaseModel):
+    part: int
+    handbook: HandbookDetailUShort = Field(
+        validation_alias=AliasChoices("handbook", "hbook")
+    )
+
+
 class PageDetail(BaseModel):
     id: int
     short_description: str
+    subpart: int
     title: str
     text: str
     reading_time: int
     create_date: datetime
     update_date: datetime
-    handbook: HBookPageDetail = Field(
-        validation_alias=AliasChoices("handbook", "hbook_content")
+    content: PageInfoDetail = Field(
+        validation_alias=AliasChoices("content", "hbook_content")
     )
-
-    @field_validator("handbook", mode="before")
-    @classmethod
-    def content_to_handbook(cls, v) -> HBookPageDetail:
-        return v.hbook
 
 
 """
