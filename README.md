@@ -3,18 +3,22 @@
 ### Первичный запуск проекта
 1. `$ git clone https://github.com/Panabey/handbook.git`
 2. `$ docker-compose up -d postgresql`
-3. `$ docker-compose build async_api`
-4. `$ docker-compose up -d async_api`
-5. `$ docker exec -it <id_контейнера> /bin/bash`
-6. `$ cd ..`
-7. `$ alembic upgrade head` (Выйти из контейнера и на всякий повторно перезапустить)
-8. `$ docker-compose build admin`
-9. `$ docker volume create --name=shared-media` (Если потребуется)
-10. `$ docker-compose up -d admin`
-11. `$ docker exec -it <id_контейнера> /bin/sh`
-12. `$ python manage.py makemigrations && python manage.py migrate`
-13. `$ python manage.py createsuperuser` (Выйти из контейнера)
-14. `$ docker-compose up -d` или `$ docker-compose up -d <имя_контейнера>`
+3. `$ docker-compose up -d --build async_api`
+4. `$ docker exec -it <id_контейнера> /bin/bash`
+5. `$ cd ..`
+6. `$ alembic upgrade head` (Выйти из контейнера и на всякий повторно перезапустить)
+7. `$ docker-compose build admin`
+8. `$ docker volume create --name=shared-media` (Если потребуется)
+9. `$ docker-compose up -d admin`
+10. `$ docker exec -it <id_контейнера> /bin/bash`
+11. `$ python manage.py makemigrations && python manage.py migrate`
+12. `$ python manage.py createsuperuser` (Выйти из контейнера)
+13. `$ docker-compose up -d` или `$ docker-compose up -d <имя_контейнера>`
+
+### Запуск при обновлении
+1. `$ git pull`
+2. `$ docker-compose up -d --build async_api` (Обновить то, где были изменения)
+3. Если потребуется, то провести миграции БД через **alembic** или **django ORM**
 
 ### FAQ
 
