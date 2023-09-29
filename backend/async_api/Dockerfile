@@ -14,16 +14,13 @@ RUN pip install -r requirements.txt --no-cache-dir -U
 
 WORKDIR /app/src
 
-CMD ["uvicorn", "main:app", \
+CMD ["granian", \
     "--workers", "4", \
+    "--interface", "asgi", \
     "--host", "0.0.0.0", \
     "--port", "8000", \
     "--log-level", "error", \
-    "--ws", "none", \
-    "--interface", "asgi3", \
+    "--no-ws", \
     "--loop", "uvloop", \
-    "--http", "httptools", \
-    "--timeout-keep-alive", "30", \
-    "--proxy-headers", \
-    "--no-server-header" \
+    "main:app" \
     ]

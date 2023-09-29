@@ -25,6 +25,7 @@ services:
       - "traefik.http.middlewares.security.headers.accesscontrolmaxage=600"
       - "traefik.http.middlewares.security.headers.framedeny=true"
       - "traefik.http.middlewares.security.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.security.headers.customresponseheaders.server="
     depends_on:
       - postgresql
 
