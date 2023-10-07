@@ -70,7 +70,7 @@ services:
 
   postgresql:
     container_name: postgresql_handbook
-    image: postgres:15.3
+    image: postgres:16.0
     restart: always
     expose:
       - 5432
