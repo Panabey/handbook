@@ -16,8 +16,12 @@ class Settings(BaseSettings):
     # general
     DEBUG_MODE: bool = False
 
-    # database
+    # postgres database
     URL_DATABASE: str
+
+    # redis
+    REDIS_HOST: str
+    REDIS_PORT: int = 6379
 
     # docs
     OPEN_API_URL: str | None = "/openapi.json"

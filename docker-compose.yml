@@ -12,6 +12,7 @@ services:
     environment:
       - DEBUG_MODE=false
       - URL_DATABASE=postgresql+asyncpg://handbook_user:<password>@postgresql/handbook # change
+      - REDIS_HOST=redis_server
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fastapi.rule=Host(`<domain>`)" # change
@@ -28,6 +29,7 @@ services:
       - "traefik.http.middlewares.security.headers.customresponseheaders.server="
     depends_on:
       - postgresql
+      - redis_server
 
   admin:
     image: admin
@@ -88,10 +90,19 @@ services:
       - ./scripts/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
       - pg-data:/var/lib/postgresql/data
 
+
+  redis_server:
+    image: redis:7.2
+    container_name: "redis"
+    restart: always
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --loglevel warning --appendonly no
+    expose:
+      - 6379
+
   traefik:
     image: traefik:2.10
-    restart: always
     container_name: "traefik"
+    restart: always
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
