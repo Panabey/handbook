@@ -29,9 +29,13 @@ async def get_all_tags(
     status: Annotated[str, Query(min_length=1, max_length=60)],
     limit: Annotated[int, Query(ge=1, le=15)] = 15,
 ):
-    """Получение списка общих тегов (Теги для квизов и статьей одинаковые).
-
+    """Получение списка общих тегов (Теги для квизов и статьей одинаковые).\n
     По умолчанию ограничен 15 тегами.
+
+    **Рекомендации!**\n
+    Включить заголовок **X-Use-Cache: true** для использования кеширования.\n
+    Если данные уже лежали в кеше, то в ответе Вы получите заголовок:
+    **X-Cache-Status: HIT**, в противном случае **X-Cache-Status: MISS**.
     """
     result = await get_tags(session, status, limit)
     if result is None:

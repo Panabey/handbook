@@ -29,7 +29,14 @@ async def get_last_news_project(
     session: Session,
     limit: Annotated[int, Query(ge=1, le=8)] = 8,
 ):
-    """Получение последней информации о событиях, изменениях и т.д"""
+    """Получение последней информации о событиях, изменениях и т.д.
+    (Использовать для главной страницы)
+
+    **Рекомендации!**\n
+    Включить заголовок **X-Use-Cache: true** для использования кеширования.\n
+    Если данные уже лежали в кеше, то в ответе Вы получите заголовок:
+    **X-Cache-Status: HIT**, в противном случае **X-Cache-Status: MISS**.
+    """
     result = await get_last_news(session, limit)
     return result
 

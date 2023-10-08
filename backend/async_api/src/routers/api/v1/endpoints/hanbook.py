@@ -29,7 +29,13 @@ Int = Annotated[int, Query(ge=1, le=2147483647)]
 
 @router.get("/all", response_model=list[CategoryDetail])
 async def get_handbooks(session: Session):
-    """Получение списка всех доступных категорий и их справочников"""
+    """Получение списка всех доступных категорий и их справочников.
+
+    **Рекомендации!**\n
+    Включить заголовок **X-Use-Cache: true** для использования кеширования.\n
+    Если данные уже лежали в кеше, то в ответе Вы получите заголовок:
+    **X-Cache-Status: HIT**, в противном случае **X-Cache-Status: MISS**.
+    """
     result = await get_all(session)
     return result
 
@@ -46,6 +52,11 @@ async def get_content_handbook(
 
     Полученнные данные (темы) приходят в сортированном виде,
     делать что то дополнительно не требуется.
+
+    **Рекомендации!**\n
+    Включить заголовок **X-Use-Cache: true** для использования кеширования.\n
+    Если данные уже лежали в кеше, то в ответе Вы получите заголовок:
+    **X-Cache-Status: HIT**, в противном случае **X-Cache-Status: MISS**.
     """
     handbook = re.sub(r"[-\s]+", " ", handbook.strip())
 
@@ -67,9 +78,13 @@ async def get_content_handbook(
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_page_handbook(session: Session, page_id: Int):
-    """Получение содержимого подтемы справочника.
+    """Получение содержимого подтемы справочника
+    (Полученный текст представлен в виде Markdown v2).
 
-    Полученный текст представлен в виде Markdown v2
+    **Рекомендации!**\n
+    Включить заголовок **X-Use-Cache: true** для использования кеширования.\n
+    Если данные уже лежали в кеше, то в ответе Вы получите заголовок:
+    **X-Cache-Status: HIT**, в противном случае **X-Cache-Status: MISS**.
     """
     result = await get_page_by_id(session, page_id)
     if not result:
