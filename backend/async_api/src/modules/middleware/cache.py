@@ -6,8 +6,10 @@ from starlette.types import Message
 from starlette.types import Receive
 from starlette.types import ASGIApp
 from starlette.datastructures import Headers
+from starlette.datastructures import MutableHeaders
 
-from fastapi.responses import Response
+from starlette.responses import Response
+
 
 from modules.redis.utils import get_cache_content
 from modules.redis.utils import set_cache_content
@@ -42,9 +44,13 @@ class RedisCacheMiddleware:
         async def send_wrapper(message: Message) -> None:
             nonlocal allow_cache
 
-            if message["type"] == "http.response.start" and message["status"] != 200:
-                # разрешить кеширование если ответ правильно обработался
-                allow_cache = False
+            if message["type"] == "http.response.start" and allow_cache:
+                if message["status"] != 200:
+                    # разрешить кеширование если ответ правильно обработался
+                    allow_cache = False
+                else:
+                    headers = MutableHeaders(scope=message)
+                    headers.append("X-Cache-Status", "MISS")
 
             if message["type"] == "http.response.body" and allow_cache:
                 # кеширование ответа
