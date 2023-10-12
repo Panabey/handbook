@@ -3,6 +3,7 @@ version: "3.8"
 services:
   async_api:
     image: async_api
+    container_name: async_api_debug
     restart: always
     build:
       context: .
@@ -19,7 +20,7 @@ services:
       # middlewares
       - "traefik.http.routers.fastapi.middlewares=security"
       - "traefik.http.middlewares.security.headers.accesscontrolallowmethods=GET,POST,HEAD"
-      - "traefik.http.middlewares.security.headers.accesscontrolallowheaders=Content-Type"
+      - "traefik.http.middlewares.security.headers.accesscontrolallowheaders=Content-Type,X-Use-Cache"
       - "traefik.http.middlewares.security.headers.accesscontrolalloworiginlist=*" # change
       - "traefik.http.middlewares.security.headers.accesscontrolmaxage=600"
       - "traefik.http.middlewares.security.headers.framedeny=true"
@@ -29,6 +30,7 @@ services:
 
   admin:
     image: admin
+    container_name: admin_debug
     restart: always
     build:
       context: .
@@ -54,12 +56,10 @@ services:
       - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
     depends_on:
       - postgresql
-    volumes:
-      - shared-media:/app/media
 
   postgresql:
-    container_name: postgresql_handbook
     image: postgres:16.0
+    container_name: postgresql_handbook
     restart: always
     expose:
       - 5432
@@ -79,7 +79,7 @@ services:
 
   redis_server:
     image: redis:7.2
-    container_name: "redis"
+    container_name: redis_debug
     restart: always
     command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --loglevel warning --appendonly no
     expose:
@@ -87,7 +87,7 @@ services:
 
   traefik:
     image: traefik:2.10
-    container_name: "traefik"
+    container_name: traefik_debug
     restart: always
     command:
       - "--providers.docker=true"
@@ -95,10 +95,14 @@ services:
       - "--entrypoints.web.address=:80"
     ports:
       - 80:80
+    networks:
+      - proxy_network
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 volumes:
   pg-data:
-  shared-media:
+
+networks:
+  proxy_network:
     external: true
