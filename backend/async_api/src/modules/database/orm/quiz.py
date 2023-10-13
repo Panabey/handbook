@@ -129,7 +129,7 @@ async def search_quiz(
     if query:
         subquery = subquery.where(Quiz.title.ilike(f"%{query}%"))
     if tags_id:
-        smt = subquery.where(Tag.id.in_(tags_id))
+        subquery = subquery.where(Tag.id.in_(tags_id))
     subquery = subquery.subquery()
 
     smt = (

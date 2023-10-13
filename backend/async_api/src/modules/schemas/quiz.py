@@ -1,4 +1,5 @@
 from pydantic import Field
+from pydantic import validator
 from pydantic import BaseModel
 from pydantic import AliasChoices
 from pydantic import field_validator
@@ -115,7 +116,20 @@ class QuizAnswerView(BaseModel):
 
 
 class QuizSearchDetail(BaseModel):
-    q: str | None = Field(None, min_length=1, max_length=80)
+    q: str | None = Field(None, min_length=1, max_length=100)
     tags: list[int] | None = Field(None, min_length=1, max_length=4)
-    limit: int = Field(default=20, ge=1, le=20)
-    continue_after: int | None = Field(default=None, ge=1, le=1000)
+    limit: int = Field(20, ge=1, le=20)
+    continue_after: int | None = Field(None, ge=1, le=1000)
+
+    @validator("tags")
+    @classmethod
+    def validate_tags(cls, tags: list[int] | None):
+        if tags is None:
+            return tags
+
+        for value in tags:
+            if not 1 <= value <= 2147483647:
+                raise ValueError(
+                    "значение должно быть в диапазоне между 1 и 2147483647"
+                )
+        return tags
