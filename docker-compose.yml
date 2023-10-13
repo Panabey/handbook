@@ -70,6 +70,9 @@ services:
       # middlewares
       - "traefik.http.routers.admin.middlewares=admin_security"
       - "traefik.http.middlewares.admin_security.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.admin_security.headers.customresponseheaders.server="
+    volumes:
+      - shared-media:/app/media
     depends_on:
       - postgresql
     networks:
@@ -137,6 +140,8 @@ services:
 volumes:
   pg-data:
   certificates:
+  shared-media:
+    external: true
 
 networks:
   proxy_network:
