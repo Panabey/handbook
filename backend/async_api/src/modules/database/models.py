@@ -24,7 +24,7 @@ class Handbook(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(80), unique=True)
-    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(String(300), nullable=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
     category_id: Mapped[int] = mapped_column(
@@ -58,7 +58,7 @@ class HandbookContent(Base):
     )
     part: Mapped[int] = mapped_column(SmallInteger)
     title: Mapped[str] = mapped_column(String(80))
-    description: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(400))
 
     hbook: Mapped["Handbook"] = relationship(back_populates="content")
     hbook_page: Mapped[list["HandbookPage"]] = relationship(
@@ -76,7 +76,7 @@ class HandbookPage(Base):
     )
     subpart: Mapped[int] = mapped_column(SmallInteger)
     title: Mapped[str] = mapped_column(String(80))
-    short_description: Mapped[str] = mapped_column(String(160))
+    short_description: Mapped[str] = mapped_column(String(255))
     text: Mapped[str] = mapped_column(Text)
     reading_time: Mapped[int] = mapped_column(Integer)
     update_date: Mapped[datetime] = mapped_column(
@@ -93,7 +93,7 @@ class HandbookStatus(Base):
     __tablename__ = "handbook_status"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(25), unique=True)
+    title: Mapped[str] = mapped_column(String(40), unique=True)
     color_text: Mapped[str] = mapped_column(String(7))
     color_background: Mapped[str] = mapped_column(String(7))
 
@@ -108,7 +108,7 @@ class HandbookСategory(Base):
     __tablename__ = "handbook_category"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(50), unique=True)
+    title: Mapped[str] = mapped_column(String(80), unique=True)
 
     hbook_category: Mapped[list["Handbook"]] = relationship(
         back_populates="category_info"
@@ -120,8 +120,8 @@ class Article(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
-    title: Mapped[str] = mapped_column(String(80))
-    anons: Mapped[str] = mapped_column(String(255))
+    title: Mapped[str] = mapped_column(String(120))
+    anons: Mapped[str] = mapped_column(String(400))
     text: Mapped[str] = mapped_column(Text)
     update_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
@@ -194,7 +194,7 @@ class QuizTopic(Base):
     __tablename__ = "quiz_topic"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(60), unique=True)
+    title: Mapped[str] = mapped_column(String(80), unique=True)
 
     quizzes_info: Mapped[list["Quiz"]] = relationship(
         back_populates="topic_info",
@@ -214,8 +214,8 @@ class Quiz(Base):
     )
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String(100))
-    short_description: Mapped[str] = mapped_column(String(160))
-    description: Mapped[str] = mapped_column(String(255))
+    short_description: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(500))
     is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     topic_info: Mapped[QuizTopic] = relationship(back_populates="quizzes_info")
@@ -236,7 +236,7 @@ class Question(Base):
     quiz_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quiz.id", ondelete="CASCADE", onupdate="CASCADE")
     )
-    text: Mapped[str] = mapped_column(String(255))
+    text: Mapped[str] = mapped_column(String(400))
     hint: Mapped[str] = mapped_column(String(255), nullable=True)
 
     answers_info: Mapped[list["Answer"]] = relationship(
@@ -256,7 +256,7 @@ class Answer(Base):
     )
     text: Mapped[str] = mapped_column(String(255))
     is_correct: Mapped[bool] = mapped_column(Boolean)
-    explanation: Mapped[str] = mapped_column(String(255), nullable=True)
+    explanation: Mapped[str] = mapped_column(String(300), nullable=True)
 
     question_info: Mapped["Question"] = relationship(back_populates="answers_info")
 

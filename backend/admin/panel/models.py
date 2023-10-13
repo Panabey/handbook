@@ -44,7 +44,7 @@ class Tag(models.Model):
 
 class HandBookStatus(models.Model):
     title = models.CharField(
-        max_length=25, verbose_name="Название статуса", unique=True
+        max_length=40, verbose_name="Название статуса", unique=True
     )
     color_text = ColorField("Цвет текста", default="#5573f3")
     color_background = ColorField("Цвет фона", default="#e2e8ff")
@@ -61,7 +61,7 @@ class HandBookStatus(models.Model):
 
 class HandbookCategory(models.Model):
     title = models.CharField(
-        "Название категории справочников", max_length=50, unique=True
+        "Название категории справочников", max_length=80, unique=True
     )
 
     def __str__(self) -> str:
@@ -84,7 +84,7 @@ class Handbook(models.Model):
         storage=CompressImageStorage,
     )
     title = models.CharField("Название справочника", max_length=80, unique=True)
-    description = models.TextField("Описание", max_length=255, blank=True, null=True)
+    description = models.TextField("Описание", max_length=300, blank=True, null=True)
     is_visible = models.BooleanField("Видимый?", default=False)
     category = models.ForeignKey(
         "HandbookCategory",
@@ -123,7 +123,7 @@ class HandbookContent(models.Model):
     title = models.CharField(
         "Название раздела справочника", help_text="Например: Основы", max_length=80
     )
-    description = models.TextField("Описание раздела", max_length=255)
+    description = models.TextField("Описание раздела", max_length=400)
 
     def __str__(self) -> str:
         return f"{self.part}. {self.title} ({self.handbook.title})"
@@ -150,7 +150,7 @@ class HandbookPage(models.Model):
     short_description = models.TextField(
         "Короткое описание",
         help_text="Так же используется для мета тегов",
-        max_length=160,
+        max_length=255,
     )
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
@@ -187,8 +187,8 @@ class Article(models.Model):
         null=True,
         storage=CompressImageStorage,
     )
-    title = models.CharField("Название поста", max_length=80)
-    anons = models.TextField("Краткое содержание", max_length=255)
+    title = models.CharField("Название поста", max_length=120)
+    anons = models.TextField("Краткое содержание", max_length=400)
     text = MDTextField("Текст")
     reading_time = models.IntegerField(default=0, editable=False)
     update_date = models.DateTimeField("Дата редактирования", auto_now=True)
@@ -228,7 +228,7 @@ class ArticleTag(models.Model):
 
 
 class QuizTopic(models.Model):
-    title = models.CharField("Название", max_length=60, unique=True)
+    title = models.CharField("Название", max_length=80, unique=True)
 
     def __str__(self) -> str:
         return self.title
@@ -256,9 +256,9 @@ class Quiz(models.Model):
     short_description = models.TextField(
         "Короткое опписание",
         help_text="Так же используется для мета тегов",
-        max_length=160,
+        max_length=255,
     )
-    description = MDTextField("Описание", blank=True, null=True)
+    description = MDTextField("Описание", max_length=500, blank=True, null=True)
     is_visible = models.BooleanField(
         "Видимый?", default=False, help_text="Не скрывает вопросы и ответы"
     )
@@ -297,7 +297,7 @@ class QuizTag(models.Model):
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, models.CASCADE, verbose_name="Тест")
-    text = MDTextField("Текст вопроса", max_length=255)
+    text = MDTextField("Текст вопроса", max_length=400)
     hint = models.CharField("Подсказка", max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
@@ -314,7 +314,7 @@ class QuizAnswer(models.Model):
     question = models.ForeignKey(QuizQuestion, models.CASCADE)
     text = models.CharField("Ответ", max_length=255)
     is_correct = models.BooleanField("Правильный?", default=False)
-    explanation = models.TextField("Объсянение", max_length=255, blank=True, null=True)
+    explanation = models.TextField("Объсянение", max_length=300, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.text
