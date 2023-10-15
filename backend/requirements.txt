@@ -4,4 +4,4 @@
 # via main API server
 -r async_api/requirements.txt
 
-pre-commit>=3.4.0,<3.5.0
+pre-commit>=3.5.0
