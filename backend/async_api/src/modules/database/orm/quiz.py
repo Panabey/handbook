@@ -128,8 +128,6 @@ async def search_quiz(
 
     if query:
         subquery = subquery.where(Quiz.title.ilike(f"%{query}%"))
-    if tags_id:
-        subquery = subquery.where(Tag.id.in_(tags_id))
     subquery = subquery.subquery()
 
     smt = (
@@ -143,6 +141,8 @@ async def search_quiz(
             contains_eager(Quiz.tags_quiz_info).defer(Tag.status_id),
         )
     )
+    if tags_id:
+        smt = smt.where(Tag.id.in_(tags_id))
 
     result = await session.scalars(smt)
     return result.unique().all()

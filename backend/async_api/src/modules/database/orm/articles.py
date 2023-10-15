@@ -71,8 +71,6 @@ async def search_article(
 
     if query:
         subquery = subquery.where(Article.title.ilike(f"%{query}%"))
-    if tags_id:
-        subquery = subquery.where(Tag.id.in_(tags_id))
     subquery = subquery.subquery()
 
     smt = (
@@ -85,6 +83,8 @@ async def search_article(
             contains_eager(Article.tags_article_info).defer(Tag.status_id),
         )
     )
+    if tags_id:
+        smt = smt.where(Tag.id.in_(tags_id))
 
     result = await session.scalars(smt)
     return result.unique().all()
