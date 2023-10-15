@@ -58,7 +58,7 @@ async def get_article(session: AsyncSession, post_id: int):
 async def search_article(
     session: AsyncSession,
     query: str | None,
-    tags_id: list[int] | None,
+    tags_id: list[int],
     continue_after: int | None,
     limit: int,
 ):

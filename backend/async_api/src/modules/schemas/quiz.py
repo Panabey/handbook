@@ -117,14 +117,14 @@ class QuizAnswerView(BaseModel):
 
 class QuizSearchDetail(BaseModel):
     q: str | None = Field(None, min_length=1, max_length=100)
-    tags: list[int] | None = Field(None, min_length=1, max_length=4)
+    tags: list[int] = Field(max_length=4)
     limit: int = Field(20, ge=1, le=20)
     continue_after: int | None = Field(None, ge=1, le=1000)
 
     @validator("tags")
     @classmethod
-    def validate_tags(cls, tags: list[int] | None):
-        if tags is None:
+    def validate_tags(cls, tags: list[int]):
+        if not tags:
             return tags
 
         for value in tags:

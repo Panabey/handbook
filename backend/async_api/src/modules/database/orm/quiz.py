@@ -114,7 +114,7 @@ async def get_one(session: AsyncSession, quiz_id: int):
 async def search_quiz(
     session: AsyncSession,
     query: str | None,
-    tags_id: list[int] | None,
+    tags_id: list[int],
     limit: int,
     continue_after: int,
 ):
