@@ -26,6 +26,7 @@ async def get_all_article(session: AsyncSession, page: int, limit: int):
         select(Article)
         .join(subquery, Article.id == subquery.c.id)
         .join(Article.tags_article_info, isouter=True)
+        .order_by(Article.create_date.desc())
         .options(
             defer(Article.text),
             defer(Article.update_date),
@@ -77,6 +78,7 @@ async def search_article(
         select(Article)
         .join(subquery, Article.id == subquery.c.id)
         .join(Article.tags_article_info, isouter=True)
+        .order_by(Article.create_date.desc())
         .options(
             defer(Article.text),
             defer(Article.update_date),

@@ -134,6 +134,7 @@ async def search_quiz(
         select(Quiz)
         .join(subquery, Quiz.id == subquery.c.id)
         .join(Quiz.tags_quiz_info, isouter=True)
+        .order_by(Quiz.id)
         .options(
             defer(Quiz.description),
             defer(Quiz.topic_id),
