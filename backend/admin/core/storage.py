@@ -1,7 +1,7 @@
 from PIL import Image
 
 import os
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -238,7 +238,7 @@ class CompressImageStorage(Storage, StorageSettingsMixin):
         If timezone support is enabled, make an aware datetime object in UTC;
         otherwise make a naive one in the local timezone.
         """
-        tz = timezone.utc if settings.USE_TZ else None
+        tz = UTC if settings.USE_TZ else None
         return datetime.fromtimestamp(ts, tz=tz)
 
     def get_accessed_time(self, name):

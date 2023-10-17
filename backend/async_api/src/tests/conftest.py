@@ -37,7 +37,7 @@ async def session(test_db_setup_sessionmaker):
         yield session
 
         # удалить все данные после теста
-        for _, table in Base.metadata.tables.items():
+        for table in Base.metadata.tables.values():
             await session.execute(delete(table))
         await session.commit()
 
