@@ -12,13 +12,15 @@ app = FastAPI(
     debug=settings.DEBUG_MODE,
     title="Handbook API",
     version="1.0.3",
+    description="Документация API проекта",
     default_response_class=ORJSONResponse,
     openapi_url=settings.OPEN_API_URL,
     docs_url=settings.DOCS_URL,
     redoc_url=settings.REDOC_URL,
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 
-# Используется только для SSR (Server Side Rendering)
+# Используется только для кеширования контента
 app.add_middleware(
     RedisCacheMiddleware,
     include_path={

@@ -22,7 +22,7 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 @router.get(
     "/",
     response_model=list[TagsDetail],
-    summary="Получение тегов",
+    summary="Получение списка тегов",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_all_tags(
@@ -30,16 +30,18 @@ async def get_all_tags(
     status: Annotated[str, Query(min_length=1, max_length=60)],
     limit: Annotated[int, Query(ge=1, le=15)] = 15,
 ):
-    """Получение всех существующих тегов в зависимости от требуемой группы.
-
-    Типы статусов:\n
-    **article** - статусы для статей\n
-    **quiz** - статусты для квизов
+    """
+    **Параметры:**\n
+    `status` - Статус тег, который разделяется на следующие константные группы:\n
+    - `article` - Группа тегов для статей\n
+    - `quiz` - Группа тегов для квизов\n
+    `limit` -  Ограничение количества записей в ответе
 
     **Рекомендации!**\n
-    Включить заголовок **X-Use-Cache: true** для использования кеширования.\n
-    Если данные уже лежали в кеше, то в ответе Вы получите заголовок:
-    **X-Cache-Status: HIT**, в противном случае **X-Cache-Status: MISS**.
+    Включить заголовок `X-Use-Cache: true` для использования кеширования.
+
+    Если данные уже присутствовали в кеше, то получаемый заголовок в ответе:
+    `X-Cache-Status: HIT`, в противном случае `X-Cache-Status: MISS`.
     """
     result = await get_tags(session, status, limit)
     if result is None:

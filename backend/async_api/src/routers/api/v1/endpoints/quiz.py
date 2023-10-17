@@ -37,7 +37,7 @@ PathId = Annotated[int, Path(ge=1, le=2147483647)]
 @router.get(
     "/topic/all",
     response_model=list[QuizTopicsDetail],
-    summary="Получение квизов по топикам"
+    summary="Получение списка топиков и их квизов"
 )  # fmt: skip
 async def get_all_topic(
     session: Session,
@@ -45,9 +45,11 @@ async def get_all_topic(
     count_content: Annotated[int, Query(ge=1, le=5)] = 3,
     continue_after: Annotated[int, Query(ge=1, le=100)] | None = None,
 ):
-    """Получение полного списка доступных топиков для квизов.
-
-    Также включает небольшой список последних квизов.
+    """
+    **Параметры:**\n
+    `limit` - Ограничение записей топиков в ответе\n
+    `count_content` - Количество записей отображаемых в каждом топике\n
+    `continue_after` - Числовой идентифкикатор для продолжения с конкретной записи
     """
     result = await get_topics(session, limit, count_content, continue_after)
     return result
@@ -66,10 +68,10 @@ async def get_topic_quiz(
     continue_after: Annotated[int, Query(ge=1, le=1000)] | None = None,
 ):
     """
-    Если указан топик, то  происходит получение полного списка
-    доступных квизов в текущем топике.
-
-    Если топик не указан, получаем полный список доступных квизов.
+    **Параметры:**\n
+    `topic_id` - Уникальный идентификатор топика (Если не указано, выведет все квизы)\n
+    `limit` - Ограничение записией квизов в ответе\n
+    `continue_after` - Числовой идентифкикатор для продолжения с конкретной записи
     """
     result = await get_by_topic(session, topic_id, limit, continue_after)
     if result is None:
@@ -85,8 +87,8 @@ async def get_topic_quiz(
 )  # fmt: skip
 async def get_quiz(session: Session, quiz_id: QueryId):
     """
-    Получение подробной информации по тесте.
-    Также включает вопросы и описание.
+    **Параметры:**\n
+    `quiz_id` - Уникальный идентификатор квиза
     """
     result = await get_one(session, quiz_id)
     if result is None:
@@ -104,9 +106,15 @@ async def get_quiz(session: Session, quiz_id: QueryId):
     }
 )  # fmt: skip
 async def search_quizzez(session: Session, schema: QuizSearchDetail):
-    """Поиск квизов по всем топикам
+    """
+    **Параметры:**\n
+    `q` - Текст для поиска по названию квиза (Не зависит от регистра)\n
+    `limit` - Ограничение количества записей в ответе\n
+    `tags` - Уникальные числовые идентификаторы тегов\n
+    `continue_after` - Числовой идентифкикатор для продолжения с конкретной записи
 
-    Параметры query и tags опциональны, но не могут быть оба пустыми.
+    **Примечание:**\n
+    Поиск осуществляется по одному или нескольким доступным параметрам: `q` и/или `tags`
     """
     if not schema.q and not schema.tags:
         raise HTTPException(400, "Одно из обязательных полей пустое..")
@@ -126,13 +134,17 @@ async def search_quizzez(session: Session, schema: QuizSearchDetail):
 @router.get(
     "/question",
     response_model=QuizQuestionDetail,
-    summary="Получение вариантов ответа",
+    summary="Получение информации вопроса квиза",
     responses={404: {"model": DetailInfo}},
 )  # fmt: skip
 async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: QueryId):
     """
-    Получение вариантов ответа для конкретного вопроса теста.
-    Также содержит подсказки.
+    **Параметры:**\n
+    `quiz_id` - уникальный идентификатор квиза\n
+    `question_id` - уникальный идентификатор вопроса, которому принадлежит квиз
+
+    **Примечание:**\n
+    Список вопросов должен быть получен при запросе информации о квизе
     """
     result = await get_question(session, quiz_id, question_id)
     if result is None:
@@ -148,8 +160,9 @@ async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: Que
 )  # fmt: skip
 async def get_quiz_answer(session: Session, schema: QuizAnswerView):
     """
-    Получение ответа/ов для конкретного вопроса теста.
-    Содержит информацию о правильных ответах и объяснении.
+    **Параметры:**\n
+    `quiz_id` - уникальный идентификатор квиза\n
+    `question_id` - уникальный идентификатор вопроса, который принадлежит квизу
     """
     result = await get_answer(session, schema.quiz_id, schema.question_id)
     if result is None:

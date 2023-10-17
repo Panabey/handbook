@@ -26,7 +26,7 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 @router.get(
     "/all",
     response_model=ArticleAllDetail,
-    summary="Получение полного списка новостей"
+    summary="Получение списка статей"
 )  # fmt: skip
 async def get_all_articles(
     session: Session,
@@ -34,7 +34,9 @@ async def get_all_articles(
     limit: Annotated[int, Query(ge=5, le=20)] = 20,
 ):
     """
-    Вывод представляет собой неполную информацию о статье.
+    **Параметры:**\n
+    `page` - Страница с контентом\n
+    `limit` - Ограничение записей на странице
     """
     result = await get_all_article(session, page, limit)
     return result
@@ -43,14 +45,15 @@ async def get_all_articles(
 @router.get(
     "/",
     response_model=ArticleDetail,
-    summary="Получение информации о конкрентной новости",
+    summary="Получение информации о конкрентной статьи",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_page_article(
     session: Session, article_id: Annotated[int, Query(ge=1, le=2147483647)]
 ):
-    """Получение полной ифнормации о странице, за исключением
-    логотипа страницы.
+    """
+    **Параметры:**\n
+    `article_id` - Уникальный числовой идентификатор статьи
     """
     result = await get_article(session, article_id)
     if not result:
@@ -65,7 +68,16 @@ async def get_page_article(
     responses={400: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_search_article(session: Session, schema: SearchDetail):
-    """Поиск по названию статьи (Включая теги)"""
+    """
+    **Параметры:**\n
+    `q` - Текст для поиска по названию статьи (не зависит от регистра)\n
+    `limit` - Ограничение количества записей в ответе\n
+    `tags` - Уникальные числовые идентификаторы тегов\n
+    `continue_after` - Числовой идентифкикатор для продолжения с конкретной записи
+
+    **Примечание:**\n
+    Поиск осуществляется по одному или нескольким доступным параметрам: `q` и/или `tags`
+    """
     if not schema.q and not schema.tags:
         raise HTTPException(400, "Одно из обязательных полей пустое..")
 
