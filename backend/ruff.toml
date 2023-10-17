@@ -1,5 +1,15 @@
-# Official web site https://beta.ruff.rs/docs/
+# Official web site https://docs.astral.sh/ruff/rules/
 # github actions https://github.com/astral-sh/ruff/blob/main/docs/configuration.md
-select = ["E", "F", "B", "N", "W"]
-
 target-version = "py311"
+
+select = [
+    "E",    # pycodestyle
+    "F",    # Pyflakes
+    "B",    # flake8-bugbear
+    "N",    # pep8-naming
+    "W",    # pycodestyle
+    "C4",   # flake8-comprehensions
+    "PT",   # flake8-pytest-style
+    "UP",   # pyupgrade
+    "PERF", # Perflint
+]
