@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from routers.api.deps import get_async_session
 from modules.database.orm.tags import get_tags
 
+from modules.schemas.openapi import CACHE_HEADER
 from modules.schemas.base import DetailInfo
 from modules.schemas.tags import TagsDetail
 
@@ -23,6 +24,7 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
     "/",
     response_model=list[TagsDetail],
     summary="Получение списка тегов",
+    openapi_extra=CACHE_HEADER,
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_all_tags(
