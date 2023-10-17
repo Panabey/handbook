@@ -11,7 +11,7 @@ from routers.api.v1.router import router
 app = FastAPI(
     debug=settings.DEBUG_MODE,
     title="Handbook API",
-    version="1.0.3",
+    version="1.1.0",
     description="Документация API проекта",
     default_response_class=ORJSONResponse,
     openapi_url=settings.OPEN_API_URL,
