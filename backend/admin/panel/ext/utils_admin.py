@@ -23,10 +23,7 @@ def find_image(markdown_text: str):
     # поиск пути к изображениям
     matches = re.findall(combined_pattern, markdown_text)
     # удаление пустых строк
-    image_paths = []
-    for match in matches:
-        image_paths.append(match[0] if match[0] else match[1])
-    return image_paths
+    return [match[0] if match[0] else match[1] for match in matches]
 
 
 def remove_old_images(old_text: str, new_text: str):

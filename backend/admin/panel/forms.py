@@ -24,9 +24,7 @@ class AnswerForm(forms.BaseInlineFormSet):
 class TagsForm(forms.BaseInlineFormSet):
     def clean(self) -> None:
         queryset = self.get_queryset()
-        tags_id = []
-        for data in queryset:
-            tags_id.append(data.tag.id)
+        tags_id = [data.tag.id for data in queryset]
 
         result = Counter(tags_id)
         is_repeat = any(count > 1 for count in result.values())

@@ -1,10 +1,10 @@
 # linter
-ruff>=0.0.282
+ruff>=0.1.0
 mypy>=1.4.1
 black>=23.7.0
 
 # test
-pytest>=7.4.0,<7.5.0
+pytest>=7.4.0
 pytest-asyncio>=0.21.1
 coverage>=7.3.0
 httpx>=0.24.1

@@ -10,7 +10,6 @@ from starlette.datastructures import MutableHeaders
 
 from starlette.responses import Response
 
-
 from modules.redis.utils import get_cache_content
 from modules.redis.utils import set_cache_content
 
@@ -25,20 +24,22 @@ class RedisCacheMiddleware:
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
 
-        # параметры кеширования
         cache_content = None
         allow_cache = False
+
         path = re.sub(r"/api/v\d+/", "", scope["path"])
-        options = self.include_path.get(path)  # содержит (<ключ>, <ttl>)
+        # Содержит словарь {<path>: (<key>, <ttl>)}
+        options = self.include_path.get(path)
 
         if options is not None:
             headers = Headers(scope=scope)
             if headers.get(self.header_name) == "true":
-                # если запрошен контент из кеша
+                # Если запрошен контент из кеша
                 allow_cache = True
                 params = scope.get("query_string")
 
                 redis_key = f"{options[0]}?{params.decode()}" if params else options[0]
+                # Получить данные из Redis
                 cache_content = await get_cache_content(redis_key)
 
         async def send_wrapper(message: Message) -> None:
@@ -46,23 +47,24 @@ class RedisCacheMiddleware:
 
             if message["type"] == "http.response.start" and allow_cache:
                 if message["status"] != 200:
-                    # разрешить кеширование если ответ правильно обработался
+                    # Разрешить кеширование, если ответ правильно обработался
                     allow_cache = False
                 else:
                     headers = MutableHeaders(scope=message)
                     headers.append("X-Cache-Status", "MISS")
 
             if message["type"] == "http.response.body" and allow_cache:
-                # кеширование ответа
+                # Кеширование ответа в Redis
                 await set_cache_content(redis_key, message["body"], options[1])
 
             await send(message)
 
         if cache_content is None:
-            # выполнить стандартный запрос, так как данных в кеше нет
+            # Выполнить стандартный запрос, так как данных в кеше нет
             await self.app(scope, receive, send_wrapper)
             return
 
+        # Выполнить запрос используя кешированные данные
         response = Response(
             cache_content,
             headers={"X-Cache-Status": "HIT"},
