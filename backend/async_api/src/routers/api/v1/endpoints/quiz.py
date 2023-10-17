@@ -34,7 +34,11 @@ QueryId = Annotated[int, Query(ge=1, le=2147483647)]
 PathId = Annotated[int, Path(ge=1, le=2147483647)]
 
 
-@router.get("/topic/all", response_model=list[QuizTopicsDetail])
+@router.get(
+    "/topic/all",
+    response_model=list[QuizTopicsDetail],
+    summary="Получение квизов по топикам"
+)  # fmt: skip
 async def get_all_topic(
     session: Session,
     limit: Annotated[int, Query(ge=1, le=5)] = 5,
@@ -52,6 +56,7 @@ async def get_all_topic(
 @router.get(
     "/topic",
     response_model=QuizInTopicDetail,
+    summary="Получение списка квизов по топику",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_topic_quiz(
@@ -75,6 +80,7 @@ async def get_topic_quiz(
 @router.get(
     "/",
     response_model=QuizDetail,
+    summary="Получение квиза",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_quiz(session: Session, quiz_id: QueryId):
@@ -91,6 +97,7 @@ async def get_quiz(session: Session, quiz_id: QueryId):
 @router.post(
     "/search",
     response_model=list[QuizAllDetail],
+    summary="Поиск по квизам",
     responses={
         400: {"model": DetailInfo},
         404: {"model": DetailInfo}
@@ -119,6 +126,7 @@ async def search_quizzez(session: Session, schema: QuizSearchDetail):
 @router.get(
     "/question",
     response_model=QuizQuestionDetail,
+    summary="Получение вариантов ответа",
     responses={404: {"model": DetailInfo}},
 )  # fmt: skip
 async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: QueryId):
@@ -135,6 +143,7 @@ async def get_quiz_question(session: Session, quiz_id: QueryId, question_id: Que
 @router.post(
     "/answer/view",
     response_model=QuizAnswerDetail,
+    summary="Получение ответа(ов) по вопросу",
     responses={404: {"model": DetailInfo}},
 )  # fmt: skip
 async def get_quiz_answer(session: Session, schema: QuizAnswerView):

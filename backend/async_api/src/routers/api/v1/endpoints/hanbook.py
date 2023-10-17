@@ -14,6 +14,7 @@ from modules.database.orm.handbook import get_content
 from modules.database.orm.handbook import get_page_by_id
 from modules.database.orm.handbook import search_page
 
+from modules.schemas.openapi import CACHE_HEADER
 from modules.schemas.base import DetailInfo
 from modules.schemas.handbook import PageDetail
 from modules.schemas.handbook import SearchDetail
@@ -27,7 +28,12 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 Int = Annotated[int, Query(ge=1, le=2147483647)]
 
 
-@router.get("/all", response_model=list[CategoryDetail])
+@router.get(
+    "/all",
+    response_model=list[CategoryDetail],
+    summary="Получениние списка доступных справочников",
+    openapi_extra=CACHE_HEADER
+)  # fmt: skip
 async def get_handbooks(session: Session):
     """Получение списка всех доступных категорий и их справочников.
 
@@ -43,10 +49,13 @@ async def get_handbooks(session: Session):
 @router.get(
     "/content",
     response_model=ContentDetail,
+    summary="Получение содержимого справочника",
+    openapi_extra=CACHE_HEADER,
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_content_handbook(
-    session: Session, handbook: Annotated[str, Query(min_length=1, max_length=80)]
+    session: Session,
+    handbook: Annotated[str, Query(min_length=1, max_length=80)],
 ):
     """Получение списка всех тем и подтем справочника.
 
@@ -75,6 +84,8 @@ async def get_content_handbook(
 @router.get(
     "/",
     response_model=PageDetail,
+    summary="Получение страницы справочника",
+    openapi_extra=CACHE_HEADER,
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_page_handbook(session: Session, page_id: Int):
@@ -92,7 +103,11 @@ async def get_page_handbook(session: Session, page_id: Int):
     return result
 
 
-@router.post("/search", response_model=list[SearchPageDetail])
+@router.post(
+    "/search",
+    response_model=list[SearchPageDetail],
+    summary="Поиск по содержимому справочника"
+)  # fmt: skip
 async def search_page_handbook(session: Session, schema: SearchDetail):
     """Поиск тем по конкретному справочнику или по всем записям.
 

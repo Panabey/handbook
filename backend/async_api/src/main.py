@@ -18,7 +18,7 @@ app = FastAPI(
     redoc_url=settings.REDOC_URL,
 )
 
-# используется только для SSR
+# Используется только для SSR (Server Side Rendering)
 app.add_middleware(
     RedisCacheMiddleware,
     include_path={

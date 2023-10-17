@@ -23,14 +23,17 @@ router = APIRouter()
 Session = Annotated[AsyncSession, Depends(get_async_session)]
 
 
-@router.get("/all", response_model=ArticleAllDetail)
+@router.get(
+    "/all",
+    response_model=ArticleAllDetail,
+    summary="Получение полного списка новостей"
+)  # fmt: skip
 async def get_all_articles(
     session: Session,
     page: Annotated[int, Query(ge=1, le=10000)],
     limit: Annotated[int, Query(ge=5, le=20)] = 20,
 ):
-    """Получение списка статьей с пагинацией страниц
-
+    """
     Вывод представляет собой неполную информацию о статье.
     """
     result = await get_all_article(session, page, limit)
@@ -40,6 +43,7 @@ async def get_all_articles(
 @router.get(
     "/",
     response_model=ArticleDetail,
+    summary="Получение информации о конкрентной новости",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_page_article(
@@ -57,6 +61,7 @@ async def get_page_article(
 @router.post(
     "/search",
     response_model=list[ArticleShortDetail],
+    summary="Поиск по статьям",
     responses={400: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_search_article(session: Session, schema: SearchDetail):

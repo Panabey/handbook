@@ -13,6 +13,7 @@ from modules.database.orm.project_news import get_news
 from modules.database.orm.project_news import get_all_news
 from modules.database.orm.project_news import get_last_news
 
+from modules.schemas.openapi import CACHE_HEADER
 from modules.schemas.base import DetailInfo
 from modules.schemas.project import NewsDetail
 from modules.schemas.project import NewsAllDetail
@@ -24,7 +25,12 @@ router = APIRouter()
 Session = Annotated[AsyncSession, Depends(get_async_session)]
 
 
-@router.get("/news/widget", response_model=list[NewsWidgetDetail])
+@router.get(
+    "/news/widget",
+    response_model=list[NewsWidgetDetail],
+    summary="Краткое получение информации о новостях проекта",
+    openapi_extra=CACHE_HEADER
+)  # fmt: skip
 async def get_last_news_project(
     session: Session,
     limit: Annotated[int, Query(ge=1, le=8)] = 8,
@@ -41,7 +47,11 @@ async def get_last_news_project(
     return result
 
 
-@router.get("/news/all", response_model=NewsAllDetail)
+@router.get(
+    "/news/all",
+    response_model=NewsAllDetail,
+    summary="Получение информации о новостях проекта"
+)  # fmt: skip
 async def get_all_news_project(
     session: Session,
     page: Annotated[int, Query(ge=1, le=10000)],
@@ -55,6 +65,7 @@ async def get_all_news_project(
 @router.get(
     "/news/",
     response_model=NewsDetail,
+    summary="Получение новостной страницы проекта",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_news_project(

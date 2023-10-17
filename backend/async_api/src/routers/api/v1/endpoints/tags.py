@@ -22,6 +22,7 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 @router.get(
     "/",
     response_model=list[TagsDetail],
+    summary="Получение тегов",
     responses={404: {"model": DetailInfo}}
 )  # fmt: skip
 async def get_all_tags(
@@ -29,8 +30,7 @@ async def get_all_tags(
     status: Annotated[str, Query(min_length=1, max_length=60)],
     limit: Annotated[int, Query(ge=1, le=15)] = 15,
 ):
-    """Получение списка общих тегов (Теги для квизов и статьей одинаковые).\n
-    По умолчанию ограничен 15 тегами.
+    """Получение всех существующих тегов в зависимости от требуемой группы.
 
     Типы статусов:\n
     **article** - статусы для статей\n
