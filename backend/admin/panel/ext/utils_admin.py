@@ -2,9 +2,11 @@ import os
 import re
 import math
 
+from typing import Any
 from threading import Lock
-from django.conf import settings
+
 from django.db import models
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 
@@ -59,3 +61,10 @@ def get_text_or_none(classmodel: models.Model, pk: int, field_name: str):
 def validate_uint(value: int):
     if value < 1:
         raise ValidationError("Убедитесь, что это значение больше либо равно 1.")
+
+
+def validate_exist(classmodel: models.Model, fields: dict[str, Any]) -> bool:
+    data = classmodel.objects.using("handbook").filter(**fields).exists()
+    if data:
+        return True
+    return False
