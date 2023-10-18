@@ -4,6 +4,8 @@ from django.contrib import admin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
+from core.settings import settings
+
 from .models import (
     Tag,
     Quiz,
@@ -28,7 +30,7 @@ from .forms import AnswerForm, TagsForm
 class MultiplyModelAdmin(admin.ModelAdmin):
     """Расширеная модель для подключения сторонней базы данных"""
 
-    using = "handbook"
+    using = settings.DB_BACKEND_NAME
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         obj.save(using=self.using)
@@ -53,7 +55,7 @@ class MultiplyModelAdmin(admin.ModelAdmin):
 class MultiModelTabularInline(admin.TabularInline):
     """Расширеная модель для соеденения нескольхих таблиц"""
 
-    using = "handbook"
+    using = settings.DB_BACKEND_NAME
 
     def get_queryset(self, request):
         return super().get_queryset(request).using(self.using)

@@ -9,6 +9,10 @@ class AnswerForm(forms.BaseInlineFormSet):
         model = QuizAnswer
 
     def clean(self) -> None:
+        """
+        Функция валидации сохранения ответов квиза,
+        т.к нельзя создать вопрос без единого ответа.
+        """
         count_correct = 0
 
         for form in self.forms:
@@ -23,9 +27,11 @@ class AnswerForm(forms.BaseInlineFormSet):
 
 class TagsForm(forms.BaseInlineFormSet):
     def clean(self) -> None:
+        """Функция валидации сохранения тегов, т.к нельзя создать одинаковые теги"""
         queryset = self.get_queryset()
         tags_id = [data.tag.id for data in queryset]
 
+        # Подсчёт количества одинаковых тегов
         result = Counter(tags_id)
         is_repeat = any(count > 1 for count in result.values())
         if is_repeat:

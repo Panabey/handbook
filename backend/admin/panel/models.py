@@ -1,18 +1,20 @@
 import threading
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
+from django_cleanup import cleanup
 from mdeditor.fields import MDTextField
 from colorfield.fields import ColorField
 
 from .ext.utils_admin import replace_char
 from .ext.utils_admin import validate_uint
+from .ext.utils_admin import validate_exist
 from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
 
 from core.storage import CompressImageStorage
-from django_cleanup import cleanup
 
 
 class TagStatus(models.Model):
@@ -116,9 +118,7 @@ class HandbookContent(models.Model):
     part = models.SmallIntegerField(
         "Номер раздела справочника",
         help_text="Например: 1",
-        validators=[
-            validate_uint,
-        ],
+        validators=[validate_uint],
     )
     title = models.CharField(
         "Название раздела справочника", help_text="Например: Основы", max_length=80
@@ -127,6 +127,14 @@ class HandbookContent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.part}. {self.title} ({self.handbook.title})"
+
+    def clean_fields(self, exclude) -> None:
+        has_exist = validate_exist(
+            self.__class__, {"handbook": self.handbook.pk, "part": self.part}
+        )
+        if has_exist:
+            raise ValidationError({"part": "Номер раздела уже существует"})
+        return super().clean_fields(exclude)
 
     class Meta:
         managed = False
@@ -140,9 +148,7 @@ class HandbookPage(models.Model):
     subpart = models.SmallIntegerField(
         "Номер темы раздела справочника",
         help_text="Например: 1",
-        validators=[
-            validate_uint,
-        ],
+        validators=[validate_uint],
     )
     title = models.CharField(
         "Название темы", help_text="Например: Циклы", max_length=80
@@ -159,6 +165,14 @@ class HandbookPage(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def clean_fields(self, exclude) -> None:
+        has_exist = validate_exist(
+            self.__class__, {"content": self.content, "subpart": self.subpart}
+        )
+        if has_exist:
+            raise ValidationError({"subpart": "Номер подраздела уже существует"})
+        return super().clean_fields(exclude)
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
@@ -199,7 +213,7 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(Article, self.pk, "text")
+        old_text = get_text_or_none(self.__class__, self.pk, "text")
 
         super().save(*args, **kwargs)
         if old_text:
@@ -267,7 +281,7 @@ class Quiz(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        old_description = get_text_or_none(Quiz, self.pk, "description")
+        old_description = get_text_or_none(self.__class__, self.pk, "description")
 
         super().save(*args, **kwargs)
         if old_description:
@@ -337,7 +351,7 @@ class ProjectNews(models.Model):
 
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
-        old_text = get_text_or_none(ProjectNews, self.pk, "text")
+        old_text = get_text_or_none(self.__class__, self.pk, "text")
 
         super().save(*args, **kwargs)
         if old_text:

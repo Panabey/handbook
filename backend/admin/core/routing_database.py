@@ -1,22 +1,32 @@
 from django.db.models.base import ModelBase
+from core.settings import settings
 
 
 class BaseRouter:
+    """
+    Класс, реализующий взаимодействие с несколькими БД
+    в разных приложениях.
+
+    Также используется для использования функций: unique и т.д.
+    """
+
     route_app_label = "panel"
+    default_database = "default"
+    external_database = settings.DB_BACKEND_NAME
 
     def db_for_read(self, model: ModelBase, **hints):
         if model._meta.app_label == self.route_app_label:
-            return "handbook"
-        return "default"
+            return self.external_database
+        return self.default_database
 
     def db_for_write(self, model: ModelBase, **hints):
         if model._meta.app_label == self.route_app_label:
-            return "handbook"
-        return "default"
+            return self.external_database
+        return self.default_database
 
     def allow_relation(self, obj1, obj2, **hints):
         db_set = {
-            "handbook",
+            self.external_database,
         }
         if obj1._state.db in db_set and obj2._state.db in db_set:
             return True
