@@ -27,7 +27,7 @@ app.add_middleware(
         "handbook/all": ("hb:all", 3600),  # 1 час
         "handbook/content": ("hb:content", 1800),  # 30 минут
         "handbook/": ("hb:page", 1800),
-        "tags/": ("tags:all", 10800),  # 3 часа
+        "tags/": ("tags", 10800),  # 3 часа
         "project/news/widget": ("project:news", 1800),
     },
 )

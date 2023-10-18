@@ -1,15 +1,16 @@
 import threading
 
 from django.db import models
-from django.core.exceptions import ValidationError
 
 from django_cleanup import cleanup
 from mdeditor.fields import MDTextField
 from colorfield.fields import ColorField
 
+from modules.redis.cache import invalidate_key
+from modules.redis.cache import invalidate_pattern
+
 from .ext.utils_admin import replace_char
 from .ext.utils_admin import validate_uint
-from .ext.utils_admin import validate_exist
 from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
@@ -54,6 +55,17 @@ class HandBookStatus(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Так как данные не отображаются нигде, кроме страницы справочников,
+        # то обновление других страниц не имеет смысла
+        invalidate_key("hb:all")
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        invalidate_key("hb:all")
+
     class Meta:
         managed = False
         verbose_name = "Справочник (Статус)"
@@ -68,6 +80,17 @@ class HandbookCategory(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Так как данные не отображаются нигде, кроме страницы справочников,
+        # то обновление других страниц не имеет смысла
+        invalidate_key("hb:all")
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удалить кэш страницы справочников
+        invalidate_key("hb:all")
 
     class Meta:
         managed = False
@@ -104,7 +127,23 @@ class Handbook(models.Model):
 
     def save(self, *args, **kwargs):
         self.title = replace_char(r"[-\s]+", self.title.strip())
+        # Получение старого названия для сравнения
+        old_title = get_text_or_none(self.__class__, self.pk, "title")
+
         super().save(*args, **kwargs)
+        # Если название было изменено, требуется удалить все страницы
+        # которые связаны с данным справочником
+        if old_title != self.title.strip():
+            invalidate_pattern("hb:page:page_id=*")
+
+        # Удалить из кэша: спискок справочников и его содержимое
+        invalidate_key(["hb:all", f"hb:content:handbook={self.title.lower()}"])
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удалить данные из кэша, если справочник удалён
+        invalidate_pattern("hb:page:page_id=*")
+        invalidate_key(["hb:all", f"hb:content:handbook={self.title.lower()}"])
 
     class Meta:
         managed = False
@@ -128,13 +167,15 @@ class HandbookContent(models.Model):
     def __str__(self) -> str:
         return f"{self.part}. {self.title} ({self.handbook.title})"
 
-    def clean_fields(self, exclude) -> None:
-        has_exist = validate_exist(
-            self.__class__, {"handbook": self.handbook.pk, "part": self.part}
-        )
-        if has_exist:
-            raise ValidationError({"part": "Номер раздела уже существует"})
-        return super().clean_fields(exclude)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Удаление кеша, так как изменяется страница с содержимым справочника
+        invalidate_key(f"hb:content:handbook={self.handbook.title.lower()}")
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        invalidate_key(f"hb:content:handbook={self.handbook.title.lower()}")
 
     class Meta:
         managed = False
@@ -166,24 +207,32 @@ class HandbookPage(models.Model):
     def __str__(self) -> str:
         return self.title
 
-    def clean_fields(self, exclude) -> None:
-        has_exist = validate_exist(
-            self.__class__, {"content": self.content, "subpart": self.subpart}
-        )
-        if has_exist:
-            raise ValidationError({"subpart": "Номер подраздела уже существует"})
-        return super().clean_fields(exclude)
-
     def save(self, *args, **kwargs):
         self.reading_time = calculate_reading_time(self.text)
         old_text = get_text_or_none(HandbookPage, self.pk, "text")
 
         super().save(*args, **kwargs)
+        # Удалить из кэша: данную страницу и содержимое справочника, так как
+        # эти данные частично отображается и там
+        invalidate_key([
+            f"hb:page:page_id={self.pk}",
+            f"hb:content:handbook={self.content.handbook.title.lower()}",
+        ])  # fmt:skip
+
+        # Очистка изображений, которые отсуствуют в новом тексте
         if old_text:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_text, self.text)
             )
             thread.start()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        invalidate_key([
+            f"hb:page:page_id={self.pk}",
+            f"hb:content:handbook={self.content.handbook.title.lower()}",
+        ])  # fmt:skip
 
     class Meta:
         managed = False
@@ -216,6 +265,7 @@ class Article(models.Model):
         old_text = get_text_or_none(self.__class__, self.pk, "text")
 
         super().save(*args, **kwargs)
+        # Очистка изображений, которые отсуствуют в новом тексте
         if old_text:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_text, self.text)
@@ -284,6 +334,7 @@ class Quiz(models.Model):
         old_description = get_text_or_none(self.__class__, self.pk, "description")
 
         super().save(*args, **kwargs)
+        # Очистка изображений, которые отсуствуют в новом тексте
         if old_description:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_description, self.description)
@@ -354,11 +405,21 @@ class ProjectNews(models.Model):
         old_text = get_text_or_none(self.__class__, self.pk, "text")
 
         super().save(*args, **kwargs)
+        # Удаление данных из кэша, которые связаны с списком новостей
+        # и приводит к очистке всех возможных вариантов limit
+        invalidate_pattern("project:news:limit=*")
+
+        # Очистка изображений, которые отсуствуют в новом тексте
         if old_text:
             thread = threading.Thread(
                 target=remove_old_images, args=(old_text, self.text)
             )
             thread.start()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        invalidate_pattern("project:news:limit=*")
 
     class Meta:
         managed = False

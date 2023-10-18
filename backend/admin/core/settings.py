@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: list[str] = ["*"]
     SECRET_APP: str | None = None
 
+    # Параметры Redis
+    REDIS_HOST: str
+    REDIS_PORT: int = 6379
+
     # Параметры БД
     DATABASE_HOST: str | None = None
 
