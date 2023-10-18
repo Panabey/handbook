@@ -14,7 +14,6 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.uploadedfile import UploadedFile
-
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from mdeditor.configs import MDConfig
@@ -32,13 +31,13 @@ class UploadView(generic.View):
         upload_image = request.FILES.get("editormd-image-file", None)
         media_root = settings.MEDIA_ROOT
 
-        # image none check
+        # Если изображение не существует или не было получено
         if not upload_image:
             return JsonResponse({
                 "success": 0, "message": "未获取到要上传的图片", "url": ""
             })  # fmt: skip
 
-        # image format check
+        # Проверка допустимого формата изображения
         file_name_list = upload_image.name.split(".")
         file_extension = file_name_list.pop(-1)
         file_name = self.normalize_filename(".".join(file_name_list))
@@ -53,12 +52,12 @@ class UploadView(generic.View):
                 }
             )
 
-        # image floder check
+        # Получение папки в соотвествии с текущей датой
         date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
         file_path = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"], date)
         os.makedirs(file_path, exist_ok=True)
 
-        # save image
+        # Сохранение изображения
         if file_extension != "svg":
             save_filename = self._compress_img(upload_image, file_name, file_path, 0.8)
         else:
@@ -85,7 +84,7 @@ class UploadView(generic.View):
         img = Image.open(image)
 
         if new_size_ratio < 1.0:
-            # если коэффициент изменения размера ниже 1,0, умножить ширину и
+            # Если коэффициент изменения размера ниже 1.0, умножить ширину и
             # высоту на этот коэффициент, чтобы уменьшить размер изображения.
             img = img.resize(
                 (int(img.size[0] * new_size_ratio), int(img.size[1] * new_size_ratio)),
@@ -131,7 +130,10 @@ class UploadView(generic.View):
         return file_fullname
 
     def generate_filename(self, save_path: str, filename: str, extension: str):
+        """Генерация имени изображения для последующего сохранения"""
         full_path = os.path.join(save_path, f"{filename}{extension}")
+
+        # Если файл с таким именем уже существует добавить случайные данные в путь
         if os.path.exists(full_path):
             random_choice = "".join(
                 random.choices(string.ascii_lowercase + string.digits, k=6)
@@ -142,12 +144,14 @@ class UploadView(generic.View):
         return filename
 
     def normalize_filename(self, filename):
+        """Удаление символов, которые могут повлять на отображение/сохранение"""
         # Удаление пробелов и замена на подчеркивания
         filename = re.sub(r"[\s]+", "_", filename)
         # Удаление специальных символов
         filename = re.sub(r"[^\w]+", "", filename)
 
-        max_length = 255  # Максимальная длина имени файла для URL
+        # Максимальная длина имени файла для URL
+        max_length = 255
         if len(filename) > 255:
             filename = filename[:max_length]
         return filename
