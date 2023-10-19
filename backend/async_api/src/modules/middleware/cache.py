@@ -38,7 +38,7 @@ class RedisCacheMiddleware:
                 allow_cache = True
                 params = scope.get("query_string")
 
-                redis_key = f"{options[0]}?{params.decode()}" if params else options[0]
+                redis_key = f"{options[0]}:{params.decode()}" if params else options[0]
                 # Получить данные из Redis
                 cache_content = await get_cache_content(redis_key)
 
