@@ -6,10 +6,12 @@ client = Redis(
 )
 
 
-def invalidate_pattern(pattern: str) -> None:
+def invalidate_pattern(
+    pattern: str, count: int | None = None, _type: str | None = "STRING"
+) -> None:
     """Удаление данных из Redis используя шаблон"""
     # Сложность поиска и удаления O(n)
-    keys = client.scan(match=pattern)
+    keys = client.scan(match=pattern, count=count, _type=_type)
     if keys[1]:
         # Удаление списка полученных ключей
         client.delete(*keys[1])
