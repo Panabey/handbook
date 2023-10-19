@@ -47,6 +47,7 @@ services:
     environment:
       - DEBUG_MODE=false
       - ALLOWED_HOSTS=["<host>"] # change
+      - REDIS_HOST=redis_server
       - DATABASE_HOST=postgresql
       # for db async_api
       - DB_BACKEND_NAME=handbook
@@ -75,6 +76,7 @@ services:
       - shared-media:/app/media
     depends_on:
       - postgresql
+      - redis_server
     networks:
       - proxy_network
 
