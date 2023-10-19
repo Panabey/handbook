@@ -38,6 +38,17 @@ class Tag(models.Model):
     def __str__(self) -> str:
         return f"{self.title} ({self.status})"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Так как данные не отображаются нигде, кроме страницы тегов,
+        # то обновление других страниц не имеет смысла
+        invalidate_pattern(f"tags:status={self.status.title}&limit=*")
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        invalidate_pattern(f"tags:status={self.status.title}&limit=*")
+
     class Meta:
         managed = False
         db_table = "tag"
