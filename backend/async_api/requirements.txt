@@ -1,5 +1,5 @@
 # framework
-fastapi>=0.103.0,<0.104.0
+fastapi>=0.104.0,<0.105.0
 
 # database
 sqlalchemy==2.0.22
@@ -10,10 +10,10 @@ redis[hiredis]>=5.0.1,<5.1.0
 
 # perfomance
 orjson>=3.9.2
-uvloop==0.17.0; sys_platform != "win32"
+uvloop>=0.18.0,<1.19.0; sys_platform != "win32"
 
 # other
 pydantic-settings>=2.0.2,<2.1.0
 
 # asgi server
-granian>=0.6.0,<0.7.0
+granian>=0.7.0,<0.8.0
