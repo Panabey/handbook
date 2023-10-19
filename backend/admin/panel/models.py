@@ -143,8 +143,9 @@ class Handbook(models.Model):
 
         super().save(*args, **kwargs)
         # Если название было изменено, требуется удалить все страницы
-        # которые связаны с данным справочником
-        if old_title != self.title.strip():
+        # которые связаны с данным справочником.
+        # Если создано в первые, то кэш всех страниц очищать не нужно.
+        if old_title != self.title.strip() and old_title:
             invalidate_pattern("hb:page:page_id=*")
 
         # Удалить из кэша: спискок справочников и его содержимое
