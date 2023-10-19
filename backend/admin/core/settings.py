@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     SECRET_APP: str | None = None
 
     # Параметры Redis
-    REDIS_HOST: str
+    REDIS_HOST: str | None = None
     REDIS_PORT: int = 6379
 
     # Параметры БД

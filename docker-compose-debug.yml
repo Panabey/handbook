@@ -42,6 +42,7 @@ services:
     environment:
       - DEBUG_MODE=true
       - DATABASE_HOST=postgresql
+      - REDIS_HOST=redis_server
       # for db async_api
       - DB_BACKEND_NAME=handbook
       - DB_BACKEND_USER=handbook_user
@@ -58,6 +59,7 @@ services:
       - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
     depends_on:
       - postgresql
+      - redis_server
     networks:
       - proxy_network
 
