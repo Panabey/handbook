@@ -40,8 +40,7 @@ class UploadView(generic.View):
         # Проверка допустимого формата изображения
         file_path = self.normalize_filename(Path(upload_image.name))
         ext = file_path.suffix
-
-        if ext not in MDEDITOR_CONFIGS["upload_image_formats"]:
+        if ext[1:] not in MDEDITOR_CONFIGS["upload_image_formats"]:
             return JsonResponse(
                 {
                     "success": 0,
@@ -50,7 +49,6 @@ class UploadView(generic.View):
                     "url": "",
                 }
             )
-
         # Получение папки в соотвествии с текущей датой
         date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
         save_dir = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"], date)
