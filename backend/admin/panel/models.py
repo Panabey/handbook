@@ -253,6 +253,45 @@ class HandbookPage(models.Model):
         db_table = "handbook_page"
 
 
+class Book(models.Model):
+    handbook = models.ForeignKey(
+        Handbook, models.SET_NULL, verbose_name="Справочник", null=True, blank=True
+    )
+    logo_url = models.FileField(
+        "Изображение",
+        upload_to="book/",
+        blank=True,
+        null=True,
+        storage=CompressImageStorage,
+    )
+    title = models.CharField("Название книги", max_length=255)
+    author = models.CharField("Автор", max_length=255)
+    is_display = models.BooleanField("Отображать в справочнике?", default=False)
+
+    def __str__(self) -> str:
+        return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Удаление кеша, так как изменяется страница с содержимым справочника
+        handbook = self.handbook
+        if handbook is not None:
+            invalidate_key(f"hb:content:handbook={handbook.title.lower()}")
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        handbook = self.handbook
+        if handbook is not None:
+            invalidate_key(f"hb:content:handbook={handbook.title.lower()}")
+
+    class Meta:
+        managed = False
+        verbose_name = "Книга"
+        verbose_name_plural = "Книги"
+        db_table = "book"
+
+
 @cleanup.select
 class Article(models.Model):
     logo_url = models.FileField(
