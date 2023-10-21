@@ -1,6 +1,7 @@
 import threading
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from django_cleanup import cleanup
 from mdeditor.fields import MDTextField
@@ -11,6 +12,7 @@ from modules.redis.cache import invalidate_pattern
 
 from .ext.utils_admin import replace_char
 from .ext.utils_admin import validate_uint
+from .ext.utils_admin import validate_count
 from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
@@ -251,6 +253,55 @@ class HandbookPage(models.Model):
         verbose_name = "Справочник (Страница)"
         verbose_name_plural = "Справочник (Страницы)"
         db_table = "handbook_page"
+
+
+class Book(models.Model):
+    handbook = models.ForeignKey(
+        Handbook, models.SET_NULL, verbose_name="Справочник", null=True, blank=True
+    )
+    logo_url = models.FileField(
+        "Изображение",
+        upload_to="book/",
+        blank=True,
+        null=True,
+        storage=CompressImageStorage,
+    )
+    title = models.CharField("Название книги", max_length=255)
+    author = models.CharField("Автор", max_length=255)
+    is_display = models.BooleanField("Отображать в справочнике?", default=False)
+
+    def __str__(self) -> str:
+        return self.title
+
+    def clean_fields(self, exclude) -> None:
+        is_valid = validate_count(
+            self.__class__, {"id": self.handbook.pk, "is_display": self.is_display}, 5
+        )
+        if not is_valid:
+            raise ValidationError(
+                {"is_display": "Превышен допустимый лимит (5 книг) отображения"}
+            )
+        return super().clean_fields(exclude)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Удаление кеша, так как изменяется страница с содержимым справочника
+        handbook = self.handbook
+        if handbook is not None:
+            invalidate_key(f"hb:content:handbook={handbook.title.lower()}")
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Удаление кеша, если тот существует
+        handbook = self.handbook
+        if handbook is not None:
+            invalidate_key(f"hb:content:handbook={handbook.title.lower()}")
+
+    class Meta:
+        managed = False
+        verbose_name = "Книга"
+        verbose_name_plural = "Книги"
+        db_table = "book"
 
 
 @cleanup.select

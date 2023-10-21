@@ -14,6 +14,7 @@ from .models import (
     QuizAnswer,
     QuizQuestion,
     TagStatus,
+    Book,
     Article,
     ArticleTag,
     HandBookStatus,
@@ -226,6 +227,15 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     get_content.short_description = "Раздел"
 
 
+class BookAdmin(MultiplyModelAdmin):
+    list_display = ("title", "author", "handbook", "is_display")
+    list_filter = ("handbook__title",)
+    search_fields = ("title", "author")
+    ordering = ("-id",)
+    list_per_page = 20
+    autocomplete_fields = ("handbook",)
+
+
 # Общие теги
 admin.site.register(Tag, TagAdmin)
 admin.site.register(TagStatus, MultiplyModelAdmin)
@@ -235,6 +245,9 @@ admin.site.register(Quiz, QuizAdmin)
 admin.site.register(QuizTopic, QuizTopicAdmin)
 admin.site.register(QuizQuestion, QuestionAdmin)
 admin.site.register(QuizAnswer, AnswerAdmin)
+
+# Книги
+admin.site.register(Book, BookAdmin)
 
 # Статьи
 admin.site.register(Article, ArticleAdmin)

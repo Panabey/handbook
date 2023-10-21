@@ -81,3 +81,15 @@ def validate_exist(classmodel: models.Model, fields: dict[str, Any]) -> bool:
     if data:
         return True
     return False
+
+
+def validate_count(
+    classmodel: models.Model, fields: dict[str, Any], max_count: int
+) -> bool:
+    """Функция проверки надопустимое количество элементов в БД"""
+    count_data = (
+        classmodel.objects.using(settings.DB_BACKEND_NAME).filter(**fields).count()
+    )
+    if count_data >= max_count:
+        return False
+    return True
