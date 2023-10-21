@@ -1,6 +1,7 @@
 import threading
 
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from django_cleanup import cleanup
 from mdeditor.fields import MDTextField
@@ -11,6 +12,7 @@ from modules.redis.cache import invalidate_pattern
 
 from .ext.utils_admin import replace_char
 from .ext.utils_admin import validate_uint
+from .ext.utils_admin import validate_count
 from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
@@ -270,6 +272,16 @@ class Book(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def clean_fields(self, exclude) -> None:
+        is_valid = validate_count(
+            self.__class__, {"id": self.handbook.pk, "is_display": self.is_display}, 5
+        )
+        if not is_valid:
+            raise ValidationError(
+                {"is_display": "Превышен допустимый лимит (5 книг) отображения"}
+            )
+        return super().clean_fields(exclude)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
