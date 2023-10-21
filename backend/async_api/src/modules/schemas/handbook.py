@@ -65,8 +65,17 @@ class HandbookDetailShort(BaseModel):
     description: str | None
 
 
+class BookMaterial(BaseModel):
+    logo_url: str | None
+    title: str
+    author: str
+
+
 class ContentDetail(HandbookDetailShort):
     content: list[HBookContentDetail]
+    books: list[BookMaterial] | None = Field(
+        validation_alias=AliasChoices("books", "book_info")
+    )
 
 
 class PageInfoDetail(BaseModel):

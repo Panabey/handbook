@@ -43,6 +43,7 @@ class Handbook(Base):
         cascade="all, delete",
         passive_deletes=True,
     )
+    book_info: Mapped[list["Book"]] = relationship(back_populates="hbook_book")
     category_info: Mapped["HandbookСategory"] = relationship(
         back_populates="hbook_category"
     )
@@ -113,6 +114,23 @@ class HandbookСategory(Base):
     hbook_category: Mapped[list["Handbook"]] = relationship(
         back_populates="category_info"
     )
+
+
+class Book(Base):
+    __tablename__ = "book"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    handbook_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("handbook.id", ondelete="SET NULL", onupdate="SET NULL"),
+        nullable=True,
+    )
+    logo_url: Mapped[str] = mapped_column(String, nullable=True)
+    title: Mapped[str] = mapped_column(String(255))
+    author: Mapped[str] = mapped_column(String(255))
+    is_display: Mapped[str] = mapped_column(Boolean, default=False)
+
+    hbook_book: Mapped[Handbook] = relationship(back_populates="book_info")
 
 
 class Article(Base):

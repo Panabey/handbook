@@ -35,6 +35,7 @@ async def get_content(session: AsyncSession, handbook_title: str):
         .where(HBook.title.ilike(handbook_title), HBook.is_visible)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
+            joinedload(HBook.book_info),
             joinedload(HBook.content)
             .load_only(HBookContent.part, HBookContent.title, HBookContent.description)
             .joinedload(HBookContent.hbook_page)
