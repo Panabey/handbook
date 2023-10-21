@@ -274,13 +274,16 @@ class Book(models.Model):
         return self.title
 
     def clean_fields(self, exclude) -> None:
-        is_valid = validate_count(
-            self.__class__, {"id": self.handbook.pk, "is_display": self.is_display}, 5
-        )
-        if not is_valid:
-            raise ValidationError(
-                {"is_display": "Превышен допустимый лимит (5 книг) отображения"}
+        if self.handbook is not None:
+            is_valid = validate_count(
+                self.__class__,
+                {"id": self.handbook.pk, "is_display": self.is_display},
+                5,
             )
+            if not is_valid:
+                raise ValidationError(
+                    {"is_display": "Превышен допустимый лимит (5 книг) отображения"}
+                )
         return super().clean_fields(exclude)
 
     def save(self, *args, **kwargs):
