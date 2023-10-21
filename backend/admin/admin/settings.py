@@ -192,7 +192,15 @@ MDEDITOR_CONFIGS = {
     "default": {
         "emoji": False,
         "language": "en",
-        "upload_image_formats": ["jpg", "jpeg", "gif", "png", "bmp", "webp", "svg"],
+        "upload_image_formats": [
+            ".jpg",
+            ".jpeg",
+            ".gif",
+            ".png",
+            ".bmp",
+            ".webp",
+            ".svg",
+        ],
         "image_folder": "general/",
         "lineWrapping": True,
     }

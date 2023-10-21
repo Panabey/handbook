@@ -1,6 +1,11 @@
 import os
+import random
+import string
 
 from PIL import Image
+from pathlib import Path
+from slugify import slugify
+
 from django.core.files import locks
 from django.core.files.move import file_move_safe
 
@@ -13,6 +18,7 @@ class CompressImageStorage(FileSystemStorage):
         # Стандартный модуль Django
         full_path = self.path(name)
         directory = os.path.dirname(full_path)
+
         try:
             if self.directory_permissions_mode is not None:
                 old_umask = os.umask(0o777 & ~self.directory_permissions_mode)
@@ -29,11 +35,12 @@ class CompressImageStorage(FileSystemStorage):
                 "%s exists and is not a directory." % directory
             )
 
-        filename, ext = os.path.splitext(full_path)
-
         # Расширенный метод сохранения изображений
-        if ext not in [".svg", ".gif"]:
+        full_path, ext = self.normalize_filename(full_path)
+
+        if ext not in [".svg", ".gif", ".bmp", ".webp"]:
             new_size_ratio = 0.9
+            full_path = self.generate_filename(full_path)
 
             with Image.open(content) as img:
                 img = img.resize(
@@ -43,7 +50,6 @@ class CompressImageStorage(FileSystemStorage):
                     ),
                     Image.BILINEAR,
                 )
-                full_path = f"{filename}.jpeg"
 
                 if img.mode == "LA":
                     img = img.convert("RGBA")
@@ -103,3 +109,26 @@ class CompressImageStorage(FileSystemStorage):
         self._ensure_location_group_id(full_path)
         # Store filenames with forward slashes, even on Windows.
         return str(name).replace("\\", "/")
+
+    def normalize_filename(self, path: str):
+        """Удаление символов, которые могут повлять на отображение/сохранение"""
+        full_path = Path(path)
+        # Исключает специальные символы и заменяет пробелы на подчёркивания
+        filename = slugify(full_path.stem, max_length=255)
+        filename = filename + full_path.suffix
+        return (full_path.parent / filename).as_posix(), full_path.suffix
+
+    def generate_filename(self, path: str):
+        """Генерация имени изображения для последующего сохранения"""
+        full_path = Path(path)
+        full_path = full_path.with_suffix(".jpeg")
+
+        # Если файл с таким именем уже существует добавить случайные данные в путь
+        if full_path.exists():
+            random_choice = "".join(
+                random.choices(string.ascii_lowercase + string.digits, k=6)
+            )
+            filename = f"{full_path.stem}-{random_choice}{full_path.suffix}"
+        else:
+            filename = full_path.name
+        return (full_path.parent / filename).as_posix()

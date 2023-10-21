@@ -1,13 +1,13 @@
 import os
-import re
 import string
 import random
 import datetime
 
 from PIL import Image
+from pathlib import Path
+from slugify import slugify
 
 from django.conf import settings
-
 from django.views import generic
 from django.http import HttpRequest
 from django.http import JsonResponse
@@ -38,11 +38,10 @@ class UploadView(generic.View):
             })  # fmt: skip
 
         # Проверка допустимого формата изображения
-        file_name_list = upload_image.name.split(".")
-        file_extension = file_name_list.pop(-1)
-        file_name = self.normalize_filename(".".join(file_name_list))
+        file_path = self.normalize_filename(Path(upload_image.name))
+        ext = file_path.suffix
 
-        if file_extension not in MDEDITOR_CONFIGS["upload_image_formats"]:
+        if ext not in MDEDITOR_CONFIGS["upload_image_formats"]:
             return JsonResponse(
                 {
                     "success": 0,
@@ -54,25 +53,30 @@ class UploadView(generic.View):
 
         # Получение папки в соотвествии с текущей датой
         date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
-        file_path = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"], date)
-        os.makedirs(file_path, exist_ok=True)
+        save_dir = os.path.join(media_root, MDEDITOR_CONFIGS["image_folder"], date)
+        os.makedirs(save_dir, exist_ok=True)
 
         # Сохранение изображения
-        if file_extension != "svg":
-            save_filename = self._compress_img(upload_image, file_name, file_path, 0.8)
+        if ext not in [".svg", ".gif", ".bmp", ".webp"]:
+            relative_filename = self._compress_img(
+                upload_image, file_path, save_dir, 0.9
+            )
         else:
-            save_filename = self._no_compress_img(upload_image, file_name, file_path)
+            relative_filename = self._no_compress_img(upload_image, file_path, save_dir)
 
         path_url = os.path.join(
-            settings.MEDIA_URL, MDEDITOR_CONFIGS["image_folder"], date, save_filename
+            settings.MEDIA_URL,
+            MDEDITOR_CONFIGS["image_folder"],
+            date,
+            relative_filename,
         ).replace("\\", "/")
         return JsonResponse({"success": 1, "message": "上传成功！", "url": path_url})
 
     def _compress_img(
         self,
         image: UploadedFile,
-        filename: str,
-        save_path: str,
+        file_path: Path,
+        save_dir: str,
         new_size_ratio: float = 0.9,
         quality: int = 90,
         width: int | None = None,
@@ -93,13 +97,9 @@ class UploadView(generic.View):
         elif width and height:
             img = img.resize((width, height), Image.BILINEAR)
 
-        # имя файла
-        file_fullname = self.generate_filename(
-            save_path,
-            filename,
-            ".jpeg",
-        )
-        # конвертация прозрачности в белый цвет
+        relative_filename = self.generate_filename(save_dir, file_path, True)
+
+        # Конвертация прозрачности в белый цвет
         if img.mode == "LA":
             img = img.convert("RGBA")
         if img.mode == "RGBA":
@@ -108,7 +108,7 @@ class UploadView(generic.View):
             img = new_image
 
         img.save(
-            os.path.join(save_path, file_fullname),
+            os.path.join(save_dir, relative_filename),
             format="JPEG",
             quality=quality,
             optimize=True,
@@ -117,11 +117,11 @@ class UploadView(generic.View):
         )
         img.close()
 
-        return file_fullname
+        return relative_filename
 
-    def _no_compress_img(self, image: UploadedFile, filename: str, save_path: str):
+    def _no_compress_img(self, image: UploadedFile, filename: Path, save_path: str):
         """Сохранение изображения без последующей оптимизации"""
-        file_fullname = self.generate_filename(save_path, filename, ".svg")
+        file_fullname = self.generate_filename(save_path, filename, False)
 
         with open(os.path.join(save_path, file_fullname), "wb") as file:
             for chunk in image.chunks():
@@ -129,29 +129,27 @@ class UploadView(generic.View):
 
         return file_fullname
 
-    def generate_filename(self, save_path: str, filename: str, extension: str):
+    def generate_filename(
+        self, save_dir: str, file_path: Path, is_compress: bool
+    ) -> str:
         """Генерация имени изображения для последующего сохранения"""
-        full_path = os.path.join(save_path, f"{filename}{extension}")
+        if is_compress:
+            file_path = file_path.with_suffix(".jpeg")
+        full_path = os.path.join(save_dir, file_path.name)
 
         # Если файл с таким именем уже существует добавить случайные данные в путь
         if os.path.exists(full_path):
             random_choice = "".join(
                 random.choices(string.ascii_lowercase + string.digits, k=6)
             )
-            filename = f"{filename}_{random_choice}{extension}"
+            relative_filename = f"{file_path.stem}-{random_choice}{file_path.suffix}"
         else:
-            filename = f"{filename}{extension}"
-        return filename
+            relative_filename = file_path.name
+        return relative_filename
 
-    def normalize_filename(self, filename):
+    def normalize_filename(self, file_path: Path) -> Path:
         """Удаление символов, которые могут повлять на отображение/сохранение"""
-        # Удаление пробелов и замена на подчеркивания
-        filename = re.sub(r"[\s]+", "_", filename)
-        # Удаление специальных символов
-        filename = re.sub(r"[^\w]+", "", filename)
-
-        # Максимальная длина имени файла для URL
-        max_length = 255
-        if len(filename) > 255:
-            filename = filename[:max_length]
-        return filename
+        # Исключает специальные символы и заменяет пробелы на подчёркивания
+        filename = slugify(file_path.stem, max_length=255)
+        filename = filename + file_path.suffix
+        return file_path.parent / filename
