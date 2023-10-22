@@ -39,7 +39,7 @@ class CompressImageStorage(FileSystemStorage):
         full_path, ext = normalize_filename(full_path)
         if ext not in [".svg", ".gif", ".bmp", ".webp"]:
             new_size_ratio = 0.9
-            save_path = generate_filename(full_path)
+            full_path = generate_filename(full_path)
 
             with Image.open(content) as img:
                 img = img.resize(
@@ -58,7 +58,7 @@ class CompressImageStorage(FileSystemStorage):
                     img = new_image
 
                 img.save(
-                    save_path,
+                    full_path,
                     "JPEG",
                     quality=90,
                     optimize=True,
