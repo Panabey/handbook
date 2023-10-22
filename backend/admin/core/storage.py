@@ -36,11 +36,10 @@ class CompressImageStorage(FileSystemStorage):
             )
 
         # Расширенный метод сохранения изображений
-        full_path, ext = self.normalize_filename(full_path)
-
+        full_path, ext = normalize_filename(full_path)
         if ext not in [".svg", ".gif", ".bmp", ".webp"]:
             new_size_ratio = 0.9
-            full_path = self.generate_filename(full_path)
+            save_path = generate_filename(full_path)
 
             with Image.open(content) as img:
                 img = img.resize(
@@ -59,7 +58,7 @@ class CompressImageStorage(FileSystemStorage):
                     img = new_image
 
                 img.save(
-                    full_path,
+                    save_path,
                     "JPEG",
                     quality=90,
                     optimize=True,
@@ -110,25 +109,27 @@ class CompressImageStorage(FileSystemStorage):
         # Store filenames with forward slashes, even on Windows.
         return str(name).replace("\\", "/")
 
-    def normalize_filename(self, path: str):
-        """Удаление символов, которые могут повлять на отображение/сохранение"""
-        full_path = Path(path)
-        # Исключает специальные символы и заменяет пробелы на подчёркивания
-        filename = slugify(full_path.stem, max_length=255)
-        filename = filename + full_path.suffix
-        return (full_path.parent / filename).as_posix(), full_path.suffix
 
-    def generate_filename(self, path: str):
-        """Генерация имени изображения для последующего сохранения"""
-        full_path = Path(path)
-        full_path = full_path.with_suffix(".jpeg")
+def normalize_filename(path: str):
+    """Удаление символов, которые могут повлять на отображение/сохранение"""
+    full_path = Path(path)
+    # Исключает специальные символы и заменяет пробелы на подчёркивания
+    filename = slugify(full_path.stem, max_length=255)
+    filename = filename + full_path.suffix
+    return (full_path.parent / filename).as_posix(), full_path.suffix
 
-        # Если файл с таким именем уже существует добавить случайные данные в путь
-        if full_path.exists():
-            random_choice = "".join(
-                random.choices(string.ascii_lowercase + string.digits, k=6)
-            )
-            filename = f"{full_path.stem}-{random_choice}{full_path.suffix}"
-        else:
-            filename = full_path.name
-        return (full_path.parent / filename).as_posix()
+
+def generate_filename(path: str):
+    """Генерация имени изображения для последующего сохранения"""
+    full_path = Path(path)
+    full_path = full_path.with_suffix(".jpeg")
+
+    # Если файл с таким именем уже существует добавить случайные данные в путь
+    if full_path.exists():
+        random_choice = "".join(
+            random.choices(string.ascii_lowercase + string.digits, k=6)
+        )
+        filename = f"{full_path.stem}-{random_choice}{full_path.suffix}"
+    else:
+        filename = full_path.name
+    return (full_path.parent / filename).as_posix()

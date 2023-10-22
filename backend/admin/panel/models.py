@@ -264,6 +264,7 @@ class HandbookPage(models.Model):
         db_table = "handbook_page"
 
 
+@cleanup.select
 class Book(models.Model):
     handbook = models.ForeignKey(
         Handbook, models.SET_NULL, verbose_name="Справочник", null=True, blank=True
