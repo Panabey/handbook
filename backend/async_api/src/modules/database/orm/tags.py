@@ -8,7 +8,7 @@ from modules.database.models import Tag, TagStatus
 async def get_tags(session: AsyncSession, title: str, limit: int):
     smt = (
         select(TagStatus)
-        .join(TagStatus.tag_info)
+        .join(TagStatus.tag_info, isouter=True)
         .where(TagStatus.title.ilike(title))
         .order_by(Tag.id)
         .limit(limit)
