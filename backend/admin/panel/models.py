@@ -16,6 +16,7 @@ from .ext.utils_admin import validate_count
 from .ext.utils_admin import get_text_or_none
 from .ext.utils_admin import remove_old_images
 from .ext.utils_admin import calculate_reading_time
+from .ext.utils_admin import validate_english_letters
 
 from core.storage import CompressImageStorage
 
@@ -121,7 +122,15 @@ class Handbook(models.Model):
         null=True,
         storage=CompressImageStorage,
     )
-    title = models.CharField("Название справочника", max_length=80, unique=True)
+    title = models.CharField(
+        "Название справочника",
+        max_length=80,
+        unique=True,
+        validators=[
+            validate_english_letters,
+        ],
+        help_text="Только на английском языке",
+    )
     description = models.TextField("Описание", max_length=300, blank=True, null=True)
     is_visible = models.BooleanField("Видимый?", default=False)
     category = models.ForeignKey(

@@ -75,6 +75,13 @@ def validate_uint(value: int) -> None | NoReturn:
         raise ValidationError("Убедитесь, что это значение больше либо равно 1.")
 
 
+def validate_english_letters(value: str) -> None | NoReturn:
+    if not re.match("^[a-zA-Z ]+$", value):
+        raise ValidationError(
+            "Текст должен содержать только английские буквы и/или пробелы."
+        )
+
+
 def validate_exist(classmodel: models.Model, fields: dict[str, Any]) -> bool:
     """Функция проверки на существующие значения в БД"""
     data = classmodel.objects.using(settings.DB_BACKEND_NAME).filter(**fields).exists()
