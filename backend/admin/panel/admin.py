@@ -82,8 +82,8 @@ class ProjectNewsAdmin(MultiplyModelAdmin):
 
 class TagAdmin(MultiplyModelAdmin):
     list_display = ("title", "status")
-    list_filter = ("status",)
-    search_fields = ("title", "status")
+    list_filter = ("status__title",)
+    search_fields = ("title", "status__title")
     list_per_page = 20
 
 
@@ -110,12 +110,17 @@ class QuizTopicAdmin(MultiplyModelAdmin):
 
 class QuizAdmin(MultiplyModelAdmin):
     inlines = [QuizTagInline]
-    list_display = ("title", "topic", "is_visible")
+    list_display = ("title", "topic", "is_visible", "questions_count")
     list_filter = ("topic", "is_visible")
     search_fields = ("title", "topic__title")
     ordering = ("-id",)
     list_per_page = 20
     autocomplete_fields = ("topic",)
+
+    def questions_count(self, obj: Quiz):
+        return obj.quizquestion_set.count()
+
+    questions_count.short_description = "Количество вопросов"
 
 
 class QuestionAdmin(MultiplyModelAdmin):
@@ -164,9 +169,9 @@ class ArticleAdmin(MultiplyModelAdmin):
 
 
 class HandbookAdmin(MultiplyModelAdmin):
-    list_display = ("title", "category", "is_visible")
+    list_display = ("title", "category", "is_visible", "status")
     search_fields = ("title",)
-    list_filter = ("is_visible",)
+    list_filter = ("is_visible", "status__title", "category__title")
     autocomplete_fields = ("category",)
     ordering = ("-id",)
     list_per_page = 20
@@ -188,7 +193,7 @@ class HandbookStatusAdmin(MultiplyModelAdmin):
 class HandbookContentAdmin(MultiplyModelAdmin):
     list_display = ("handbook", "get_full_title")
     search_fields = ("title", "handbook__title")
-    list_filter = ("handbook",)
+    list_filter = ("handbook__title",)
     ordering = ("-id",)
     list_per_page = 20
     autocomplete_fields = ("handbook",)
@@ -201,13 +206,13 @@ class HandbookContentAdmin(MultiplyModelAdmin):
 
 class HandbookPageAdmin(MultiplyModelAdmin):
     list_display = (
+        "content",
         "get_full_title",
-        "get_content",
         "get_handbook",
         "create_date",
         "update_date",
     )
-    list_filter = ("create_date", "update_date", "content__handbook")
+    list_filter = ("create_date", "update_date", "content__handbook__title")
     ordering = ("-update_date",)
     search_fields = ("title", "content__handbook__title")
     list_per_page = 20
@@ -219,26 +224,27 @@ class HandbookPageAdmin(MultiplyModelAdmin):
     def get_handbook(self, obj: HandbookPage):
         return obj.content.handbook.title
 
-    def get_content(self, obj: HandbookPage):
-        return obj.content.title
-
     get_full_title.short_description = "Название страницы"
     get_handbook.short_description = "Справочник"
-    get_content.short_description = "Раздел"
 
 
 class BookAdmin(MultiplyModelAdmin):
     list_display = ("title", "author", "handbook", "is_display")
-    list_filter = ("handbook__title",)
+    list_filter = ("is_display", "handbook__title")
     search_fields = ("title", "author")
     ordering = ("-id",)
     list_per_page = 20
     autocomplete_fields = ("handbook",)
 
 
+class TagStatusAdmin(MultiplyModelAdmin):
+    ordering = ("-id",)
+    list_per_page = 20
+
+
 # Общие теги
 admin.site.register(Tag, TagAdmin)
-admin.site.register(TagStatus, MultiplyModelAdmin)
+admin.site.register(TagStatus, TagStatusAdmin)
 
 # Квизы
 admin.site.register(Quiz, QuizAdmin)
