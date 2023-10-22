@@ -28,6 +28,8 @@ services:
       - "traefik.http.middlewares.security.headers.accesscontrolmaxage=600"
       - "traefik.http.middlewares.security.headers.framedeny=true"
       - "traefik.http.middlewares.security.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.security.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.security.headers.forcestsheader=true"
       - "traefik.http.middlewares.security.headers.customresponseheaders.server="
     depends_on:
       - postgresql
@@ -71,6 +73,8 @@ services:
       # middlewares
       - "traefik.http.routers.admin.middlewares=admin_security"
       - "traefik.http.middlewares.admin_security.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.admin_security.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.admin_security.headers.forcestsheader=true"
       - "traefik.http.middlewares.admin_security.headers.customresponseheaders.server="
     volumes:
       - shared-media:/app/media
