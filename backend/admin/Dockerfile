@@ -15,7 +15,7 @@ CMD ["granian", \
     "--interface", "wsgi", \
     "--host", "0.0.0.0", \
     "--port", "8001", \
-    "--log-level", "error", \
+    "--log-level", "warn", \
     "--no-ws", \
     "admin.wsgi:application" \
     ]

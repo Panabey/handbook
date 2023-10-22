@@ -17,7 +17,7 @@ CMD ["granian", \
     "--interface", "asgi", \
     "--host", "0.0.0.0", \
     "--port", "8000", \
-    "--log-level", "error", \
+    "--log-level", "warn", \
     "--no-ws", \
     "--loop", "uvloop", \
     "main:app" \
