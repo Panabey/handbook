@@ -5,6 +5,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from modules.database.models import Book
 from modules.database.models import Handbook as HBook
 from modules.database.models import HandbookPage as HBookPage
 from modules.database.models import HandbookContent as HBookContent
@@ -32,7 +33,7 @@ async def get_all(session: AsyncSession):
 async def get_content(session: AsyncSession, handbook_title: str):
     smt = (
         select(HBook)
-        .where(HBook.title.ilike(handbook_title), HBook.is_visible)
+        .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
             joinedload(HBook.book_info),
