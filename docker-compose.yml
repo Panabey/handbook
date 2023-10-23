@@ -16,7 +16,7 @@ services:
       - REDIS_HOST=redis_server
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`<domain>`)" # change
+      - "traefik.http.routers.fastapi.rule=Host(`api.<domain>`)" # change
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
       # middlewares
@@ -67,7 +67,7 @@ services:
       - SECRET_APP=<token> # without symbols$
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
+      - "traefik.http.routers.admin.rule=Host(`admin-panel.<domain>`)" # change
       - "traefik.http.routers.admin.tls=true"
       - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
       # middlewares
@@ -116,6 +116,25 @@ services:
     networks:
       - proxy_network
 
+  media_server:
+    image: joseluisq/static-web-server:2.23
+    container_name: media_server
+    restart: unless-stopped
+    expose:
+      - 8787
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sws.rule=Host(`media.<domain>`)" # change
+      - "traefik.http.routers.sws.tls=true"
+      - "traefik.http.routers.sws.tls.certresolver=letsencrypt"
+      # middlewares
+      - "traefik.http.routers.sws.middlewares=sws_security"
+      - "traefik.http.middlewares.sws_security.headers.stsseconds=31536000"
+    volumes:
+      - shared-media:/app/media:ro
+    networks:
+      - proxy_network
+
   traefik:
     image: traefik:2.10
     container_name: traefik
@@ -147,7 +166,6 @@ volumes:
   pg-data:
   certificates:
   shared-media:
-    external: true
 
 networks:
   proxy_network:

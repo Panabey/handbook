@@ -57,6 +57,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin.rule=Host(`<domain>`)" # change
+    volumes:
+      - shared-media:/app/media
     depends_on:
       - postgresql
       - redis_server
@@ -95,6 +97,20 @@ services:
     networks:
       - proxy_network
 
+    media_server:
+      image: joseluisq/static-web-server:2.23
+      container_name: media_server
+      restart: unless-stopped
+      expose:
+        - 8787
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.sws.rule=Host(`<domain>`)" # change
+      volumes:
+        - shared-media:/app/media:ro
+      networks:
+        - proxy_network
+
   traefik:
     image: traefik:2.10
     container_name: traefik_debug
@@ -112,6 +128,7 @@ services:
 
 volumes:
   pg-data:
+  shared-media:
 
 networks:
   proxy_network:
