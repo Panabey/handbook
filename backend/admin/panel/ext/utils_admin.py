@@ -26,7 +26,9 @@ def replace_char(pattern: str, text: str) -> str:
 
 def find_image(markdown_text: str):
     """Функция поиска изображений в тексте markdown или html"""
-    combined_pattern = r'!\[.*\]\((\/media\/.*?)\)|<img.*?src=["\'](/media\/.*?)["\']'
+    combined_pattern = (
+        r'!\[.*\]\((\/general\/.*?)\)|<img.*?src=["\'](\/general\/.*?)["\']'
+    )
     # Поиск пути к изображениям в тексте
     matches = re.findall(combined_pattern, markdown_text)
     # Удаление пустых строк полученных при сравнении
@@ -42,7 +44,7 @@ def remove_old_images(old_text: str, new_text: str):
     # Поиск изображений, которые были удалены при изменении текста
     missing_images = [image for image in old_images if image not in new_images]
     for image in missing_images:
-        image_path = os.path.join(django_settings.BASE_DIR, image[1:])
+        image_path = django_settings.MEDIA_ROOT / image.lstrip("/")
         lock.acquire()
         try:
             parent_dir = os.path.dirname(image_path)

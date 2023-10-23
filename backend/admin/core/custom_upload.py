@@ -62,8 +62,7 @@ class UploadView(generic.View):
         else:
             relative_filename = self._no_compress_img(upload_image, file_path, save_dir)
 
-        path_url = os.path.join(
-            settings.MEDIA_URL,
+        path_url = "/" + os.path.join(
             MDEDITOR_CONFIGS["image_folder"],
             date,
             relative_filename,
