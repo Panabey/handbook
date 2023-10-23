@@ -25,10 +25,7 @@ from core.favicon import favicon
 urlpatterns = [
     path("ui-admin/", admin.site.urls),
     re_path(r"^mdeditor/uploads/$", UploadView.as_view(), name="uploads"),
-    re_path(
-        r"^(?P<path>(handbook|general|article|book)/.*)$",
-        serve,
-        {"document_root": settings.MEDIA_ROOT},
-    ),
+    re_path(r"^(?P<path>general/.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     path("favicon.ico", favicon),
 ]
