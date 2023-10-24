@@ -2,7 +2,11 @@ from redis import Redis
 from core.settings import settings
 
 client = Redis(
-    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=1, decode_responses=True
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=1,
+    protocol=3,
+    decode_responses=True,
 )
 
 
