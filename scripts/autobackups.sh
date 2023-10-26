@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Переменные
-DB_CONTAINER_NAME="postgresql"
-DB_USER="user" # change
+DB_CONTAINER_NAME="postgresql_handbook"
+DB_USER="handbook_user"
 DB_NAME="handbook"
 BACKUP_DIR="/path" # change
 PASSWORD="password" # change
@@ -10,7 +10,7 @@ MAX_BACKUPS=2
 
 # Создание имени файла бэкапа с датой
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
-BACKUP_TEMP_FILE="$BACKUP_DIR/tmp/$DB_NAME-$TIMESTAMP-dump.gz"
+BACKUP_TEMP_FILE="$BACKUP_DIR/tmp/$DB_NAME-$TIMESTAMP-dump.sql.gz"
 BACKUP_FILE="$BACKUP_DIR/$DB_NAME-$TIMESTAMP"
 
 # Создать директорию для бэкапов, если она не существует
@@ -25,10 +25,10 @@ if [ -z "$CONTAINER_ID" ]; then
 fi
 
 # Выполнить резервное копирование внутри контейнера
-docker exec -t $CONTAINER_ID pg_dump -U $DB_USER $DB_NAME --no-indexes | gzip > $BACKUP_TEMP_FILE
+docker exec -t $DB_CONTAINER_NAME pg_dump -U $DB_USER -d $DB_NAME | gzip -7 > $BACKUP_TEMP_FILE
 
 # Заархивировать бэкап с паролем
-zip --password $PASSWORD $BACKUP_FILE.zip $BACKUP_TEMP_FILE
+zip --password $PASSWORD "$BACKUP_FILE.zip" $BACKUP_TEMP_FILE -j
 
 # Удаление папки
 rm -rf "$BACKUP_DIR/tmp/"

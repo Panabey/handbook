@@ -29,6 +29,10 @@
 
 > Скрипт будет запускаться раз в 2 дня. Для более лучшей конфигурации рекомендую [данный сервис](https://crontab.guru/)
 
+### Востановление из бэкапа
+
+`gunzip < your_dump.sql.gz | docker exec -i postgres_handbook psql -U handbook_user -d handbook`
+
 ### FAQ
 
 1. Что делать если произошла блокировка пользователя в admin панели?
