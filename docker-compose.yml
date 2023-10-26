@@ -131,7 +131,7 @@ services:
       - "traefik.http.middlewares.sws_security.headers.framedeny=true"
       - "traefik.http.middlewares.sws_security.headers.contentsecuritypolicy=frame-ancestors 'self'"
     volumes:
-      - shared-media:/app/media:ro
+      - shared-media:/public:ro
     networks:
       - proxy_network
 
