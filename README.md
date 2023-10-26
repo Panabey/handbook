@@ -2,23 +2,32 @@
 
 ### Первичный запуск проекта
 1. `$ git clone https://github.com/Panabey/handbook.git`
-2. `$ docker-compose up -d postgresql`
-3. `$ docker-compose up -d --build async_api`
+2. `$ docker-compose up -d postgresql redis_server`
+3. `$ docker-compose up -d --build`
 4. `$ docker exec -it <id_контейнера> /bin/bash`
 5. `$ cd ..`
-6. `$ alembic upgrade head` (Выйти из контейнера и на всякий повторно перезапустить)
-7. `$ docker-compose build admin`
-8. `$ docker volume create --name=shared-media` (Если потребуется)
-9. `$ docker-compose up -d admin`
-10. `$ docker exec -it <id_контейнера> /bin/bash`
-11. `$ python manage.py makemigrations && python manage.py migrate`
-12. `$ python manage.py createsuperuser` (Выйти из контейнера)
-13. `$ docker-compose up -d` или `$ docker-compose up -d <имя_контейнера>`
+6. `$ alembic upgrade head` (Выйти из контейнера)
+7.  `$ docker exec -it <id_контейнера> /bin/bash`
+8.  `$ python manage.py makemigrations && python manage.py migrate`
+9.  `$ python manage.py createsuperuser` (Выйти из контейнера)
 
 ### Запуск при обновлении
 1. `$ git pull`
 2. `$ docker-compose up -d --build async_api` (Обновить то, где были изменения)
 3. Если потребуется, то провести миграции БД через **alembic** или **django ORM**
+
+### Автоматические бэкапы БД
+Файл находиться в корневой директории scripts/autobackups.sh
+
+1. Требуется провести конфигурацию файла, и заменить некоторые параметры. По умолчанию храниться 2 свежмх бэкапа
+2. Дать права на исполнение `$ chmod +x autobackups.sh`
+3. Создать cron задачу на еженедельный запуск `crontab -e` (1-4 чтобы выбрать редактор), затем прописать следующее:
+
+`0 2 */2 * * /path/autobackups.sh`
+
+где path полный путь к скрипту.
+
+> Скрипт будет запускаться раз в 2 дня. Для более лучшей конфигурации рекомендую [данный сервис](https://crontab.guru/)
 
 ### FAQ
 
