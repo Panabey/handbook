@@ -206,8 +206,8 @@ class HandbookContentAdmin(MultiplyModelAdmin):
 
 class HandbookPageAdmin(MultiplyModelAdmin):
     list_display = (
-        "content",
         "get_full_title",
+        "content",
         "get_handbook",
         "create_date",
         "update_date",

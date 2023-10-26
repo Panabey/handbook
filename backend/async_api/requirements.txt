@@ -10,7 +10,7 @@ redis[hiredis]>=5.0.1,<5.1.0
 
 # perfomance
 orjson>=3.9.2
-uvloop>=0.18.0,<1.19.0; sys_platform != "win32"
+uvloop>=0.18.0,<0.19.0; sys_platform != "win32"
 
 # other
 pydantic-settings>=2.0.2,<2.1.0
