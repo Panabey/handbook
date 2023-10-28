@@ -21,7 +21,7 @@ Session = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.get(
-    "/",
+    "",
     response_model=list[TagsDetail],
     summary="Получение списка тегов",
     openapi_extra=CACHE_HEADER,
