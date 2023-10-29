@@ -80,7 +80,7 @@ async def get_topic_quiz(
 
 
 @router.get(
-    "/",
+    "",
     response_model=QuizDetail,
     summary="Получение квиза",
     responses={404: {"model": DetailInfo}}

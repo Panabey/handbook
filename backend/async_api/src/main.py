@@ -11,9 +11,10 @@ from routers.api.v1.router import router
 app = FastAPI(
     debug=settings.DEBUG_MODE,
     title="Handbook API",
-    version="1.3.1",
+    version="1.3.2",
     description="Документация API проекта",
     default_response_class=ORJSONResponse,
+    redirect_slashes=False,
     openapi_url=settings.OPEN_API_URL,
     docs_url=settings.DOCS_URL,
     redoc_url=settings.REDOC_URL,
@@ -26,10 +27,10 @@ app.add_middleware(
     include_path={
         "handbook/all": ("hb:all", 3600),  # 1 час
         "handbook/content": ("hb:content", 1800),  # 30 минут
-        "handbook/": ("hb:page", 1800),
-        "tags/": ("tags", 10800),  # 3 часа
+        "handbook": ("hb:page", 1800),
+        "tags": ("tags", 10800),  # 3 часа
         "project/news/widget": ("project:news", 1800),
-        "utils/sitemap": ("sitemap", 1800),
+        "utils/sitemap": ("sitemap", 900),  # 15 минут
     },
 )
 

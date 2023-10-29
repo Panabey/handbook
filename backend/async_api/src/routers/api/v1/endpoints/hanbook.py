@@ -84,7 +84,7 @@ async def get_content_handbook(
 
 
 @router.get(
-    "/",
+    "",
     response_model=PageDetail,
     summary="Получение страницы справочника",
     openapi_extra=CACHE_HEADER,

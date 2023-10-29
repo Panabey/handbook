@@ -43,7 +43,7 @@ async def get_all_articles(
 
 
 @router.get(
-    "/",
+    "",
     response_model=ArticleDetail,
     summary="Получение информации о конкрентной статьи",
     responses={404: {"model": DetailInfo}}

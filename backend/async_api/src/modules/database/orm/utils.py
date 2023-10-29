@@ -11,6 +11,7 @@ async def sitemap_data(session: AsyncSession):
         .join(HandbookPage.hbook_content)
         .join(HandbookContent.hbook)
         .where(Handbook.is_visible)
+        .limit(10000)
         .options(
             load_only(HandbookPage.id, HandbookPage.title, HandbookPage.update_date),
             contains_eager(HandbookPage.hbook_content)
@@ -21,8 +22,10 @@ async def sitemap_data(session: AsyncSession):
     )
     handbook_result = await session.scalars(handbooks)
 
-    articles = select(Article).options(
-        load_only(Article.id, Article.title, Article.update_date)
+    articles = (
+        select(Article)
+        .limit(10000)
+        .options(load_only(Article.id, Article.title, Article.update_date))
     )
     article_result = await session.scalars(articles)
     return {"handbooks": handbook_result.all(), "articles": article_result.all()}
