@@ -398,7 +398,7 @@ class Quiz(models.Model):
         help_text="Так же используется для мета тегов",
         max_length=255,
     )
-    description = MDTextField("Описание", max_length=500, blank=True, null=True)
+    description = MDTextField("Описание", blank=True, null=True)
     is_visible = models.BooleanField(
         "Видимый?", default=False, help_text="Не скрывает вопросы и ответы"
     )
@@ -438,7 +438,7 @@ class QuizTag(models.Model):
 
 class QuizQuestion(models.Model):
     quiz = models.ForeignKey(Quiz, models.CASCADE, verbose_name="Тест")
-    text = MDTextField("Текст вопроса", max_length=400)
+    text = MDTextField("Текст вопроса")
     hint = models.CharField("Подсказка", max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
@@ -453,9 +453,9 @@ class QuizQuestion(models.Model):
 
 class QuizAnswer(models.Model):
     question = models.ForeignKey(QuizQuestion, models.CASCADE)
-    text = models.CharField("Ответ", max_length=255)
+    text = models.CharField("Ответ", max_length=500)
     is_correct = models.BooleanField("Правильный?", default=False)
-    explanation = models.TextField("Объсянение", max_length=300, blank=True, null=True)
+    explanation = models.TextField("Объсянение", max_length=500, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.text

@@ -233,7 +233,7 @@ class Quiz(Base):
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String(100))
     short_description: Mapped[str] = mapped_column(String(255))
-    description: Mapped[str] = mapped_column(String(500))
+    description: Mapped[str] = mapped_column(String)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=False)
 
     topic_info: Mapped[QuizTopic] = relationship(back_populates="quizzes_info")
@@ -254,7 +254,7 @@ class Question(Base):
     quiz_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quiz.id", ondelete="CASCADE", onupdate="CASCADE")
     )
-    text: Mapped[str] = mapped_column(String(400))
+    text: Mapped[str] = mapped_column(String)
     hint: Mapped[str] = mapped_column(String(255), nullable=True)
 
     answers_info: Mapped[list["Answer"]] = relationship(
@@ -272,9 +272,9 @@ class Answer(Base):
     question_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quiz_question.id", ondelete="CASCADE", onupdate="CASCADE")
     )
-    text: Mapped[str] = mapped_column(String(255))
+    text: Mapped[str] = mapped_column(String(500))
     is_correct: Mapped[bool] = mapped_column(Boolean)
-    explanation: Mapped[str] = mapped_column(String(300), nullable=True)
+    explanation: Mapped[str] = mapped_column(String(500), nullable=True)
 
     question_info: Mapped["Question"] = relationship(back_populates="answers_info")
 
