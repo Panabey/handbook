@@ -1,5 +1,4 @@
 from sqlalchemy import func
-from sqlalchemy import and_
 from sqlalchemy import select
 from sqlalchemy.orm import defer
 from sqlalchemy.orm import load_only
@@ -29,13 +28,21 @@ async def get_topics(
         .subquery()
     )
 
+    subquery_topic = (
+        select(QuizTopic.id)
+        .join(subquery, subquery.c.topic_id == QuizTopic.id)
+        .distinct(QuizTopic.id)
+        .order_by(QuizTopic.id)
+        .limit(limit)
+        .offset(continue_after)
+        .subquery()
+    )
+
     smt = (
         select(QuizTopic)
+        .join(subquery_topic, subquery_topic.c.id == QuizTopic.id)
         .join(QuizTopic.quizzes_info)
-        .join(
-            subquery,
-            and_(subquery.c.topic_id == Quiz.topic_id, subquery.c.quiz_id == Quiz.id),
-        )
+        .join(subquery, subquery.c.quiz_id == Quiz.id)
         .where(subquery.c.row_num <= count_content)
         .order_by(QuizTopic.id, Quiz.id.desc())
         .options(
@@ -44,8 +51,6 @@ async def get_topics(
                 Quiz.id, Quiz.logo_url, Quiz.title, Quiz.short_description
             ),
         )
-        .limit(limit)
-        .offset(continue_after)
     )
     result = await session.scalars(smt)
     return result.unique().all()
