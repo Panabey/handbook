@@ -37,7 +37,7 @@ async def get_topics(
             and_(subquery.c.topic_id == Quiz.topic_id, subquery.c.quiz_id == Quiz.id),
         )
         .where(subquery.c.row_num <= count_content)
-        .order_by(QuizTopic.id)
+        .order_by(QuizTopic.id, Quiz.id.desc())
         .options(
             load_only(QuizTopic.id, QuizTopic.title),
             contains_eager(QuizTopic.quizzes_info).load_only(
