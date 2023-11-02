@@ -15,8 +15,8 @@ async def test_empty_project_news(client: AsyncClient):
     НЕ существует в базе данных
     """
     payload = {"news_id": 99999999}
-    resposne = await client.get(url="/api/v1/project/news/", params=payload)
-    assert resposne.status_code == 404
+    response = await client.get(url="/api/v1/project/news/", params=payload)
+    assert response.status_code == 404
 
 
 async def test_project_news(client: AsyncClient, session: AsyncSession):
@@ -28,9 +28,9 @@ async def test_project_news(client: AsyncClient, session: AsyncSession):
     project_news = await insert_value(ProjectNews, session, None, **data)
 
     payload = {"news_id": project_news.id}
-    resposne = await client.get(url="/api/v1/project/news/", params=payload)
-    assert resposne.status_code == 200
-    assert resposne.json() == {
+    response = await client.get(url="/api/v1/project/news/", params=payload)
+    assert response.status_code == 200
+    assert response.json() == {
         "id": project_news.id,
         "title": project_news.title,
         "text": project_news.text,
@@ -48,9 +48,9 @@ async def test_all_news(client: AsyncClient, session: AsyncSession):
     project_news = await insert_value(ProjectNews, session, None, **data)
 
     payload = {"page": 1}
-    resposne = await client.get(url="/api/v1/project/news/all", params=payload)
-    assert resposne.status_code == 200
-    assert resposne.json() == {
+    response = await client.get(url="/api/v1/project/news/all", params=payload)
+    assert response.status_code == 200
+    assert response.json() == {
         "items": [
             {
                 "id": project_news.id,
@@ -73,9 +73,9 @@ async def test_widget_news(client: AsyncClient, session: AsyncSession):
     project_news_1 = await insert_value(ProjectNews, session, None, **data)
     project_news_2 = await insert_value(ProjectNews, session, None, **data)
 
-    resposne = await client.get(url="/api/v1/project/news/widget", params={"limit": 5})
-    assert resposne.status_code == 200
-    assert resposne.json() == [
+    response = await client.get(url="/api/v1/project/news/widget", params={"limit": 5})
+    assert response.status_code == 200
+    assert response.json() == [
         {
             "id": project_news_2.id,
             "title": project_news_2.title,

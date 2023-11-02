@@ -14,8 +14,8 @@ async def test_empty_tags(client: AsyncClient):
     НЕ существует в базе данных
     """
     payload = {"status": "article"}
-    resposne = await client.get(url="/api/v1/tags/", params=payload)
-    assert resposne.status_code == 404
+    response = await client.get(url="/api/v1/tags", params=payload)
+    assert response.status_code == 404
 
 
 async def test_tags(client: AsyncClient, session: AsyncSession):
@@ -35,6 +35,6 @@ async def test_tags(client: AsyncClient, session: AsyncSession):
     sorted(list_tags, key=lambda x: x["id"])
 
     payload = {"status": "article", "limit": 2}
-    resposne = await client.get(url="/api/v1/tags/", params=payload)
-    assert resposne.status_code == 200
-    assert resposne.json() == list_tags[:2]
+    response = await client.get(url="/api/v1/tags", params=payload)
+    assert response.status_code == 200
+    assert response.json() == list_tags[:2]

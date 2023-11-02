@@ -56,8 +56,8 @@ async def test_empty_article(client: AsyncClient):
     """Тестирование получения конеркетной статьи, если той
     нет в базе данных
     """
-    payload = {"article_id": 10000000}
-    resposne = await client.get(url="/api/v1/article/", params=payload)
+    payload = {"article_id": 1}
+    resposne = await client.get(url="/api/v1/article", params=payload)
     assert resposne.status_code == 404
 
 
@@ -70,7 +70,7 @@ async def test_article(client: AsyncClient, session: AsyncSession):
     article = await insert_value(Article, session, None, **data)
 
     payload = {"article_id": article.id}
-    resposne = await client.get(url="/api/v1/article/", params=payload)
+    resposne = await client.get(url="/api/v1/article", params=payload)
     assert resposne.status_code == 200
     assert resposne.json() == {
         "id": article.id,
@@ -88,7 +88,7 @@ async def test_empty_search_article(client: AsyncClient):
     """Тестирование поиска по названию статьи, если той
     не существует в базе данных
     """
-    payload = {"q": "test"}
+    payload = {"q": "test", "tags": []}
     resposne = await client.post(url="/api/v1/article/search", json=payload)
     assert resposne.status_code == 200
     assert resposne.json() == []
@@ -98,7 +98,7 @@ async def test_invalid_search_article(client: AsyncClient):
     """Тестирование поиска по названию статьи, если не указан
     обязательный атрибут поиска по названию или тегу
     """
-    payload = {"limit": 20}
+    payload = {"limit": 20, "tags": []}
     resposne = await client.post(url="/api/v1/article/search", json=payload)
     assert resposne.status_code == 400
 
@@ -111,7 +111,7 @@ async def test_search_article(client: AsyncClient, session: AsyncSession):
     data = {"title": "test", "anons": "test", "text": "test", "reading_time": 1}
     article = await insert_value(Article, session, None, **data)
 
-    payload = {"q": article.title}
+    payload = {"q": article.title, "tags": []}
     resposne = await client.post(url="/api/v1/article/search", json=payload)
     assert resposne.status_code == 200
     assert resposne.json() == [

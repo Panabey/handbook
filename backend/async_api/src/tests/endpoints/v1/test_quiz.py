@@ -14,8 +14,8 @@ async def test_empty_quiz(client: AsyncClient):
     НЕ существует в базе данных
     """
     payload = {"quiz_id": 1}
-    resposne = await client.get(url="/api/v1/quiz/", params=payload)
-    assert resposne.status_code == 404
+    response = await client.get(url="/api/v1/quiz", params=payload)
+    assert response.status_code == 404
 
 
 async def test_quiz(client: AsyncClient, session: AsyncSession):
@@ -37,9 +37,9 @@ async def test_quiz(client: AsyncClient, session: AsyncSession):
     quiz = await insert_value(Quiz, session, None, **data)
 
     payload = {"quiz_id": quiz.id}
-    resposne = await client.get(url="/api/v1/quiz/", params=payload)
-    assert resposne.status_code == 200
-    assert resposne.json() == {
+    response = await client.get(url="/api/v1/quiz", params=payload)
+    assert response.status_code == 200
+    assert response.json() == {
         "id": quiz.id,
         "logo_url": quiz.logo_url,
         "title": quiz.title,
