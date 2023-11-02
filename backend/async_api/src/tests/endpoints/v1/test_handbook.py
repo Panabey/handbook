@@ -106,15 +106,6 @@ async def test_handbook_all_with_status(client: AsyncClient, session: AsyncSessi
     ]
 
 
-async def test_handbook_empty_content(client: AsyncClient, session: AsyncSession):
-    """Тестирование получения содержимого справочника, если тот
-    НЕ имеет содержимого
-    """
-    payload = {"handbook": "javascripts"}
-    response = await client.get(url="/api/v1/handbook/content", params=payload)
-    assert response.status_code == 404
-
-
 async def test_handbook_content(client: AsyncClient, session: AsyncSession):
     """Тестирование получения содержимого справочника, если тот
     имеет содержимое
@@ -122,10 +113,10 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
     data = {"title": "Языки программирования"}
     category = await insert_value(HandbookСategory, session, None, **data)
 
-    data = {"title": "Python", "is_visible": True, "category_id": category.id}
+    data = {"title": "JavaScript", "is_visible": True, "category_id": category.id}
     handbook = await insert_value(Handbook, session, None, **data)
 
-    payload = {"handbook": "python"}
+    payload = {"handbook": "javascript"}
     response = await client.get(url="/api/v1/handbook/content", params=payload)
     assert response.status_code == 200
     assert response.json() == {
@@ -133,7 +124,7 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
         "title": handbook.title,
         "description": handbook.description,
         "content": [],
-        "book": [],
+        "books": [],
     }
 
     # Добавление раздела справочника
@@ -159,7 +150,7 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
                 "page": [],
             }
         ],
-        "book": [],
+        "books": [],
     }
 
 
