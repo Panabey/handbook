@@ -1,5 +1,4 @@
 from pydantic import Field
-from pydantic import validator
 from pydantic import BaseModel
 from pydantic import AliasChoices
 from pydantic import field_validator
@@ -121,7 +120,7 @@ class QuizSearchDetail(BaseModel):
     limit: int = Field(20, ge=1, le=20)
     continue_after: int | None = Field(None, ge=1, le=1000)
 
-    @validator("tags")
+    @field_validator("tags")
     @classmethod
     def validate_tags(cls, tags: list[int]):
         if not tags:

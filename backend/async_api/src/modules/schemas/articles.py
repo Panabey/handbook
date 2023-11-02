@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from pydantic import Field
-from pydantic import validator
 from pydantic import BaseModel
 from pydantic import AliasChoices
 from pydantic import field_validator
@@ -63,7 +62,7 @@ class SearchDetail(BaseModel):
     tags: list[int] = Field(max_length=4)
     continue_after: int | None = Field(default=None, ge=1, le=1000)
 
-    @validator("tags")
+    @field_validator("tags")
     @classmethod
     def validate_tags(cls, tags: list[int]):
         if not tags:

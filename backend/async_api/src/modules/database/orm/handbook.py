@@ -33,10 +33,11 @@ async def get_all(session: AsyncSession):
 async def get_content(session: AsyncSession, handbook_title: str):
     smt = (
         select(HBook)
+        .join(HBook.book_info)
         .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
-            joinedload(HBook.book_info),
+            contains_eager(HBook.book_info),
             joinedload(HBook.content)
             .load_only(HBookContent.part, HBookContent.title, HBookContent.description)
             .joinedload(HBookContent.hbook_page)
