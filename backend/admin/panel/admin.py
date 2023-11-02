@@ -125,30 +125,21 @@ class QuizAdmin(MultiplyModelAdmin):
 
 class QuestionAdmin(MultiplyModelAdmin):
     inlines = [AnswerInline]
-    list_display = ("question_number", "quiz")
+    list_display = ("__str__", "quiz")
     search_fields = ("quiz__title",)
     ordering = ("-id",)
     autocomplete_fields = ("quiz",)
 
-    def question_number(self, obj: QuizQuestion) -> str:
-        return f"Вопрос #{obj.pk}"
-
-    question_number.short_description = "Вопрос"
-
 
 class AnswerAdmin(MultiplyModelAdmin):
-    list_display = ("text", "get_question", "get_quiz")
+    list_display = ("__str__", "question", "get_quiz")
     search_fields = ("question__quiz__title",)
     ordering = ("-id",)
 
     def get_quiz(self, obj: QuizAnswer):
         return obj.question.quiz.title
 
-    def get_question(self, obj: QuizAnswer):
-        return f"Вопрос #{obj.question.pk}"
-
     get_quiz.short_description = "Квиз"
-    get_question.short_description = "Вопрос"
 
 
 class ArticleTagInline(MultiModelTabularInline):

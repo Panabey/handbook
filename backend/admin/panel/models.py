@@ -442,7 +442,7 @@ class QuizQuestion(models.Model):
     hint = models.CharField("Подсказка", max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
-        return self.text
+        return f"Вопрос #{self.pk}"
 
     class Meta:
         managed = False
@@ -458,7 +458,7 @@ class QuizAnswer(models.Model):
     explanation = models.TextField("Объсянение", max_length=500, blank=True, null=True)
 
     def __str__(self) -> str:
-        return self.text
+        return f"Ответ #{self.pk}"
 
     class Meta:
         managed = False
