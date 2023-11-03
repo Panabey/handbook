@@ -4,32 +4,43 @@ services:
   mailserver:
     image: mailserver/docker-mailserver:latest
     container_name: mailserver
-    hostname: mail.example.com # change
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      # smtp
-      - "traefik.tcp.routers.smtp-ssl.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.smtp-ssl.tls=false"
-      - "traefik.tcp.routers.smtp-ssl.entrypoints=smtp-ssl"
-      - "traefik.tcp.routers.smtp-ssl.service=smtp-ssl"
-      - "traefik.tcp.services.smtp-ssl.loadbalancer.server.port=465"
-      - "traefik.tcp.services.smtp-ssl.loadbalancer.proxyProtocol.version=1"
-      # imap
-      - "traefik.tcp.routers.imap-ssl.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.imap-ssl.entrypoints=imap-ssl"
-      - "traefik.tcp.routers.imap-ssl.service=imap-ssl"
-      - "traefik.tcp.services.imap-ssl.loadbalancer.server.port=10993"
-      - "traefik.tcp.services.imap-ssl.loadbalancer.proxyProtocol.version=2"
-      # sieve
-      - "traefik.tcp.routers.sieve.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.sieve.entrypoints=sieve"
-      - "traefik.tcp.routers.sieve.service=sieve"
-      - "traefik.tcp.services.sieve.loadbalancer.server.port=4190"
+    ports:
+      - "25:25"
+      - "465:465"
+      - "993:993"
+    environment:
+      - OVERRIDE_HOSTNAME=mail.dropmecode.ru
+      - SSL_TYPE=letsencrypt
+      - SSL_DOMAIN=mail.dropmecode.ru
+      - ONE_DIR=1
+      - ENABLE_AMAVIS=1
+      - ENABLE_CLAMAV=0
+      - ENABLE_SPAMASSASSIN=1
+      - ENABLE_FAIL2BAN=1
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./dms/mail-data/:/var/mail/
       - ./dms/mail-state/:/var/mail-state/
+      - ./dms/config:/tmp/docker-mailserver/
+      - ../certificates/acme.json:/etc/letsencrypt/acme.json:ro
+    cap_add:
+      - NET_ADMIN
+
+  whoami:
+    container_name: whoami
+    image: traefik/whoami:latest
+    restart: unless-stopped
+    command:
+      - --port=8005
+      - --name=iamfoo
+    expose:
+      - 8005
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`mail.dropmecode.ru`) && Path(`/health`)" # change
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
     networks:
       - proxy_network
 

@@ -164,7 +164,6 @@ services:
 
 volumes:
   pg-data:
-  certificates:
   shared-media:
 
 networks:
