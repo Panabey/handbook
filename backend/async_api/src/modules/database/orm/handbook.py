@@ -31,7 +31,18 @@ async def get_all(session: AsyncSession):
 
 
 async def get_content(session: AsyncSession, handbook_title: str):
-    smt = (
+    smt_book = (
+        select(HBook)
+        .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
+        .options(
+            load_only(HBook.id),
+            joinedload(HBook.book_info),
+        )
+    )
+
+    result_book = await session.scalars(smt_book)
+
+    smt_content = (
         select(HBook)
         .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
         .options(
@@ -44,8 +55,8 @@ async def get_content(session: AsyncSession, handbook_title: str):
         )
     )
 
-    result = await session.scalars(smt)
-    return result.first()
+    result_content = await session.scalars(smt_content)
+    return result_content.first(), result_book.first()
 
 
 async def get_page_by_id(session: AsyncSession, page_id: int):

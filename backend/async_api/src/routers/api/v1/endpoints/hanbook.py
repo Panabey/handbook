@@ -71,10 +71,11 @@ async def get_content_handbook(
     """
     handbook = re.sub(r"[-\s]+", " ", handbook.strip())
 
-    result = await get_content(session, handbook)
+    result, book = await get_content(session, handbook)
     if not result:
         raise HTTPException(404, "По Вашему запросу ничего не найдено..")
 
+    result.book_info = book.book_info
     # Сортировка тем и подтем от меньшего к большему
     result.content.sort(key=lambda x: x.part)
 
