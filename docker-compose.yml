@@ -83,7 +83,7 @@ services:
       - proxy_network
 
   postgresql:
-    image: postgres:16.0
+    image: postgres:16.1
     container_name: postgresql_handbook
     restart: always
     expose:
@@ -115,7 +115,7 @@ services:
       - proxy_network
 
   media_server:
-    image: joseluisq/static-web-server:2.23
+    image: joseluisq/static-web-server:2.24
     container_name: media_server
     restart: unless-stopped
     expose:
