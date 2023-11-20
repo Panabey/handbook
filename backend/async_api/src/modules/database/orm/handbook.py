@@ -34,20 +34,16 @@ async def get_content(session: AsyncSession, handbook_title: str):
     smt_book = (
         select(HBook)
         .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
-        .options(
-            load_only(HBook.id),
-            joinedload(HBook.book_info),
-        )
+        .options(load_only(HBook.id, HBook.title).joinedload(HBook.book_info))
     )
 
     result_book = await session.scalars(smt_book)
 
     smt_content = (
         select(HBook)
-        .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
+        .where(HBook.title.ilike(handbook_title), HBook.is_visible)
         .options(
             load_only(HBook.id, HBook.title, HBook.description),
-            joinedload(HBook.book_info),
             joinedload(HBook.content)
             .load_only(HBookContent.part, HBookContent.title, HBookContent.description)
             .joinedload(HBookContent.hbook_page)
