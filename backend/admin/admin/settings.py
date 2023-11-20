@@ -202,3 +202,27 @@ MDEDITOR_CONFIGS = {
 # https://github.com/radwon/django-admin-logs
 
 DJANGO_ADMIN_LOGS_ENABLED = settings.ADMIN_LOGS_ENABLED
+
+# Application logging
+if not settings.DEBUG_MODE:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "verbose": {
+                "()": "django.utils.log.ServerFormatter",
+                "format": "{levelname} [{asctime}] - {message}",
+                "style": "{",
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "verbose",
+            },
+        },
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
+        },
+    }
