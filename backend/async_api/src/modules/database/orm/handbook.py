@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.orm import defer
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm import joinedload
@@ -33,8 +33,9 @@ async def get_all(session: AsyncSession):
 async def get_content(session: AsyncSession, handbook_slug: str):
     smt_book = (
         select(HBook)
-        .where(HBook.slug.ilike(handbook_slug), HBook.is_visible, Book.is_display)
-        .options(load_only(HBook.id, HBook.slug).joinedload(HBook.book_info))
+        .join(Book, and_(HBook.id == Book.handbook_id, Book.is_display), isouter=True)
+        .where(HBook.slug.ilike(handbook_slug), HBook.is_visible)
+        .options(load_only(HBook.id), contains_eager(HBook.book_info))
     )
 
     result_book = await session.scalars(smt_book)
