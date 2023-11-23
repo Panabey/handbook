@@ -29,7 +29,12 @@ async def test_hidden_handbook(client: AsyncClient, session: AsyncSession):
     data = {"title": "Языки программирования"}
     category = await insert_value(HandbookСategory, session, None, **data)
 
-    data = {"title": "Python", "is_visible": False, "category_id": category.id}
+    data = {
+        "slug": "python",
+        "title": "Python",
+        "is_visible": False,
+        "category_id": category.id,
+    }
     _ = await insert_value(Handbook, session, None, **data)
 
     response = await client.get(url="/api/v1/handbook/all")
@@ -44,7 +49,12 @@ async def test_handbook_all_without_status(client: AsyncClient, session: AsyncSe
     data = {"title": "Языки программирования"}
     category = await insert_value(HandbookСategory, session, None, **data)
 
-    data = {"title": "Python", "is_visible": True, "category_id": category.id}
+    data = {
+        "slug": "python",
+        "title": "Python",
+        "is_visible": True,
+        "category_id": category.id,
+    }
     handbook = await insert_value(Handbook, session, None, **data)
 
     response = await client.get(url="/api/v1/handbook/all")
@@ -54,6 +64,7 @@ async def test_handbook_all_without_status(client: AsyncClient, session: AsyncSe
             "handbook": [
                 {
                     "id": handbook.id,
+                    "slug": handbook.slug,
                     "title": handbook.title,
                     "logo_url": handbook.logo_url,
                     "status": None,
@@ -79,6 +90,7 @@ async def test_handbook_all_with_status(client: AsyncClient, session: AsyncSessi
 
     # Добавление справочника
     data = {
+        "slug": "html",
         "title": "HTML",
         "status_id": status.id,
         "is_visible": True,
@@ -93,6 +105,7 @@ async def test_handbook_all_with_status(client: AsyncClient, session: AsyncSessi
             "handbook": [
                 {
                     "id": handbook.id,
+                    "slug": handbook.slug,
                     "title": handbook.title,
                     "logo_url": handbook.logo_url,
                     "status": {
@@ -113,7 +126,12 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
     data = {"title": "Языки программирования"}
     category = await insert_value(HandbookСategory, session, None, **data)
 
-    data = {"title": "JavaScript", "is_visible": True, "category_id": category.id}
+    data = {
+        "slug": "javascript",
+        "title": "JavaScript",
+        "is_visible": True,
+        "category_id": category.id,
+    }
     handbook = await insert_value(Handbook, session, None, **data)
 
     payload = {"handbook": "javascript"}
@@ -121,6 +139,7 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
     assert response.status_code == 200
     assert response.json() == {
         "id": handbook.id,
+        "slug": handbook.slug,
         "title": handbook.title,
         "description": handbook.description,
         "content": [],
@@ -140,6 +159,7 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
     assert response.status_code == 200
     assert response.json() == {
         "id": handbook.id,
+        "slug": handbook.slug,
         "title": handbook.title,
         "description": handbook.description,
         "content": [
@@ -169,7 +189,12 @@ async def test_handbook_page(client: AsyncClient, session: AsyncSession):
     data = {"title": "Языки программирования"}
     category = await insert_value(HandbookСategory, session, None, **data)
 
-    data = {"title": "Python", "is_visible": True, "category_id": category.id}
+    data = {
+        "slug": "python",
+        "title": "Python",
+        "is_visible": True,
+        "category_id": category.id,
+    }
     handbook = await insert_value(Handbook, session, Handbook, **data)
 
     data = {
@@ -204,7 +229,11 @@ async def test_handbook_page(client: AsyncClient, session: AsyncSession):
         "update_date": pydantic_datetime(page.update_date),
         "content": {
             "part": content.part,
-            "handbook": {"id": handbook.id, "title": handbook.title},
+            "handbook": {
+                "id": handbook.id,
+                "slug": handbook.slug,
+                "title": handbook.title,
+            },
         },
     }
 
@@ -226,7 +255,12 @@ async def test_search_page(client: AsyncClient, session: AsyncSession):
     data = {"title": "Языки программирования"}
     category = await insert_value(HandbookСategory, session, None, **data)
 
-    data = {"title": "Python", "is_visible": True, "category_id": category.id}
+    data = {
+        "slug": "python",
+        "title": "Python",
+        "is_visible": True,
+        "category_id": category.id,
+    }
     handbook = await insert_value(Handbook, session, Handbook, **data)
 
     # Добавление раздела справочника
@@ -254,6 +288,7 @@ async def test_search_page(client: AsyncClient, session: AsyncSession):
         list_page.append(
             {
                 "id": handbook.id,
+                "slug": handbook.slug,
                 "title": handbook.title,
                 "page_id": page.id,
                 "page_title": page.title,
