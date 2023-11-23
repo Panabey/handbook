@@ -21,7 +21,7 @@ async def get_all(session: AsyncSession):
         .order_by(HBook.id, HBookCategory.id)
         .options(
             contains_eager(HBookCategory.hbook_category)
-            .load_only(HBook.id, HBook.title, HBook.logo_url)
+            .load_only(HBook.id, HBook.slug, HBook.title, HBook.logo_url)
             .contains_eager(HBook.status_info),
         )
     )
@@ -30,20 +30,20 @@ async def get_all(session: AsyncSession):
     return result.unique().all()
 
 
-async def get_content(session: AsyncSession, handbook_title: str):
+async def get_content(session: AsyncSession, handbook_slug: str):
     smt_book = (
         select(HBook)
-        .where(HBook.title.ilike(handbook_title), HBook.is_visible, Book.is_display)
-        .options(load_only(HBook.id, HBook.title).joinedload(HBook.book_info))
+        .where(HBook.slug.ilike(handbook_slug), HBook.is_visible, Book.is_display)
+        .options(load_only(HBook.id, HBook.slug).joinedload(HBook.book_info))
     )
 
     result_book = await session.scalars(smt_book)
 
     smt_content = (
         select(HBook)
-        .where(HBook.title.ilike(handbook_title), HBook.is_visible)
+        .where(HBook.slug.ilike(handbook_slug), HBook.is_visible)
         .options(
-            load_only(HBook.id, HBook.title, HBook.description),
+            load_only(HBook.id, HBook.slug, HBook.title, HBook.description),
             joinedload(HBook.content)
             .load_only(HBookContent.part, HBookContent.title, HBookContent.description)
             .joinedload(HBookContent.hbook_page)
@@ -66,7 +66,7 @@ async def get_page_by_id(session: AsyncSession, page_id: int):
             contains_eager(HBookPage.hbook_content)
             .load_only(HBookContent.id, HBookContent.part)
             .contains_eager(HBookContent.hbook)
-            .load_only(HBook.id, HBook.title),
+            .load_only(HBook.id, HBook.slug, HBook.title),
         )
     )
 
@@ -84,6 +84,7 @@ async def search_page(
     smt = (
         select(
             HBook.id,
+            HBook.slug,
             HBook.title,
             HBookPage.id.label("page_id"),
             HBookPage.title.label("page_title"),
