@@ -23,6 +23,7 @@ class Handbook(Base):
     __tablename__ = "handbook"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(80), unique=True)
     title: Mapped[str] = mapped_column(String(80), unique=True)
     description: Mapped[str] = mapped_column(String(300), nullable=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
