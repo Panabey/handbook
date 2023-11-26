@@ -18,6 +18,7 @@ class HBookPageDetail(BaseModel):
 
 class SearchPageDetail(BaseModel):
     id: int
+    slug: str
     title: str
     page_id: int
     page_title: str
@@ -40,6 +41,7 @@ class HandbookStatusDetail(BaseModel):
 
 class HandbookDetail(BaseModel):
     id: int
+    slug: str
     title: str
     logo_url: str | None
     status: HandbookStatusDetail | None = Field(
@@ -56,11 +58,13 @@ class CategoryDetail(BaseModel):
 
 class HandbookDetailUShort(BaseModel):
     id: int
+    slug: str
     title: str
 
 
 class HandbookDetailShort(BaseModel):
     id: int
+    slug: str
     title: str
     description: str | None
 
