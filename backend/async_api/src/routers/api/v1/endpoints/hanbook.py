@@ -1,4 +1,3 @@
-import re
 from typing import Annotated
 
 from fastapi import Query
@@ -69,8 +68,6 @@ async def get_content_handbook(
     Если данные уже присутствовали в кеше, то получаемый заголовок в ответе:
     `X-Cache-Status: HIT`, в противном случае `X-Cache-Status: MISS`.
     """
-    handbook = re.sub(r"[-\s]+", " ", handbook.strip())
-
     result, book = await get_content(session, handbook)
     if not result:
         raise HTTPException(404, "По Вашему запросу ничего не найдено..")
