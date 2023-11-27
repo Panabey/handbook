@@ -17,7 +17,7 @@ async def sitemap_data(session: AsyncSession):
             contains_eager(HandbookPage.hbook_content)
             .load_only(HandbookContent.id)
             .contains_eager(HandbookContent.hbook)
-            .load_only(Handbook.slug, Handbook.title),
+            .load_only(Handbook.slug),
         )
     )
     handbook_result = await session.scalars(handbooks)
