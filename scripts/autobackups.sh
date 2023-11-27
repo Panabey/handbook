@@ -4,9 +4,9 @@
 DB_CONTAINER_NAME="postgresql_handbook"
 DB_USER="handbook_user"
 DB_NAME="handbook"
-BACKUP_DIR="/path" # change
-PASSWORD="password" # change
-MAX_BACKUPS=2
+BACKUP_DIR="/root/backups"
+PASSWORD="!dropmecode" # change
+MAX_BACKUPS=3
 
 # Создание имени файла бэкапа с датой
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
