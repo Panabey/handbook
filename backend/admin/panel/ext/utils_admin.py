@@ -26,13 +26,10 @@ def replace_char(pattern: str, text: str) -> str:
 
 def find_image(markdown_text: str):
     """Функция поиска изображений в тексте markdown или html"""
-    combined_pattern = (
-        r'!\[.*\]\((\/general\/.*?)\)|<img.*?src=["\'](\/general\/.*?)["\']'
-    )
+    pattern = r"\/general\/[^\/]+\/[^\/]+\.\w+"
     # Поиск пути к изображениям в тексте
-    matches = re.findall(combined_pattern, markdown_text)
-    # Удаление пустых строк полученных при сравнении
-    return [match[0] if match[0] else match[1] for match in matches]
+    matches = re.findall(pattern, markdown_text)
+    return matches
 
 
 def remove_old_images(old_text: str, new_text: str):
@@ -40,7 +37,7 @@ def remove_old_images(old_text: str, new_text: str):
     lock = Lock()
     old_images = find_image(old_text)
     new_images = find_image(new_text)
-
+    print(old_images, new_images)
     # Поиск изображений, которые были удалены при изменении текста
     missing_images = [image for image in old_images if image not in new_images]
     for image in missing_images:
