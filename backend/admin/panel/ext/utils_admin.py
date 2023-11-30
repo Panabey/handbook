@@ -37,7 +37,7 @@ def remove_old_images(old_text: str, new_text: str):
     lock = Lock()
     old_images = find_image(old_text)
     new_images = find_image(new_text)
-    print(old_images, new_images)
+
     # Поиск изображений, которые были удалены при изменении текста
     missing_images = [image for image in old_images if image not in new_images]
     for image in missing_images:
