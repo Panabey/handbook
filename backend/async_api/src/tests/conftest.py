@@ -16,6 +16,8 @@ DATABASE_URL = "postgresql+asyncpg://postgres:postgres@192.168.1.3:5432/test_han
 
 @pytest.fixture(scope="session")
 def event_loop():
+    # Устарело в >=0.22.0!
+    # Отслеживать https://github.com/pytest-dev/pytest-asyncio/issues/706
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop
@@ -25,18 +27,18 @@ def event_loop():
 @pytest_asyncio.fixture(scope="session")
 async def test_db_setup_sessionmaker() -> None:
     assert settings.URL_DATABASE == DATABASE_URL
-    # всегда очищать и создавать тестовую БД между тестовыми сессиями
+    # Всегда очищать и создавать тестовую БД между сессиями
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
 
-@pytest_asyncio.fixture(autouse=True)
-async def session(test_db_setup_sessionmaker):
+@pytest_asyncio.fixture
+async def session():
     async with async_session() as session:
         yield session
 
-        # удалить все данные после теста
+        # Удалить все данные после теста
         for table in Base.metadata.tables.values():
             await session.execute(delete(table))
         await session.commit()

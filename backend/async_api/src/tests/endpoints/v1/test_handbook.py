@@ -143,6 +143,7 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
         "title": handbook.title,
         "description": handbook.description,
         "content": [],
+        "status": None,
         "books": [],
     }
 
@@ -170,6 +171,7 @@ async def test_handbook_content(client: AsyncClient, session: AsyncSession):
                 "page": [],
             }
         ],
+        "status": None,
         "books": [],
     }
 
