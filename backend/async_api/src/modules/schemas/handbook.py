@@ -77,6 +77,9 @@ class BookMaterial(BaseModel):
 
 class ContentDetail(HandbookDetailShort):
     content: list[HBookContentDetail]
+    status: HandbookStatusDetail | None = Field(
+        validation_alias=AliasChoices("status", "status_info")
+    )
     books: list[BookMaterial] | None = Field(
         validation_alias=AliasChoices("books", "book_info")
     )
