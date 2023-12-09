@@ -9,7 +9,7 @@ PASSWORD="!dropmecode" # change
 MAX_BACKUPS=3
 
 # Создание имени файла бэкапа с датой
-TIMESTAMP=$(date +%Y%m%d%H%M%S)
+TIMESTAMP=$(date +%Y_%m_%d_%H_%M_%S)
 BACKUP_TEMP_FILE="$BACKUP_DIR/tmp/$DB_NAME-$TIMESTAMP-dump.sql.gz"
 BACKUP_FILE="$BACKUP_DIR/$DB_NAME-$TIMESTAMP"
 
