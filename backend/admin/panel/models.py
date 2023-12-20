@@ -74,11 +74,13 @@ class HandBookStatus(models.Model):
         # Так как данные не отображаются нигде, кроме страницы справочников,
         # то обновление других страниц не имеет смысла
         invalidate_key("hb:all")
+        invalidate_pattern("hb:content:handbook=*")
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
         # Удаление кеша, если тот существует
         invalidate_key("hb:all")
+        invalidate_pattern("hb:content:handbook=*")
 
     class Meta:
         managed = False
