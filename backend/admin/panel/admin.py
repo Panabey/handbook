@@ -101,6 +101,10 @@ class QuizTagInline(MultiModelTabularInline):
     extra = 1
     max_num = 3
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        kwargs["queryset"] = Tag.objects.filter(status__title="quiz")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 class QuizTopicAdmin(MultiplyModelAdmin):
     search_fields = ("title",)
@@ -147,6 +151,10 @@ class ArticleTagInline(MultiModelTabularInline):
     formset = TagsForm
     extra = 1
     max_num = 3
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        kwargs["queryset"] = Tag.objects.filter(status__title="article")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class ArticleAdmin(MultiplyModelAdmin):

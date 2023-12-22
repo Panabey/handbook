@@ -39,7 +39,7 @@ class Tag(models.Model):
     status = models.ForeignKey("TagStatus", models.CASCADE, verbose_name="Статус")
 
     def __str__(self) -> str:
-        return f"{self.title} ({self.status})"
+        return self.title
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
