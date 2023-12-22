@@ -28,8 +28,11 @@ class AnswerForm(forms.BaseInlineFormSet):
 class TagsForm(forms.BaseInlineFormSet):
     def clean(self) -> None:
         """Функция валидации сохранения тегов, т.к нельзя создать одинаковые теги"""
-        queryset = self.get_queryset()
-        tags_id = [data.tag.id for data in queryset]
+        tags_id = [
+            form.cleaned_data.get("tag").id
+            for form in self.forms
+            if form.cleaned_data.get("tag")
+        ]
 
         # Подсчёт количества одинаковых тегов
         result = Counter(tags_id)
