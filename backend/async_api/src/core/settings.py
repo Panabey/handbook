@@ -28,5 +28,9 @@ class Settings(BaseSettings):
     DOCS_URL: str | None = "/docs"
     REDOC_URL: str | None = "/redoc"
 
+    # OAuth 2.0
+    YANDEX_CLIENT_ID: str = "a143efaadcea46f4bea36e5a3570d69c"
+    YANDEX_CLIENT_SECRET: str
+
 
 settings = Settings()
