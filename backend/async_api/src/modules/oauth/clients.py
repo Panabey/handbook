@@ -6,6 +6,7 @@ from core.settings import settings
 
 class AvailableService(StrEnum):
     YANDEX = "yandex"
+    GOOGLE = "google"
 
 
 yandex_oauth = AsyncOAuth2Client(
