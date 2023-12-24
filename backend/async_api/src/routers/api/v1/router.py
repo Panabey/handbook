@@ -10,7 +10,7 @@ from .endpoints.hanbook import router as handbook_router
 
 router = APIRouter(prefix="/v1")
 
-router.include_router(auth_router, prefix="/oauth", tags=["auth"])
+router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(tags_router, prefix="/tags", tags=["tags"])
 router.include_router(project_router, prefix="/project", tags=["project information"])
 router.include_router(posts_router, prefix="/article", tags=["article"])

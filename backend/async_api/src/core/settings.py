@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     # OAuth 2.0
     YANDEX_CLIENT_ID: str = "a143efaadcea46f4bea36e5a3570d69c"
     YANDEX_CLIENT_SECRET: str
+    GOOGLE_CLIENT_ID: str = "739310996196-uhifnqfivr58ura87ofp7tuipicsfso5.apps.googleusercontent.com"  # noqa E501
+    GOOGLE_CLIENT_SECRET: str
+    GITHUB_CLIENT_ID: str = "66a54b152bebfdf783f1"
+    GITHUB_CLIENT_SECRET: str
 
 
 settings = Settings()

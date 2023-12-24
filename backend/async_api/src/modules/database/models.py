@@ -8,6 +8,7 @@ from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import SmallInteger
+from sqlalchemy import BigInteger
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
@@ -290,3 +291,29 @@ class ProjectNews(Base):
     create_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
     )
+
+
+class User(Base):
+    __tablename__ = "user"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    avatar_url: Mapped[str] = mapped_column(String, nullable=True)
+    name: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str] = mapped_column(String(255))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    registration_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+    user_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    service_id: Mapped[int] = mapped_column(Integer, ForeignKey("oauth_service.id"))
+
+    service_info: Mapped["OAuthService"] = relationship(back_populates="user_service")
+
+
+class OAuthService(Base):
+    __tablename__ = "oauth_service"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    service_name: Mapped[str] = mapped_column(String(30))
+
+    user_service: Mapped[list["User"]] = relationship(back_populates="service_info")
