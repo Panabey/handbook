@@ -73,7 +73,7 @@ async def auth_via_yandex(
     session_token = await run_in_threadpool(
         serializer.dumps, {"user_id": user_id, "service": "yandex"}
     )
-    response.set_cookie("sid", session_token, 365 * 24 * 60 * 60)
+    response.set_cookie("s", session_token, 365 * 24 * 60 * 60, httponly=True)
     return {"detail": "Добро пожаловать!"}
 
 
@@ -117,7 +117,7 @@ async def auth_via_github(
     session_token = await run_in_threadpool(
         serializer.dumps, {"user_id": user_id, "service": "github"}
     )
-    response.set_cookie("sid", session_token, 365 * 24 * 60 * 60)
+    response.set_cookie("s", session_token, 365 * 24 * 60 * 60, httponly=True)
     return {"detail": "Добро пожаловать!"}
 
 
@@ -128,3 +128,13 @@ def login_service(response: Response, service: AvailableService):
     response = RedirectResponse(url)
     response.set_cookie("oauth_state", state, 3600, httponly=True)
     return response
+
+
+@router.get(
+    "/logout",
+    summary="Выход из аккаунта",
+    responses={200: {"model": DetailInfo}}
+)  # fmt: skip
+def logout_service(response: Response):
+    response.delete_cookie("s")
+    return {"detail": "Надеемся увидеть вас снова!"}
