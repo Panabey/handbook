@@ -9,7 +9,7 @@ from modules.database.models import User, OAuthService
 
 async def exists_user_info(session: AsyncSession, user_id: int, service_name: str):
     smt = (
-        select(User)
+        select(User.id)
         .join(OAuthService)
         .where(User.user_id == user_id, OAuthService.service_name == service_name)
     )

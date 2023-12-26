@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     )
     # general
     DEBUG_MODE: bool = False
+    SECRET_KEY: str
 
     # postgres database
     URL_DATABASE: str
