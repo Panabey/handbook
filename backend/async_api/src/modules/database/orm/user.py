@@ -30,8 +30,9 @@ async def create_user(session: AsyncSession, **kwargs: dict[str, Any]):
     return result.first()
 
 
-async def get_user_account(session: AsyncSession, user_id: int):
-    smt = select(User).where(User.id == user_id).options(joinedload(User.service_info))
-
+async def get_user_account(session: AsyncSession, user_id: int, short: bool = False):
+    smt = select(User).where(User.id == user_id)
+    if not short:
+        smt = smt.options(joinedload(User.service_info))
     result = await session.scalars(smt)
     return result.first()
