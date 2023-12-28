@@ -26,10 +26,15 @@ UserInfoCookie = Annotated[dict, Depends(get_session_cookie)]
     "/profile",
     response_model=MyProfileDetail,
     summary="Получение данных аккаунта пользователя",
-    responses={401: {"model": DetailInfo}},
+    responses={
+        401: {"model": DetailInfo},
+        404: {"model": DetailInfo},
+    },
 )
 async def my_profile(session: Session, user_info: UserInfoCookie):
     user = await get_user_account(session, user_info["user_id"])
+    if user is None:
+        raise HTTPException(404, "Пользователь не найден!")
     return user
 
 

@@ -140,20 +140,27 @@ class Article(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     logo_url: Mapped[str] = mapped_column(String, nullable=True)
-    title: Mapped[str] = mapped_column(String(120))
-    anons: Mapped[str] = mapped_column(String(400))
+    title: Mapped[str] = mapped_column(String(200))
+    anons: Mapped[str] = mapped_column(String(500))
     text: Mapped[str] = mapped_column(Text)
-    update_date: Mapped[datetime] = mapped_column(
+    publish_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
     )
     create_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=func.now()
     )
     reading_time: Mapped[int] = mapped_column(Integer)
+    has_moderation: Mapped[bool] = mapped_column(Boolean, default=False)
+    author_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("user.id", ondelete="SET NULL", onupdate="CASCADE"),
+        nullable=True,
+    )
 
     tags_article_info: Mapped[list["Tag"]] = relationship(
         secondary="article_tag", back_populates="articles_tag"
     )
+    author_info: Mapped["User"] = relationship(back_populates="articles")
 
 
 class ArticleTag(Base):
@@ -308,6 +315,11 @@ class User(Base):
     service_id: Mapped[int] = mapped_column(Integer, ForeignKey("oauth_service.id"))
 
     service_info: Mapped["OAuthService"] = relationship(back_populates="user_service")
+    articles: Mapped[list["Article"]] = relationship(
+        back_populates="author_info",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
 
 
 class OAuthService(Base):

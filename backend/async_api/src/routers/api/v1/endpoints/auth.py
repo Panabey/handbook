@@ -15,11 +15,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from routers.api.deps import get_async_session
 from routers.api.deps import set_session_cookie
 
+from modules.files.image import download_image_url
+
 from modules.oauth.clients import get_user_yandex
 from modules.oauth.clients import get_user_github
 from modules.oauth.clients import generate_oauth_url
 
 from modules.database.orm.user import create_user
+from modules.database.orm.user import update_user
 from modules.database.orm.user import exists_user_info
 
 from modules.schemas.base import DetailInfo
@@ -54,24 +57,34 @@ async def auth_via_yandex(
     response.delete_cookie("oauth_state")
     # Получение данных от OAuth 2.0
     user_data = await get_user_yandex(code, state)
+    user_id_service = int(user_data["id"])
 
+    # Получение изображения пользователя
+    avatar_id = user_data["default_avatar_id"]
+    avatar_url = f"https://avatars.yandex.net/get-yapic/{avatar_id}/islands-200"
+
+    avatar_path, is_modif = await run_in_threadpool(
+        download_image_url, avatar_url, f"a_{hex(user_id_service)[2:]}_{1}"
+    )
     # Проверка на сущестование пользователя в БД
-    user_id = await exists_user_info(session, int(user_data["id"]), "yandex")
-    if user_id is None:
+    user = await exists_user_info(session, user_id_service, "yandex")
+    if user is None:
         # Создание пользователя
-        avatar_id = user_data["default_avatar_id"]
         payload = {
             "name": user_data["real_name"],
             "email": user_data["default_email"],
-            "user_id": int(user_data["id"]),
-            "avatar_url": f"https://avatars.yandex.net/get-yapic/{avatar_id}/islands-retina-50",
+            "user_id": user_id_service,
+            "avatar_url": avatar_path,
             "service_id": 1,
         }
-        user_id = await create_user(session, **payload)
+        user = await create_user(session, **payload)
+
+    if is_modif:
+        await update_user(session, user.id, **{"avatar_url": avatar_path})
 
     # Создание сессии
     session_token = await run_in_threadpool(
-        serializer.dumps, {"user_id": user_id, "service": "yandex"}
+        serializer.dumps, {"user_id": user.id, "service": "yandex"}
     )
     response.set_cookie("s", session_token, 365 * 24 * 60 * 60, httponly=True)
     return {"detail": "Добро пожаловать!"}
@@ -99,23 +112,33 @@ async def auth_via_github(
     response.delete_cookie("oauth_state")
     # Получение данных от OAuth 2.0
     user_data = await get_user_github(code)
+    user_id_service = int(user_data["id"])
+
+    # Получение изображения пользователя
+    avatar_url = user_data["avatar_url"]
+    avatar_path, is_modif = await run_in_threadpool(
+        download_image_url, avatar_url, f"a_{hex(user_id_service)[2:]}_{2}"
+    )
 
     # Проверка на сущестование пользователя в БД
-    user_id = await exists_user_info(session, user_data["id"], "github")
-    if user_id is None:
+    user = await exists_user_info(session, user_id_service, "github")
+    if user is None:
         # Создание пользователя
         payload = {
             "name": user_data["name"],
             "email": user_data["email"],
-            "user_id": user_data["id"],
-            "avatar_url": user_data["avatar_url"],
+            "user_id": user_id_service,
+            "avatar_url": avatar_path,
             "service_id": 2,
         }
-        user_id = await create_user(session, **payload)
+        user = await create_user(session, **payload)
+
+    if is_modif:
+        await update_user(session, user.id, **{"avatar_url": avatar_path})
 
     # Создание сессии
     session_token = await run_in_threadpool(
-        serializer.dumps, {"user_id": user_id, "service": "github"}
+        serializer.dumps, {"user_id": user.id, "service": "github"}
     )
     response.set_cookie("s", session_token, 365 * 24 * 60 * 60, httponly=True)
     return {"detail": "Добро пожаловать!"}

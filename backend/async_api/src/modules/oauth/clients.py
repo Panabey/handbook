@@ -89,7 +89,7 @@ async def get_user_github(code: str) -> dict:
         emails = orjson.loads(response_email.content)
 
         for email_info in emails:
-            if email_info["primary"]:
+            if email_info.get("primary", False):
                 # Заменить email в информации о пользователе
                 user_data["email"] = email_info["email"]
                 break
