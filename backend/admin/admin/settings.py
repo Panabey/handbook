@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from pathlib import Path
 from core.settings import settings
 
@@ -232,4 +234,13 @@ if not settings.DEBUG_MODE:
 sentry_sdk.init(
     dsn="https://cc65db7ad7f18efec5433404066b3677@o1392536.ingest.sentry.io/4506446220623872",
     debug=settings.DEBUG_MODE,
+    integrations=[
+        DjangoIntegration(
+            transaction_style="url",
+            middleware_spans=False,
+            signals_spans=False,
+            cache_spans=False,
+        ),
+    ],
+    enable_tracing=False,
 )
