@@ -66,7 +66,13 @@ async def test_article(client: AsyncClient, session: AsyncSession):
     есть в базе данных
     """
     # Добавление статьи
-    data = {"title": "test", "anons": "test", "text": "test", "reading_time": 1}
+    data = {
+        "title": "test",
+        "anons": "test",
+        "text": "test",
+        "reading_time": 1,
+        "logo_url": "/media/1.png",
+    }
     article = await insert_value(Article, session, None, **data)
 
     payload = {"article_id": article.id}
@@ -74,6 +80,7 @@ async def test_article(client: AsyncClient, session: AsyncSession):
     assert resposne.status_code == 200
     assert resposne.json() == {
         "id": article.id,
+        "logo_url": article.logo_url,
         "title": article.title,
         "anons": article.anons,
         "text": article.text,
