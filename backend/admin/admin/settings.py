@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import sentry_sdk
 from pathlib import Path
 from core.settings import settings
 
@@ -226,3 +227,9 @@ if not settings.DEBUG_MODE:
             "level": "WARNING",
         },
     }
+
+# Sentry only error monitoring
+sentry_sdk.init(
+    dsn="https://cc65db7ad7f18efec5433404066b3677@o1392536.ingest.sentry.io/4506446220623872",
+    debug=settings.DEBUG_MODE,
+)
