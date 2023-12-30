@@ -1,8 +1,8 @@
 # framework
-fastapi>=0.105.0,<0.106.0
+fastapi>=0.108.0,<0.109.0
 
 # database
-sqlalchemy==2.0.23
+sqlalchemy==2.0.24
 asyncpg>=0.29.0,<0.30.0
 alembic>=1.13.0,<1.14.0
 
