@@ -47,7 +47,6 @@ async def get_article(session: AsyncSession, post_id: int):
         .join(Article.tags_article_info, isouter=True)
         .where(Article.id == post_id)
         .options(
-            defer(Article.logo_url),
             contains_eager(Article.tags_article_info).defer(Tag.status_id),
         )
     )

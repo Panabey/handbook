@@ -15,6 +15,7 @@ from .tags import TagsDetail
 
 class ArticleDetail(BaseModel):
     id: int
+    logo_url: str
     title: str
     anons: str
     text: str
