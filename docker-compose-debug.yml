@@ -112,7 +112,7 @@ services:
         - proxy_network
 
   traefik:
-    image: traefik:2.10
+    image: traefik:2.11
     container_name: traefik_debug
     restart: always
     command:
@@ -129,6 +129,7 @@ services:
 volumes:
   pg-data:
   shared-media:
+
 
 networks:
   proxy_network:
