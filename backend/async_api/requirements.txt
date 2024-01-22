@@ -16,4 +16,4 @@ uvloop>=0.18.0; sys_platform != "win32"
 pydantic-settings>=2.1.0,<2.2.0
 
 # asgi server
-granian>=0.7.0,<0.8.0
+granian>=1.0.0,<1.1.0

@@ -28,4 +28,4 @@ django-colorfield>=0.11.0,<0.12.0
 whitenoise>=6.6.0,<6.7.0
 
 # wsgi server
-granian>=0.7.0,<0.8.0
+granian>=1.0.0,<1.1.0
