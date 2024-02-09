@@ -3,7 +3,7 @@ import os
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
-# Базовый путь к файлу конфигурации
+# Базовый путь к файлу переменных окружения
 BASE_URL = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -13,20 +13,20 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         env_file=(os.path.join(BASE_URL, ".env"), ".env"),
     )
-    # general
+    # Рсновная конфигурация
     DEBUG_MODE: bool = False
 
-    # postgres database
+    # PostgreSQL database
     URL_DATABASE: str
 
-    # redis
+    # Redis
     REDIS_HOST: str
     REDIS_PORT: int = 6379
 
-    # docs
+    # Docs
     OPEN_API_URL: str | None = "/openapi.json"
     DOCS_URL: str | None = "/docs"
     REDOC_URL: str | None = "/redoc"
 
 
-settings = Settings()
+settings = Settings()  # type: ignore
