@@ -1,15 +1,15 @@
 # Official web site https://docs.astral.sh/ruff/rules/
 # github actions https://github.com/astral-sh/ruff/blob/main/docs/configuration.md
-target-version = "py311"
+target-version = "py312"
 
+exclude = ["**/tests/"]
+
+[lint]
 select = [
-    "E",    # pycodestyle
-    "F",    # Pyflakes
-    "B",    # flake8-bugbear
-    "N",    # pep8-naming
-    "W",    # pycodestyle
-    "C4",   # flake8-comprehensions
-    "PT",   # flake8-pytest-style
-    "UP",   # pyupgrade
-    "PERF", # Perflint
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "B",  # flake8-bugbear
+    "N",  # pep8-naming
+    "W",  # pycodestyle
+    "UP", # pyupgrade
 ]
