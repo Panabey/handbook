@@ -7,6 +7,6 @@
 
 import os
 
-os.environ[
-    "URL_DATABASE"
-] = "postgresql+asyncpg://postgres:postgres@192.168.1.3:5432/test_handbook"
+os.environ["URL_DATABASE"] = (
+    "postgresql+asyncpg://postgres:postgres@192.168.1.3:5432/test_handbook"
+)

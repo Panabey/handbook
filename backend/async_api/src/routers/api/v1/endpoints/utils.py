@@ -29,7 +29,7 @@ async def get_healthcheck():
     summary="Получение данных для генерации sitemap"
 )  # fmt: skip
 async def get_data_sitemap(
-    session: Annotated[AsyncSession, Depends(get_async_session)]
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     result = await sitemap_data(session)
     return result
