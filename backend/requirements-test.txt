@@ -1,7 +1,6 @@
-# linter
+# linter and statick check
 ruff>=0.1.0
 mypy>=1.4.1
-black>=23.7.0
 
 # test
 pytest>=7.4.0
