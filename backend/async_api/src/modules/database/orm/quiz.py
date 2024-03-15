@@ -57,7 +57,7 @@ async def get_topics(
 
 
 async def get_by_topic(
-    session: AsyncSession, topic_id: int, limit: int, continue_after: int | None
+    session: AsyncSession, topic_id: int | None, limit: int, continue_after: int | None
 ):
     if topic_id:
         smt = (
@@ -119,7 +119,7 @@ async def search_quiz(
     query: str | None,
     tags_id: list[int],
     limit: int,
-    continue_after: int,
+    continue_after: int | None,
 ):
     subquery = (
         select(Quiz.id)
