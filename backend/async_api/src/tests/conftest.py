@@ -18,8 +18,7 @@ DATABASE_URL = "postgresql+asyncpg://postgres:postgres@192.168.1.3:5432/test_han
 def event_loop():
     # Устарело в >=0.22.0!
     # Отслеживать https://github.com/pytest-dev/pytest-asyncio/issues/706
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
