@@ -1,4 +1,6 @@
-from django.db.models.base import ModelBase
+from typing import Final
+
+from django.db import models
 from core.settings import settings
 
 
@@ -10,16 +12,16 @@ class BaseRouter:
     Также используется для использования функций: unique и т.д.
     """
 
-    route_app_label = "panel"
-    default_database = "default"
+    route_app_label: Final[str] = "panel"
+    default_database: Final[str] = "default"
     external_database = settings.DB_BACKEND_NAME
 
-    def db_for_read(self, model: ModelBase, **hints):
+    def db_for_read(self, model: models.Model, **hints):
         if model._meta.app_label == self.route_app_label:
             return self.external_database
         return self.default_database
 
-    def db_for_write(self, model: ModelBase, **hints):
+    def db_for_write(self, model: models.Model, **hints):
         if model._meta.app_label == self.route_app_label:
             return self.external_database
         return self.default_database
