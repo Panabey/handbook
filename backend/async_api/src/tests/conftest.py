@@ -3,6 +3,7 @@ import pytest
 import pytest_asyncio
 
 from httpx import AsyncClient
+from httpx import ASGITransport
 from sqlalchemy import delete
 
 from modules.database.models import Base
@@ -45,5 +46,6 @@ async def session():
 
 @pytest_asyncio.fixture(scope="session")
 async def client():
-    async with AsyncClient(app=app, base_url="http://127.0.0.1:8000/") as client:
+    transport = ASGITransport(app=app)  # type: ignore
+    async with AsyncClient(transport=transport, base_url="http://127.0.0.1:8000/") as client:
         yield client
